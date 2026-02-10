@@ -47,7 +47,8 @@ class SurveysController < ApplicationController
     survey.update!(status: :active, sent_at: Time.current)
     TeamsNotifier.notify(
       title: "アカウントサーベイのお願い",
-      body: "「#{survey.title}」への回答をお願いします。\n期限: #{survey.deadline&.strftime('%Y/%m/%d')}"
+      body: "「#{survey.title}」への回答をお願いします。\n期限: #{survey.deadline&.strftime('%Y/%m/%d')}",
+      webhook_url: TeamsNotifier::SURVEY_WEBHOOK_URL
     )
     redirect_to survey_path(survey), notice: "サーベイを配信しました"
   end
@@ -63,7 +64,8 @@ class SurveysController < ApplicationController
     pending_count = survey.survey_responses.pending.select(:user_id).distinct.count
     TeamsNotifier.notify(
       title: "【リマインド】アカウントサーベイ未回答",
-      body: "「#{survey.title}」に#{pending_count}名が未回答です。\n期限: #{survey.deadline&.strftime('%Y/%m/%d')}"
+      body: "「#{survey.title}」に#{pending_count}名が未回答です。\n期限: #{survey.deadline&.strftime('%Y/%m/%d')}",
+      webhook_url: TeamsNotifier::SURVEY_WEBHOOK_URL
     )
     redirect_to survey_path(survey), notice: "リマインドを送信しました（未回答: #{pending_count}名）"
   end

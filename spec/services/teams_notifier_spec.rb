@@ -14,5 +14,21 @@ RSpec.describe TeamsNotifier do
       TeamsNotifier.notify(title: "テスト通知", body: "テスト本文")
       expect(WebMock).to have_requested(:post, "https://example.com/webhook")
     end
+
+    it "webhook_url引数で送信先を上書きできる" do
+      stub_const("TeamsNotifier::WEBHOOK_URL", "https://example.com/default")
+      custom_url = "https://example.com/survey-channel"
+      stub_request(:post, custom_url).to_return(status: 200)
+      TeamsNotifier.notify(title: "サーベイ通知", body: "本文", webhook_url: custom_url)
+      expect(WebMock).to have_requested(:post, custom_url)
+      expect(WebMock).not_to have_requested(:post, "https://example.com/default")
+    end
+
+    it "webhook_url引数がnilの場合はデフォルトURLを使う" do
+      stub_const("TeamsNotifier::WEBHOOK_URL", "https://example.com/default")
+      stub_request(:post, "https://example.com/default").to_return(status: 200)
+      TeamsNotifier.notify(title: "通知", body: "本文", webhook_url: nil)
+      expect(WebMock).to have_requested(:post, "https://example.com/default")
+    end
   end
 end

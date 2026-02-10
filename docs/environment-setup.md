@@ -23,7 +23,8 @@
 | `ENTRA_CLIENT_SECRET` | Entra ID アプリのクライアントシークレット | `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
 | `ENTRA_TENANT_ID` | Entra ID のテナントID | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` |
 | `APP_URL` | アプリの公開URL | `https://saas-mgmt.example.com` |
-| `TEAMS_WEBHOOK_URL` | Teams チャネルの Incoming Webhook URL | `https://xxxxx.webhook.office.com/...` |
+| `TEAMS_WEBHOOK_URL` | Teams チャネルの Incoming Webhook URL（一般通知） | `https://xxxxx.webhook.office.com/...` |
+| `TEAMS_WEBHOOK_SURVEY_URL` | サーベイ専用チャネルの Webhook URL（未設定時は `TEAMS_WEBHOOK_URL` にフォールバック） | `https://xxxxx.webhook.office.com/...` |
 
 ### オプション（インフラ）
 

@@ -1,8 +1,10 @@
 class TeamsNotifier
   WEBHOOK_URL = ENV["TEAMS_WEBHOOK_URL"]
+  SURVEY_WEBHOOK_URL = ENV["TEAMS_WEBHOOK_SURVEY_URL"]
 
-  def self.notify(title:, body:, level: :info)
-    return unless WEBHOOK_URL.present?
+  def self.notify(title:, body:, level: :info, webhook_url: nil)
+    url = webhook_url.presence || WEBHOOK_URL
+    return unless url.present?
 
     payload = {
       type: "message",
@@ -19,6 +21,6 @@ class TeamsNotifier
         }
       } ]
     }
-    Faraday.post(WEBHOOK_URL, payload.to_json, "Content-Type" => "application/json")
+    Faraday.post(url, payload.to_json, "Content-Type" => "application/json")
   end
 end
