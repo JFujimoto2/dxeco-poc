@@ -65,7 +65,71 @@ WSL環境ではポート5433で起動する場合があります。`config/datab
 ### テスト実行
 
 ```bash
+# ユニットテスト / リクエストスペック（約3秒）
 bundle exec rspec
+
+# E2Eテスト（約1.5分、Railsサーバー自動起動）
+npx playwright test
+
+# E2Eテスト UIモード（デバッグ用）
+npx playwright test --ui
+```
+
+## 開発運用フロー
+
+### 日常の開発サイクル
+
+```
+コード変更 → RSpec → コミット
+```
+
+```bash
+# 1. コード変更後（毎回）
+bundle exec rspec
+
+# 2. Lint + セキュリティチェック
+bin/rubocop
+
+# 3. 問題なければコミット
+```
+
+### 画面・ルーティング変更時
+
+```
+コード変更 → RSpec → E2E → コミット
+```
+
+```bash
+# 1. ユニットテスト
+bundle exec rspec
+
+# 2. 全画面のブラウザテスト
+npx playwright test
+
+# 3. 問題なければコミット
+```
+
+### テスト使い分け
+
+| テスト | 実行タイミング | 所要時間 |
+|--------|---------------|---------|
+| `bundle exec rspec` | コード変更のたび（常時） | 約3秒 |
+| `bin/rubocop` | コミット前 | 約5秒 |
+| `npx playwright test` | 画面変更時・リリース前 | 約1.5分 |
+
+### CI（GitHub Actions）
+
+プッシュ時に自動実行:
+- Rubocop（lint）
+- Brakeman（セキュリティ）
+- RSpec（ユニット/リクエスト）
+
+### E2Eテスト初回セットアップ
+
+```bash
+npm install
+npx playwright install chromium
+RAILS_ENV=test bin/rails assets:precompile
 ```
 
 ### 初期データ
