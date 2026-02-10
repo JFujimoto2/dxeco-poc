@@ -77,37 +77,7 @@ npx playwright test --ui
 
 ## 開発運用フロー
 
-### 日常の開発サイクル
-
-```
-コード変更 → RSpec → コミット
-```
-
-```bash
-# 1. コード変更後（毎回）
-bundle exec rspec
-
-# 2. Lint + セキュリティチェック
-bin/rubocop
-
-# 3. 問題なければコミット
-```
-
-### 画面・ルーティング変更時
-
-```
-コード変更 → RSpec → E2E → コミット
-```
-
-```bash
-# 1. ユニットテスト
-bundle exec rspec
-
-# 2. 全画面のブラウザテスト
-npx playwright test
-
-# 3. 問題なければコミット
-```
+詳細は **[運用手順書](docs/operations.md)** を参照。
 
 ### テスト使い分け
 
@@ -119,10 +89,15 @@ npx playwright test
 
 ### CI（GitHub Actions）
 
-プッシュ時に自動実行:
-- Rubocop（lint）
-- Brakeman（セキュリティ）
-- RSpec（ユニット/リクエスト）
+push / PR 時に自動実行（全パスしないと main にマージ不可）:
+
+| ジョブ | 内容 | 所要時間 |
+|--------|------|---------|
+| lint | Rubocop | ~18s |
+| scan_ruby | Brakeman + bundler-audit | ~14s |
+| scan_js | importmap audit | ~14s |
+| test | RSpec (151テスト) | ~37s |
+| e2e | Playwright (54テスト) | ~2m30s |
 
 ### E2Eテスト初回セットアップ
 
@@ -140,6 +115,13 @@ RAILS_ENV=test bin/rails assets:precompile
 - SaaS 12件（一般 7件 + 不動産管理 5件）
 - アカウント 約20件
 
+## ドキュメント
+
+- **[ユーザー運用ガイド](docs/user-guide.md)** - 管理者・マネージャー・一般ユーザー向けの操作手順
+- **[開発運用手順書](docs/operations.md)** - 開発フロー、ブランチ運用、CI、テスト戦略、DB操作
+- **[環境変数・外部サービス接続ガイド](docs/environment-setup.md)** - Entra ID SSO、Teams通知、DB設定
+- **[機能一覧](docs/features/)** - 各画面・機能の詳細ドキュメント
+
 ## ディレクトリ構成
 
 ```
@@ -152,8 +134,11 @@ app/
 └── services/        # 外部API連携
 
 docs/
-├── plans/           # 機能別の実装計画書
+├── features/        # 機能別ドキュメント（01_dashboard.md 〜 11_csv_import.md）
+├── plans/           # 実装計画書
+├── operations.md    # 運用手順書
 └── *.md             # 調査レポート・設計書
 
+e2e/                 # Playwright E2Eテスト
 spec/                # RSpecテスト
 ```
