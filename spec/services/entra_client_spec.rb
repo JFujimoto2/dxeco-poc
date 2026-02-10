@@ -28,12 +28,12 @@ RSpec.describe EntraClient do
     it "ページネーションに対応する" do
       stub_request(:get, "https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName,jobTitle,department,employeeId,accountEnabled&$top=999")
         .to_return(status: 200, body: {
-          value: [{ "id" => "user-1" }],
+          value: [ { "id" => "user-1" } ],
           "@odata.nextLink" => "https://graph.microsoft.com/v1.0/users?$skiptoken=abc"
         }.to_json)
       stub_request(:get, "https://graph.microsoft.com/v1.0/users?$skiptoken=abc")
         .to_return(status: 200, body: {
-          value: [{ "id" => "user-2" }]
+          value: [ { "id" => "user-2" } ]
         }.to_json)
 
       users = EntraClient.fetch_all_users("test-token")

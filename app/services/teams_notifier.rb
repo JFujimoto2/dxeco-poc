@@ -6,7 +6,7 @@ class TeamsNotifier
 
     payload = {
       type: "message",
-      attachments: [{
+      attachments: [ {
         contentType: "application/vnd.microsoft.card.adaptive",
         content: {
           "$schema" => "http://adaptivecards.io/schemas/adaptive-card.json",
@@ -17,7 +17,7 @@ class TeamsNotifier
             { type: "TextBlock", text: body, wrap: true }
           ]
         }
-      }]
+      } ]
     }
     Faraday.post(WEBHOOK_URL, payload.to_json, "Content-Type" => "application/json")
   end

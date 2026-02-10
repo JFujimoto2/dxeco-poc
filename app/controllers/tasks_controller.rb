@@ -1,5 +1,5 @@
 class TasksController < ApplicationController
-  before_action :require_admin, only: [:new, :create]
+  before_action :require_admin, only: [ :new, :create ]
 
   def index
     @tasks = Task.includes(:target_user, :created_by)
@@ -77,7 +77,7 @@ class TasksController < ApplicationController
   def task_params
     params.require(:task).permit(
       :title, :task_type, :target_user_id, :due_date,
-      task_items_attributes: [:action_type, :description, :saas_id, :assignee_id]
+      task_items_attributes: [ :action_type, :description, :saas_id, :assignee_id ]
     )
   end
 end

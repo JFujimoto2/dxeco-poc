@@ -26,18 +26,10 @@
           <dd class="col-sm-9"><span class="badge bg-success"><%= @saas.status %></span></dd>
 
           <dt class="col-sm-3">URL</dt>
-          <dd class="col-sm-9">
-            <% if @saas.url.present? %>
-              <%= link_to @saas.url, @saas.url, target: "_blank", rel: "noopener" %>
-            <% else %>-<% end %>
-          </dd>
+          <dd class="col-sm-9"><%= safe_url_link(@saas.url) %></dd>
 
           <dt class="col-sm-3">管理画面URL</dt>
-          <dd class="col-sm-9">
-            <% if @saas.admin_url.present? %>
-              <%= link_to @saas.admin_url, @saas.admin_url, target: "_blank", rel: "noopener" %>
-            <% else %>-<% end %>
-          </dd>
+          <dd class="col-sm-9"><%= safe_url_link(@saas.admin_url) %></dd>
 
           <dt class="col-sm-3">契約担当者</dt>
           <dd class="col-sm-9"><%= @saas.owner&.display_name || "-" %></dd>

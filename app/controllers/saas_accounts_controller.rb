@@ -1,5 +1,5 @@
 class SaasAccountsController < ApplicationController
-  before_action :set_saas_account, only: [:edit, :update, :destroy]
+  before_action :set_saas_account, only: [ :edit, :update, :destroy ]
 
   def index
     @saas_accounts = SaasAccount.includes(:saas, :user)
@@ -46,6 +46,8 @@ class SaasAccountsController < ApplicationController
   end
 
   def saas_account_params
-    params.require(:saas_account).permit(:saas_id, :user_id, :account_email, :role, :status, :last_login_at, :notes)
+    permitted = params.require(:saas_account).permit(:saas_id, :user_id, :account_email, :status, :last_login_at, :notes)
+    permitted[:role] = params[:saas_account][:role] if current_user&.admin? && params[:saas_account][:role].present?
+    permitted
   end
 end

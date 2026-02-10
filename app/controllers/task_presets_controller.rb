@@ -42,7 +42,7 @@ class TaskPresetsController < ApplicationController
   def preset_params
     params.require(:task_preset).permit(
       :name, :task_type, :description,
-      task_preset_items_attributes: [:id, :action_type, :description, :default_assignee_id, :position, :_destroy]
+      task_preset_items_attributes: [ :id, :action_type, :description, :default_assignee_id, :position, :_destroy ]
     )
   end
 end

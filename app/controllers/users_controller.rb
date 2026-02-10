@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update]
-  before_action :require_admin, only: [:edit, :update]
+  before_action :set_user, only: [ :show, :edit, :update ]
+  before_action :require_admin, only: [ :edit, :update ]
 
   def index
     @users = User.search_by_name(params[:q])
@@ -32,6 +32,8 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:display_name, :department, :job_title, :role)
+    permitted = params.require(:user).permit(:display_name, :department, :job_title)
+    permitted[:role] = params[:user][:role] if current_user&.admin? && params[:user][:role].present?
+    permitted
   end
 end

@@ -11,7 +11,7 @@ class CreateSurveyResponses < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :survey_responses, [:survey_id, :user_id, :saas_account_id],
+    add_index :survey_responses, [ :survey_id, :user_id, :saas_account_id ],
               unique: true, name: "idx_survey_responses_unique"
   end
 end

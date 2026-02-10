@@ -1,5 +1,5 @@
 class SurveysController < ApplicationController
-  before_action :require_admin, only: [:new, :create, :activate, :close, :remind]
+  before_action :require_admin, only: [ :new, :create, :activate, :close, :remind ]
 
   def index
     @surveys = if current_user.admin?
@@ -12,7 +12,7 @@ class SurveysController < ApplicationController
   def new
     @survey = Survey.new
     @saases = Saas.where(status: "active").order(:name)
-    @departments = User.where.not(department: [nil, ""]).distinct.pluck(:department).sort
+    @departments = User.where.not(department: [ nil, "" ]).distinct.pluck(:department).sort
   end
 
   def create
@@ -23,7 +23,7 @@ class SurveysController < ApplicationController
       redirect_to survey_path(@survey), notice: "サーベイを作成しました"
     else
       @saases = Saas.where(status: "active").order(:name)
-      @departments = User.where.not(department: [nil, ""]).distinct.pluck(:department).sort
+      @departments = User.where.not(department: [ nil, "" ]).distinct.pluck(:department).sort
       render :new, status: :unprocessable_entity
     end
   end

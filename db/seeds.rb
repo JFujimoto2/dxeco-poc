@@ -6,7 +6,7 @@ users_data = [
   { display_name: "鈴木 花子", email: "suzuki@example.com", department: "情報システム部", job_title: "主任", role: "manager" },
   { display_name: "田中 一郎", email: "tanaka@example.com", department: "営業本部", job_title: "課長", role: "viewer" },
   { display_name: "佐藤 美咲", email: "sato@example.com", department: "営業本部", job_title: "主任", role: "viewer" },
-  { display_name: "山田 健太", email: "yamada@example.com", department: "管理部", job_title: "係長", role: "viewer" },
+  { display_name: "山田 健太", email: "yamada@example.com", department: "管理部", job_title: "係長", role: "viewer" }
 ]
 
 users = users_data.map do |data|
@@ -28,7 +28,7 @@ general_saases = [
   { name: "Salesforce", url: "https://www.salesforce.com", description: "CRM・営業管理" },
   { name: "Zoom", url: "https://zoom.us", description: "ビデオ会議" },
   { name: "Box", url: "https://www.box.com", description: "クラウドストレージ" },
-  { name: "Notion", url: "https://www.notion.so", description: "ナレッジベース・プロジェクト管理" },
+  { name: "Notion", url: "https://www.notion.so", description: "ナレッジベース・プロジェクト管理" }
 ]
 
 general_saases.each do |data|
@@ -48,7 +48,7 @@ realestate_saases = [
   { name: "賃貸革命", url: "https://www.n-create.co.jp", description: "賃貸管理システム" },
   { name: "ESいい物件One", url: "https://www.es-service.net", description: "不動産流通プラットフォーム" },
   { name: "@プロパティ", url: "https://at-property.com", description: "不動産管理システム" },
-  { name: "ATBB", url: "https://atbb.athome.co.jp", description: "不動産業者間サイト" },
+  { name: "ATBB", url: "https://atbb.athome.co.jp", description: "不動産業者間サイト" }
 ]
 
 realestate_saases.each do |data|
@@ -89,7 +89,7 @@ end
   { action_type: "account_delete", description: "全SaaSアカウントの削除", default_assignee: it_user, position: 1 },
   { action_type: "pc_return", description: "PC返却", default_assignee: admin_user, position: 2 },
   { action_type: "phone_return", description: "社用携帯返却", default_assignee: admin_user, position: 3 },
-  { action_type: "nda", description: "機密保持契約締結", default_assignee: nil, position: 4 },
+  { action_type: "nda", description: "機密保持契約締結", default_assignee: nil, position: 4 }
 ].each do |item_data|
   offboarding_preset.task_preset_items.find_or_create_by!(action_type: item_data[:action_type]) do |i|
     i.description = item_data[:description]
@@ -105,7 +105,7 @@ end
 [
   { action_type: "account_create", description: "必要SaaSアカウントの作成", default_assignee: it_user, position: 1 },
   { action_type: "other", description: "PC準備・セットアップ", default_assignee: admin_user, position: 2 },
-  { action_type: "other", description: "社用携帯の準備", default_assignee: admin_user, position: 3 },
+  { action_type: "other", description: "社用携帯の準備", default_assignee: admin_user, position: 3 }
 ].each do |item_data|
   offboarding_preset.task_preset_items.find_or_create_by!(description: item_data[:description]) do |i|
     i.action_type = item_data[:action_type]
@@ -121,7 +121,7 @@ end
 [
   { action_type: "other", description: "異動元部署のSaaSアカウント権限確認", default_assignee: it_user, position: 1 },
   { action_type: "other", description: "異動先部署の必要SaaSアカウント追加", default_assignee: it_user, position: 2 },
-  { action_type: "other", description: "不要アカウントの削除", default_assignee: it_user, position: 3 },
+  { action_type: "other", description: "不要アカウントの削除", default_assignee: it_user, position: 3 }
 ].each do |item_data|
   transfer_preset.task_preset_items.find_or_create_by!(description: item_data[:description]) do |i|
     i.action_type = item_data[:action_type]
@@ -168,11 +168,11 @@ unless Survey.exists?(survey_type: "account_review")
     deadline: 1.week.from_now
   )
   SaasAccount.where(status: "active").includes(:user, :saas).each do |account|
-    responded = [true, true, false].sample
+    responded = [ true, true, false ].sample
     survey.survey_responses.create!(
       user: account.user,
       saas_account: account,
-      response: responded ? ["using", "using", "not_using"].sample : nil,
+      response: responded ? [ "using", "using", "not_using" ].sample : nil,
       responded_at: responded ? rand(1..3).days.ago : nil
     )
   end

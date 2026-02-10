@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   # 認証
-  get  "login",  to: "sessions#new", as: :login
+  get "login",  to: "sessions#new", as: :login
   delete "logout", to: "sessions#destroy", as: :logout
   get  "auth/:provider/callback", to: "sessions#create"
   get  "auth/failure", to: "sessions#failure"
@@ -14,26 +14,26 @@ Rails.application.routes.draw do
 
   # 台帳
   resources :saases
-  resources :saas_accounts, except: [:show]
-  resources :users, only: [:index, :show, :edit, :update]
+  resources :saas_accounts, except: [ :show ]
+  resources :users, only: [ :index, :show, :edit, :update ]
 
   # サーベイ
-  resources :surveys, only: [:index, :new, :create, :show] do
+  resources :surveys, only: [ :index, :new, :create, :show ] do
     member do
       patch :close
       post :activate
       post :remind
     end
   end
-  resources :survey_responses, only: [:update]
+  resources :survey_responses, only: [ :update ]
 
   # タスク管理
   resources :task_presets
-  resources :tasks, only: [:index, :new, :create, :show]
-  resources :task_items, only: [:update]
+  resources :tasks, only: [ :index, :new, :create, :show ]
+  resources :task_items, only: [ :update ]
 
   # 申請・承認
-  resources :approval_requests, only: [:index, :new, :create, :show] do
+  resources :approval_requests, only: [ :index, :new, :create, :show ] do
     member do
       post :approve
       post :reject
@@ -42,7 +42,7 @@ Rails.application.routes.draw do
 
   # 管理者
   namespace :admin do
-    resources :batches, only: [:index] do
+    resources :batches, only: [ :index ] do
       collection do
         post :sync_entra_users
         post :detect_retired_accounts

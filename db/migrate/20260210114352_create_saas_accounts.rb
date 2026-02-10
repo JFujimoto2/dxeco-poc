@@ -11,7 +11,7 @@ class CreateSaasAccounts < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :saas_accounts, [:saas_id, :user_id], unique: true
+    add_index :saas_accounts, [ :saas_id, :user_id ], unique: true
     add_index :saas_accounts, :status
   end
 end

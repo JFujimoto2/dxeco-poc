@@ -1,5 +1,5 @@
 class SaasesController < ApplicationController
-  before_action :set_saas, only: [:show, :edit, :update, :destroy]
+  before_action :set_saas, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @saases = Saas.search_by_name(params[:q])
@@ -55,7 +55,7 @@ class SaasesController < ApplicationController
   def saas_params
     params.require(:saas).permit(
       :name, :category, :url, :admin_url, :description, :owner_id, :status,
-      saas_contract_attributes: [:id, :plan_name, :price_cents, :billing_cycle, :started_on, :expires_on, :vendor, :notes]
+      saas_contract_attributes: [ :id, :plan_name, :price_cents, :billing_cycle, :started_on, :expires_on, :vendor, :notes ]
     )
   end
 end

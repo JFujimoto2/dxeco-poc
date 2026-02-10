@@ -19,12 +19,12 @@ RSpec.describe SurveyResponse, type: :model do
   it "pendingスコープ" do
     create(:survey_response, responded_at: Time.current)
     pending_resp = create(:survey_response, responded_at: nil)
-    expect(SurveyResponse.pending).to eq([pending_resp])
+    expect(SurveyResponse.pending).to eq([ pending_resp ])
   end
 
   it "respondedスコープ" do
     responded = create(:survey_response, responded_at: Time.current, response: "using")
     create(:survey_response, responded_at: nil)
-    expect(SurveyResponse.responded).to eq([responded])
+    expect(SurveyResponse.responded).to eq([ responded ])
   end
 end
