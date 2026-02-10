@@ -1,0 +1,80 @@
+<% content_for(:page_title) { @user.display_name || @user.email } %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4><%= @user.display_name || @user.email %></h4>
+  <% if current_user.admin? %>
+    <%= link_to edit_user_path(@user), class: "btn btn-outline-secondary" do %>
+      <i class="bi bi-pencil me-1"></i>編集
+    <% end %>
+  <% end %>
+</div>
+
+<div class="row">
+  <div class="col-md-5">
+    <div class="card mb-4">
+      <div class="card-header">基本情報</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">メール</dt>
+          <dd class="col-sm-8"><%= @user.email %></dd>
+
+          <dt class="col-sm-4">部門</dt>
+          <dd class="col-sm-8"><%= @user.department || "-" %></dd>
+
+          <dt class="col-sm-4">役職</dt>
+          <dd class="col-sm-8"><%= @user.job_title || "-" %></dd>
+
+          <dt class="col-sm-4">社員番号</dt>
+          <dd class="col-sm-8"><%= @user.employee_id || "-" %></dd>
+
+          <dt class="col-sm-4">ロール</dt>
+          <dd class="col-sm-8"><span class="badge bg-secondary"><%= @user.role %></span></dd>
+
+          <dt class="col-sm-4">アカウント状態</dt>
+          <dd class="col-sm-8">
+            <span class="badge bg-<%= @user.account_enabled? ? 'success' : 'danger' %>">
+              <%= @user.account_enabled? ? "有効" : "無効" %>
+            </span>
+          </dd>
+
+          <dt class="col-sm-4">最終ログイン</dt>
+          <dd class="col-sm-8"><%= @user.last_signed_in_at&.strftime("%Y/%m/%d %H:%M") || "-" %></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>保有アカウント</span>
+        <span class="badge bg-primary"><%= @saas_accounts.size %></span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>SaaS</th>
+              <th>メール</th>
+              <th>ロール</th>
+              <th>ステータス</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @saas_accounts.each do |account| %>
+              <tr>
+                <td><%= link_to account.saas.name, account.saas %></td>
+                <td><%= account.account_email || "-" %></td>
+                <td><%= account.role || "-" %></td>
+                <td><span class="badge bg-<%= account.active? ? 'success' : 'secondary' %>"><%= account.status %></span></td>
+              </tr>
+            <% end %>
+            <% if @saas_accounts.empty? %>
+              <tr><td colspan="4" class="text-muted">アカウントなし</td></tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

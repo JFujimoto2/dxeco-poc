@@ -12,5 +12,10 @@ Rails.application.routes.draw do
   # ダッシュボード
   root "dashboard#index"
 
+  # 台帳
+  resources :saases
+  resources :saas_accounts, except: [:show]
+  resources :users, only: [:index, :show, :edit, :update]
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

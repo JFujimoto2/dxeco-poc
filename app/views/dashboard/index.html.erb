@@ -9,37 +9,43 @@
 
 <div class="row g-4">
   <div class="col-md-3">
-    <div class="card text-center">
-      <div class="card-body">
-        <i class="bi bi-cloud fs-1 text-primary"></i>
-        <h5 class="card-title mt-2">0</h5>
-        <p class="card-text text-muted">SaaS登録数</p>
+    <%= link_to saases_path, class: "text-decoration-none" do %>
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="bi bi-cloud fs-1 text-primary"></i>
+          <h5 class="card-title mt-2"><%= @saas_count %></h5>
+          <p class="card-text text-muted">SaaS登録数</p>
+        </div>
       </div>
-    </div>
+    <% end %>
   </div>
   <div class="col-md-3">
-    <div class="card text-center">
-      <div class="card-body">
-        <i class="bi bi-people fs-1 text-success"></i>
-        <h5 class="card-title mt-2">0</h5>
-        <p class="card-text text-muted">メンバー数</p>
+    <%= link_to users_path, class: "text-decoration-none" do %>
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="bi bi-people fs-1 text-success"></i>
+          <h5 class="card-title mt-2"><%= @user_count %></h5>
+          <p class="card-text text-muted">メンバー数</p>
+        </div>
       </div>
-    </div>
+    <% end %>
   </div>
   <div class="col-md-3">
-    <div class="card text-center">
-      <div class="card-body">
-        <i class="bi bi-person-badge fs-1 text-info"></i>
-        <h5 class="card-title mt-2">0</h5>
-        <p class="card-text text-muted">アカウント数</p>
+    <%= link_to saas_accounts_path, class: "text-decoration-none" do %>
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="bi bi-person-badge fs-1 text-info"></i>
+          <h5 class="card-title mt-2"><%= @account_count %></h5>
+          <p class="card-text text-muted">アクティブアカウント</p>
+        </div>
       </div>
-    </div>
+    <% end %>
   </div>
   <div class="col-md-3">
     <div class="card text-center">
       <div class="card-body">
         <i class="bi bi-exclamation-triangle fs-1 text-warning"></i>
-        <h5 class="card-title mt-2">0</h5>
+        <h5 class="card-title mt-2"><%= @attention_count %></h5>
         <p class="card-text text-muted">要対応</p>
       </div>
     </div>

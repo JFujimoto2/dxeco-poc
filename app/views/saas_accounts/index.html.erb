@@ -1,0 +1,84 @@
+<% content_for(:page_title) { "アカウント管理" } %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4>アカウント管理</h4>
+  <%= link_to new_saas_account_path, class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i>新規登録
+  <% end %>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <%= form_tag(saas_accounts_path, method: :get, class: "row g-3 align-items-end") do %>
+      <div class="col-md-4">
+        <label class="form-label">SaaS</label>
+        <%= select_tag :saas_id,
+            options_from_collection_for_select(Saas.order(:name), :id, :name, params[:saas_id]),
+            include_blank: "すべて", class: "form-select" %>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">メンバー</label>
+        <%= select_tag :user_id,
+            options_from_collection_for_select(User.order(:display_name), :id, :display_name, params[:user_id]&.to_i),
+            include_blank: "すべて", class: "form-select" %>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">ステータス</label>
+        <select name="status" class="form-select">
+          <option value="">すべて</option>
+          <% SaasAccount.statuses.each_key do |s| %>
+            <option value="<%= s %>" <%= "selected" if params[:status] == s %>><%= s %></option>
+          <% end %>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-outline-secondary w-100">
+          <i class="bi bi-search me-1"></i>検索
+        </button>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>SaaS</th>
+          <th>メンバー</th>
+          <th>アカウントメール</th>
+          <th>ロール</th>
+          <th>ステータス</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @saas_accounts.each do |account| %>
+          <tr>
+            <td><%= link_to account.saas.name, account.saas %></td>
+            <td><%= link_to (account.user.display_name || account.user.email), account.user %></td>
+            <td><%= account.account_email || "-" %></td>
+            <td><%= account.role || "-" %></td>
+            <td>
+              <span class="badge bg-<%= account.active? ? 'success' : 'secondary' %>"><%= account.status %></span>
+            </td>
+            <td class="text-end">
+              <%= link_to edit_saas_account_path(account), class: "btn btn-sm btn-outline-secondary" do %>
+                <i class="bi bi-pencil"></i>
+              <% end %>
+              <%= button_to saas_account_path(account), method: :delete, class: "btn btn-sm btn-outline-danger",
+                  data: { turbo_confirm: "削除しますか？" } do %>
+                <i class="bi bi-trash"></i>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="mt-3">
+  <%= paginate @saas_accounts %>
+</div>

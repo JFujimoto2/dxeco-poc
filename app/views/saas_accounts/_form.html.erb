@@ -1,0 +1,54 @@
+<%= form_with(model: saas_account, class: "needs-validation") do |f| %>
+  <% if saas_account.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% saas_account.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= f.label :saas_id, "SaaS", class: "form-label" %>
+          <%= f.select :saas_id,
+              Saas.order(:name).map { |s| [s.name, s.id] },
+              { include_blank: "選択してください" }, class: "form-select", required: true %>
+        </div>
+        <div class="col-md-6 mb-3">
+          <%= f.label :user_id, "メンバー", class: "form-label" %>
+          <%= f.select :user_id,
+              User.order(:display_name).map { |u| ["#{u.display_name} (#{u.email})", u.id] },
+              { include_blank: "選択してください" }, class: "form-select", required: true %>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= f.label :account_email, "アカウントメール", class: "form-label" %>
+          <%= f.email_field :account_email, class: "form-control" %>
+        </div>
+        <div class="col-md-3 mb-3">
+          <%= f.label :role, "ロール", class: "form-label" %>
+          <%= f.select :role, [["admin", "admin"], ["member", "member"], ["owner", "owner"]],
+              { include_blank: "選択してください" }, class: "form-select" %>
+        </div>
+        <div class="col-md-3 mb-3">
+          <%= f.label :status, "ステータス", class: "form-label" %>
+          <%= f.select :status, SaasAccount.statuses.keys.map { |s| [s, s] }, {}, class: "form-select" %>
+        </div>
+      </div>
+      <div class="mb-3">
+        <%= f.label :notes, "備考", class: "form-label" %>
+        <%= f.text_area :notes, class: "form-control", rows: 2 %>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= f.submit saas_account.persisted? ? "更新" : "登録", class: "btn btn-primary" %>
+    <%= link_to "キャンセル", saas_accounts_path, class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>

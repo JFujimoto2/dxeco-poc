@@ -1,0 +1,102 @@
+<%= form_with(model: saas, class: "needs-validation") do |f| %>
+  <% if saas.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% saas.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card mb-4">
+    <div class="card-header">基本情報</div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= f.label :name, "SaaS名", class: "form-label" %>
+          <%= f.text_field :name, class: "form-control", required: true %>
+        </div>
+        <div class="col-md-3 mb-3">
+          <%= f.label :category, "カテゴリ", class: "form-label" %>
+          <%= f.select :category, options_for_select(["一般", "不動産管理", "セキュリティ", "人事・労務", "会計・経理", "その他"], saas.category),
+              { include_blank: "選択してください" }, class: "form-select" %>
+        </div>
+        <div class="col-md-3 mb-3">
+          <%= f.label :status, "ステータス", class: "form-label" %>
+          <%= f.select :status, Saas.statuses.keys.map { |s| [s, s] }, {}, class: "form-select" %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= f.label :url, "サービスURL", class: "form-label" %>
+          <%= f.url_field :url, class: "form-control", placeholder: "https://" %>
+        </div>
+        <div class="col-md-6 mb-3">
+          <%= f.label :admin_url, "管理画面URL", class: "form-label" %>
+          <%= f.url_field :admin_url, class: "form-control", placeholder: "https://" %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= f.label :owner_id, "契約担当者", class: "form-label" %>
+          <%= f.select :owner_id, User.order(:display_name).map { |u| [u.display_name || u.email, u.id] },
+              { include_blank: "未設定" }, class: "form-select" %>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <%= f.label :description, "説明", class: "form-label" %>
+        <%= f.text_area :description, class: "form-control", rows: 3 %>
+      </div>
+    </div>
+  </div>
+
+  <%= f.fields_for :saas_contract do |cf| %>
+    <div class="card mb-4">
+      <div class="card-header">契約情報</div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <%= cf.label :plan_name, "プラン名", class: "form-label" %>
+            <%= cf.text_field :plan_name, class: "form-control" %>
+          </div>
+          <div class="col-md-4 mb-3">
+            <%= cf.label :price_cents, "月額（円）", class: "form-label" %>
+            <%= cf.number_field :price_cents, class: "form-control", min: 0 %>
+          </div>
+          <div class="col-md-4 mb-3">
+            <%= cf.label :billing_cycle, "請求サイクル", class: "form-label" %>
+            <%= cf.select :billing_cycle, [["月額", "monthly"], ["年額", "yearly"]],
+                { include_blank: "選択してください" }, class: "form-select" %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <%= cf.label :vendor, "提供元", class: "form-label" %>
+            <%= cf.text_field :vendor, class: "form-control" %>
+          </div>
+          <div class="col-md-4 mb-3">
+            <%= cf.label :started_on, "契約開始日", class: "form-label" %>
+            <%= cf.date_field :started_on, class: "form-control" %>
+          </div>
+          <div class="col-md-4 mb-3">
+            <%= cf.label :expires_on, "契約満了日", class: "form-label" %>
+            <%= cf.date_field :expires_on, class: "form-control" %>
+          </div>
+        </div>
+        <div class="mb-3">
+          <%= cf.label :notes, "備考", class: "form-label" %>
+          <%= cf.text_area :notes, class: "form-control", rows: 2 %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="d-flex gap-2">
+    <%= f.submit saas.persisted? ? "更新" : "登録", class: "btn btn-primary" %>
+    <%= link_to "キャンセル", saas.persisted? ? saas_path(saas) : saases_path, class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>

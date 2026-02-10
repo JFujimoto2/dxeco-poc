@@ -11,19 +11,19 @@
       <% end %>
     </li>
     <li class="nav-item">
-      <a href="#" class="nav-link text-white disabled">
+      <%= link_to saases_path, class: "nav-link text-white #{'active' if controller_name == 'saases'}" do %>
         <i class="bi bi-cloud me-2"></i>SaaS台帳
-      </a>
+      <% end %>
     </li>
     <li class="nav-item">
-      <a href="#" class="nav-link text-white disabled">
+      <%= link_to saas_accounts_path, class: "nav-link text-white #{'active' if controller_name == 'saas_accounts'}" do %>
         <i class="bi bi-person-badge me-2"></i>アカウント管理
-      </a>
+      <% end %>
     </li>
     <li class="nav-item">
-      <a href="#" class="nav-link text-white disabled">
+      <%= link_to users_path, class: "nav-link text-white #{'active' if controller_name == 'users'}" do %>
         <i class="bi bi-people me-2"></i>メンバー
-      </a>
+      <% end %>
     </li>
     <li class="nav-item">
       <a href="#" class="nav-link text-white disabled">

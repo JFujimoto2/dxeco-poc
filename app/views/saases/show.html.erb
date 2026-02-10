@@ -1,0 +1,102 @@
+<% content_for(:page_title) { @saas.name } %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4><%= @saas.name %></h4>
+  <div>
+    <%= link_to edit_saas_path(@saas), class: "btn btn-outline-secondary me-2" do %>
+      <i class="bi bi-pencil me-1"></i>編集
+    <% end %>
+    <%= button_to saas_path(@saas), method: :delete, class: "btn btn-outline-danger",
+        data: { turbo_confirm: "「#{@saas.name}」を削除しますか？" } do %>
+      <i class="bi bi-trash me-1"></i>削除
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card mb-4">
+      <div class="card-header">基本情報</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-3">カテゴリ</dt>
+          <dd class="col-sm-9"><%= @saas.category || "-" %></dd>
+
+          <dt class="col-sm-3">ステータス</dt>
+          <dd class="col-sm-9"><span class="badge bg-success"><%= @saas.status %></span></dd>
+
+          <dt class="col-sm-3">URL</dt>
+          <dd class="col-sm-9">
+            <% if @saas.url.present? %>
+              <%= link_to @saas.url, @saas.url, target: "_blank", rel: "noopener" %>
+            <% else %>-<% end %>
+          </dd>
+
+          <dt class="col-sm-3">管理画面URL</dt>
+          <dd class="col-sm-9">
+            <% if @saas.admin_url.present? %>
+              <%= link_to @saas.admin_url, @saas.admin_url, target: "_blank", rel: "noopener" %>
+            <% else %>-<% end %>
+          </dd>
+
+          <dt class="col-sm-3">契約担当者</dt>
+          <dd class="col-sm-9"><%= @saas.owner&.display_name || "-" %></dd>
+
+          <dt class="col-sm-3">説明</dt>
+          <dd class="col-sm-9"><%= @saas.description || "-" %></dd>
+        </dl>
+      </div>
+    </div>
+
+    <% if @saas.saas_contract %>
+      <div class="card mb-4">
+        <div class="card-header">契約情報</div>
+        <div class="card-body">
+          <dl class="row mb-0">
+            <dt class="col-sm-3">プラン</dt>
+            <dd class="col-sm-9"><%= @saas.saas_contract.plan_name || "-" %></dd>
+
+            <dt class="col-sm-3">月額</dt>
+            <dd class="col-sm-9">
+              <%= @saas.saas_contract.price_cents ? number_to_currency(@saas.saas_contract.price_cents, unit: "¥", precision: 0) : "-" %>
+            </dd>
+
+            <dt class="col-sm-3">請求サイクル</dt>
+            <dd class="col-sm-9"><%= @saas.saas_contract.billing_cycle || "-" %></dd>
+
+            <dt class="col-sm-3">提供元</dt>
+            <dd class="col-sm-9"><%= @saas.saas_contract.vendor || "-" %></dd>
+
+            <dt class="col-sm-3">契約期間</dt>
+            <dd class="col-sm-9">
+              <%= @saas.saas_contract.started_on || "-" %> 〜 <%= @saas.saas_contract.expires_on || "-" %>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>アカウント一覧</span>
+        <span class="badge bg-primary"><%= @saas_accounts.size %></span>
+      </div>
+      <ul class="list-group list-group-flush">
+        <% @saas_accounts.each do |account| %>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <div><%= account.user.display_name || account.user.email %></div>
+              <small class="text-muted"><%= account.account_email %></small>
+            </div>
+            <span class="badge bg-<%= account.active? ? 'success' : 'secondary' %>"><%= account.status %></span>
+          </li>
+        <% end %>
+        <% if @saas_accounts.empty? %>
+          <li class="list-group-item text-muted">アカウントなし</li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>

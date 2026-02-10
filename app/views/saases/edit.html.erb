@@ -1,0 +1,4 @@
+<% content_for(:page_title) { "#{@saas.name} の編集" } %>
+
+<h4 class="mb-4"><%= @saas.name %> の編集</h4>
+<%= render "form", saas: @saas %>

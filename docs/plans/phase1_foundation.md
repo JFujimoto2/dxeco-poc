@@ -351,17 +351,17 @@ end
 
 ## 成果物チェックリスト
 
-- [ ] Gem 追加 & `bundle install`
-- [ ] RSpec セットアップ (`rails g rspec:install`)
-- [ ] Bootstrap 導入（SCSS + JS + Icons）
-- [ ] users マイグレーション & モデル
-- [ ] OmniAuth 設定（`config/initializers/omniauth.rb`）
-- [ ] SessionsController（Entra ID コールバック + 開発用ログイン）
-- [ ] ApplicationController（認証フィルタ + current_user）
-- [ ] ルーティング
-- [ ] サイドバー付きレイアウト
-- [ ] DashboardController + ビュー
-- [ ] ログイン画面ビュー
-- [ ] FactoryBot + User スペック
-- [ ] リクエストスペック（Dashboard, Sessions）
-- [ ] `bundle exec rspec` 全テストパス
+- [x] Gem 追加 & `bundle install`
+- [x] RSpec セットアップ (`rails g rspec:install`)
+- [x] Bootstrap 導入（CDN + importmap JS + Icons）
+- [x] users マイグレーション & モデル
+- [x] OmniAuth 設定（`config/initializers/omniauth.rb`）
+- [x] SessionsController（Entra ID コールバック + 開発用ログイン）
+- [x] ApplicationController（認証フィルタ + current_user）
+- [x] ルーティング
+- [x] サイドバー付きレイアウト
+- [x] DashboardController + ビュー
+- [x] ログイン画面ビュー
+- [x] FactoryBot + User スペック
+- [x] リクエストスペック（Dashboard, Sessions）
+- [x] `bundle exec rspec` 全14テストパス
