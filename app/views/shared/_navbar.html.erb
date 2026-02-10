@@ -1,0 +1,17 @@
+<nav class="navbar navbar-light bg-white border-bottom px-4">
+  <div class="container-fluid">
+    <span class="navbar-text">
+      <% if content_for?(:page_title) %>
+        <h5 class="mb-0"><%= yield(:page_title) %></h5>
+      <% end %>
+    </span>
+    <div class="d-flex align-items-center">
+      <span class="me-3 text-muted">
+        <i class="bi bi-person-circle me-1"></i>
+        <%= current_user.display_name || current_user.email %>
+        <span class="badge bg-secondary ms-1"><%= current_user.role %></span>
+      </span>
+      <%= button_to "ログアウト", logout_path, method: :delete, class: "btn btn-outline-secondary btn-sm" %>
+    </div>
+  </div>
+</nav>

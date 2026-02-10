@@ -1,0 +1,50 @@
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5">
+    <div class="card shadow">
+      <div class="card-body p-5">
+        <div class="text-center mb-4">
+          <i class="bi bi-shield-lock fs-1 text-primary"></i>
+          <h3 class="mt-2">SaaS管理ツール</h3>
+          <p class="text-muted">ログインして開始</p>
+        </div>
+
+        <% if entra_id_configured? %>
+          <%= form_tag("/auth/entra_id", method: :post) do %>
+            <button type="submit" class="btn btn-primary w-100 py-2">
+              <i class="bi bi-microsoft me-2"></i>Microsoft アカウントでログイン
+            </button>
+          <% end %>
+        <% end %>
+
+        <% if Rails.env.development? || Rails.env.test? %>
+          <% if entra_id_configured? %>
+            <hr class="my-4">
+            <p class="text-center text-muted small">開発用ログイン</p>
+          <% end %>
+
+          <%= form_tag(dev_login_path, method: :post) do %>
+            <div class="mb-3">
+              <label class="form-label">表示名</label>
+              <input type="text" name="display_name" class="form-control" value="開発ユーザー" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">メールアドレス</label>
+              <input type="email" name="email" class="form-control" value="dev@example.com" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">ロール</label>
+              <select name="role" class="form-select">
+                <option value="admin">admin</option>
+                <option value="manager">manager</option>
+                <option value="viewer">viewer</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-outline-secondary w-100">
+              <i class="bi bi-box-arrow-in-right me-2"></i>開発ログイン
+            </button>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
