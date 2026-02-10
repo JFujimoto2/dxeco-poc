@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_10_120927) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_10_123657) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -32,6 +32,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_120927) do
     t.index ["requester_id"], name: "index_approval_requests_on_requester_id"
     t.index ["saas_id"], name: "index_approval_requests_on_saas_id"
     t.index ["status"], name: "index_approval_requests_on_status"
+  end
+
+  create_table "audit_logs", force: :cascade do |t|
+    t.string "action", null: false
+    t.jsonb "changes_data", default: {}
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.bigint "resource_id", null: false
+    t.string "resource_type", null: false
+    t.bigint "user_id"
+    t.index ["action"], name: "index_audit_logs_on_action"
+    t.index ["created_at"], name: "index_audit_logs_on_created_at"
+    t.index ["resource_type", "resource_id"], name: "index_audit_logs_on_resource_type_and_resource_id"
+    t.index ["user_id"], name: "index_audit_logs_on_user_id"
   end
 
   create_table "batch_execution_logs", force: :cascade do |t|
@@ -193,6 +207,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_120927) do
   add_foreign_key "approval_requests", "saases"
   add_foreign_key "approval_requests", "users", column: "approved_by_id"
   add_foreign_key "approval_requests", "users", column: "requester_id"
+  add_foreign_key "audit_logs", "users"
   add_foreign_key "saas_accounts", "saases"
   add_foreign_key "saas_accounts", "users"
   add_foreign_key "saas_contracts", "saases"

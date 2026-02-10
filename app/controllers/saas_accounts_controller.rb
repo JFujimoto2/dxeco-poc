@@ -39,6 +39,20 @@ class SaasAccountsController < ApplicationController
     redirect_to saas_accounts_path, notice: "アカウントを削除しました", status: :see_other
   end
 
+  def import
+    unless params[:file].present?
+      redirect_to saas_accounts_path, alert: "ファイルを選択してください"
+      return
+    end
+
+    result = SaasAccountImportService.new(params[:file].tempfile.path).call
+    if result[:error_count].zero?
+      redirect_to saas_accounts_path, notice: "#{result[:success_count]}件のアカウントをインポートしました"
+    else
+      redirect_to saas_accounts_path, alert: "成功: #{result[:success_count]}件, エラー: #{result[:error_count]}件 (#{result[:errors].first(3).join(' / ')})"
+    end
+  end
+
   private
 
   def set_saas_account

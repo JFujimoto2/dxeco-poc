@@ -3,8 +3,14 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
 
   before_action :require_login
+  before_action :set_current_attributes
 
   private
+
+  def set_current_attributes
+    Current.user = current_user
+    Current.ip_address = request.remote_ip
+  end
 
   def require_login
     unless current_user

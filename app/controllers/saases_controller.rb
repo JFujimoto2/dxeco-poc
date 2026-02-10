@@ -46,6 +46,20 @@ class SaasesController < ApplicationController
     redirect_to saases_path, notice: "SaaSを削除しました", status: :see_other
   end
 
+  def import
+    unless params[:file].present?
+      redirect_to saases_path, alert: "ファイルを選択してください"
+      return
+    end
+
+    result = SaasImportService.new(params[:file].tempfile.path).call
+    if result[:error_count].zero?
+      redirect_to saases_path, notice: "#{result[:success_count]}件のSaaSをインポートしました"
+    else
+      redirect_to saases_path, alert: "成功: #{result[:success_count]}件, エラー: #{result[:error_count]}件 (#{result[:errors].first(3).join(' / ')})"
+    end
+  end
+
   private
 
   def set_saas

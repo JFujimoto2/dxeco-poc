@@ -1,0 +1,4 @@
+name,category,url,admin_url,description,status
+Slack,一般,https://slack.com,,ビジネスチャットツール,active
+,一般,https://invalid.com,,名前なし,active
+Zoom,一般,https://zoom.us,,ビデオ会議,active

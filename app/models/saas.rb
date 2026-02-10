@@ -1,4 +1,6 @@
 class Saas < ApplicationRecord
+  include Auditable
+
   belongs_to :owner, class_name: "User", optional: true
   has_one :saas_contract, dependent: :destroy
   has_many :saas_accounts, dependent: :destroy

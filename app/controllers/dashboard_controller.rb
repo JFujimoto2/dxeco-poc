@@ -7,5 +7,6 @@ class DashboardController < ApplicationController
     @pending_approval_count = ApprovalRequest.pending.count
     @active_task_count = Task.where.not(status: "completed").count
     @active_survey_count = Survey.active.count
+    @recent_audit_logs = AuditLog.includes(:user).recent.limit(5)
   end
 end

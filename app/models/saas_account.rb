@@ -1,4 +1,6 @@
 class SaasAccount < ApplicationRecord
+  include Auditable
+
   belongs_to :saas
   belongs_to :user
 

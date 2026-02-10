@@ -13,8 +13,16 @@ Rails.application.routes.draw do
   root "dashboard#index"
 
   # 台帳
-  resources :saases
-  resources :saas_accounts, except: [ :show ]
+  resources :saases do
+    collection do
+      post :import
+    end
+  end
+  resources :saas_accounts, except: [ :show ] do
+    collection do
+      post :import
+    end
+  end
   resources :users, only: [ :index, :show, :edit, :update ]
 
   # サーベイ
@@ -48,6 +56,7 @@ Rails.application.routes.draw do
         post :detect_retired_accounts
       end
     end
+    resources :audit_logs, only: [ :index, :show ]
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

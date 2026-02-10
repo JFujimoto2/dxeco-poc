@@ -1,4 +1,6 @@
 class TaskItem < ApplicationRecord
+  include Auditable
+
   belongs_to :task
   belongs_to :saas, class_name: "Saas", optional: true
   belongs_to :assignee, class_name: "User", optional: true

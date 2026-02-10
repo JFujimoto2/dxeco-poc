@@ -1,4 +1,6 @@
 class Survey < ApplicationRecord
+  include Auditable
+
   belongs_to :created_by, class_name: "User"
   has_many :survey_responses, dependent: :destroy
 

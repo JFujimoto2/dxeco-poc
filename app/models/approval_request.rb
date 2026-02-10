@@ -1,4 +1,6 @@
 class ApprovalRequest < ApplicationRecord
+  include Auditable
+
   belongs_to :requester, class_name: "User"
   belongs_to :saas, class_name: "Saas", optional: true
   belongs_to :approved_by, class_name: "User", optional: true

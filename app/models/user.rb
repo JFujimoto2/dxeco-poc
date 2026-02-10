@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  include Auditable
+
   has_many :saas_accounts, dependent: :destroy
   has_many :saases, through: :saas_accounts
   has_many :owned_saases, class_name: "Saas", foreign_key: :owner_id, dependent: :nullify

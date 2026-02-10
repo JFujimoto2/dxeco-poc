@@ -29,6 +29,9 @@ gem "faraday"
 # UI
 gem "kaminari"
 
+# CSV
+gem "csv"
+
 # Environment variables
 gem "dotenv-rails", groups: [ :development, :test ]
 

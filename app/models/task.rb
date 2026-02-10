@@ -1,4 +1,6 @@
 class Task < ApplicationRecord
+  include Auditable
+
   belongs_to :target_user, class_name: "User"
   belongs_to :created_by, class_name: "User"
   has_many :task_items, dependent: :destroy
