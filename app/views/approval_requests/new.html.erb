@@ -1,0 +1,54 @@
+<% content_for(:page_title) { "SaaS利用申請" } %>
+
+<h4 class="mb-4">SaaS利用申請</h4>
+
+<%= form_with model: @approval_request, class: "card" do |f| %>
+  <div class="card-body">
+    <% if @approval_request.errors.any? %>
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          <% @approval_request.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="mb-3">
+      <%= f.label :request_type, "申請種別", class: "form-label" %>
+      <%= f.select :request_type, [["新規SaaS導入", "new_saas"], ["アカウント追加", "add_account"], ["アカウント削除", "remove_account"]], {}, class: "form-select" %>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <%= f.label :saas_id, "既存SaaS（登録済みの場合）", class: "form-label" %>
+        <%= f.collection_select :saas_id, @saases, :id, :name, { include_blank: "-- 選択 --" }, class: "form-select" %>
+      </div>
+      <div class="col-md-6">
+        <%= f.label :saas_name, "SaaS名（新規の場合）", class: "form-label" %>
+        <%= f.text_field :saas_name, class: "form-control", placeholder: "例: Figma" %>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :reason, "利用理由・用途", class: "form-label" %>
+      <%= f.text_area :reason, class: "form-control", rows: 3, placeholder: "利用目的、必要性を記載してください" %>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <%= f.label :user_count, "利用予定人数", class: "form-label" %>
+        <%= f.number_field :user_count, class: "form-control", min: 1 %>
+      </div>
+      <div class="col-md-6">
+        <%= f.label :estimated_cost, "費用概算（円/月）", class: "form-label" %>
+        <%= f.number_field :estimated_cost, class: "form-control", min: 0, step: 100 %>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <%= f.submit "申請する", class: "btn btn-primary" %>
+    <%= link_to "キャンセル", approval_requests_path, class: "btn btn-outline-secondary ms-2" %>
+  </div>
+<% end %>

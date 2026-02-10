@@ -1,0 +1,94 @@
+<% content_for(:page_title) { "バッチ管理" } %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4>バッチ管理</h4>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <h6 class="mb-0">バッチ実行</h6>
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="border rounded p-3">
+          <h6><i class="bi bi-people me-1"></i>Entra IDユーザー同期</h6>
+          <p class="text-muted small mb-2">Graph APIから全ユーザー情報を取得し、メンバー情報を最新化します。完了後、退職者アカウント検出が自動実行されます。</p>
+          <%= button_to "実行", sync_entra_users_admin_batches_path, method: :post, class: "btn btn-primary btn-sm", data: { confirm: "Entra IDユーザー同期を実行しますか？" } %>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="border rounded p-3">
+          <h6><i class="bi bi-search me-1"></i>退職者アカウント検出</h6>
+          <p class="text-muted small mb-2">Entra IDで無効化されたユーザーの残存SaaSアカウントを検出します。</p>
+          <%= button_to "実行", detect_retired_accounts_admin_batches_path, method: :post, class: "btn btn-warning btn-sm", data: { confirm: "退職者アカウント検出を実行しますか？" } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h6 class="mb-0">実行履歴</h6>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>日時</th>
+          <th>バッチ名</th>
+          <th>ステータス</th>
+          <th>処理件数</th>
+          <th>作成</th>
+          <th>更新</th>
+          <th>エラー</th>
+          <th>実行時間</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @logs.any? %>
+          <% @logs.each do |log| %>
+            <tr>
+              <td class="small"><%= log.started_at&.strftime("%Y/%m/%d %H:%M") %></td>
+              <td><%= log.job_name.gsub("Job", "") %></td>
+              <td>
+                <% case log.status %>
+                <% when "running" %>
+                  <span class="badge bg-info">実行中</span>
+                <% when "success" %>
+                  <span class="badge bg-success">成功</span>
+                <% when "failure" %>
+                  <span class="badge bg-danger">失敗</span>
+                <% end %>
+              </td>
+              <td><%= log.processed_count %></td>
+              <td><%= log.created_count %></td>
+              <td><%= log.updated_count %></td>
+              <td>
+                <% if log.error_count > 0 %>
+                  <span class="text-danger"><%= log.error_count %></span>
+                <% else %>
+                  0
+                <% end %>
+              </td>
+              <td class="small">
+                <% if log.started_at && log.finished_at %>
+                  <%= "%.1f秒" % (log.finished_at - log.started_at) %>
+                <% elsif log.running? %>
+                  <span class="text-muted">実行中...</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">実行履歴がありません</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= paginate @logs %>

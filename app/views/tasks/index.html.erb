@@ -1,0 +1,72 @@
+<% content_for(:page_title) { "タスク管理" } %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4>タスク管理</h4>
+  <div>
+    <% if current_user.admin? %>
+      <%= link_to "プリセット管理", task_presets_path, class: "btn btn-outline-secondary me-1" %>
+      <%= link_to "新規タスク", new_task_path, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="mb-3">
+  <%= form_tag tasks_path, method: :get, class: "d-flex gap-2" do %>
+    <%= select_tag :status, options_for_select([["全ステータス", ""], ["未着手", "open"], ["進行中", "in_progress"], ["完了", "completed"]], params[:status]), class: "form-select", style: "width: 160px" %>
+    <%= select_tag :task_type, options_for_select([["全種別", ""], ["入社", "onboarding"], ["退職", "offboarding"], ["異動", "transfer"]], params[:task_type]), class: "form-select", style: "width: 130px" %>
+    <%= submit_tag "絞り込み", class: "btn btn-outline-secondary" %>
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>タイトル</th>
+          <th>種別</th>
+          <th>対象者</th>
+          <th>ステータス</th>
+          <th>進捗</th>
+          <th>期限</th>
+          <th>作成者</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @tasks.each do |task| %>
+          <tr>
+            <td><%= link_to task.title, task_path(task) %></td>
+            <td>
+              <% case task.task_type %>
+              <% when "onboarding" %>
+                <span class="badge bg-success">入社</span>
+              <% when "offboarding" %>
+                <span class="badge bg-danger">退職</span>
+              <% when "transfer" %>
+                <span class="badge bg-info">異動</span>
+              <% end %>
+            </td>
+            <td><%= task.target_user.display_name %></td>
+            <td>
+              <% case task.status %>
+              <% when "open" %>
+                <span class="badge bg-secondary">未着手</span>
+              <% when "in_progress" %>
+                <span class="badge bg-primary">進行中</span>
+              <% when "completed" %>
+                <span class="badge bg-success">完了</span>
+              <% end %>
+            </td>
+            <td><%= task.completion_rate %>%</td>
+            <td class="<%= 'text-danger' if task.due_date && task.due_date < Date.today && !task.completed? %>">
+              <%= task.due_date&.strftime("%Y/%m/%d") %>
+            </td>
+            <td><%= task.created_by.display_name %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= paginate @tasks %>

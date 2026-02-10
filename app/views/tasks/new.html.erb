@@ -1,0 +1,96 @@
+<% content_for(:page_title) { "タスク作成" } %>
+
+<h4 class="mb-4">タスク作成</h4>
+
+<% unless params[:preset_id].present? && params[:target_user_id].present? %>
+  <%# Step 1: プリセット & 対象者選択 %>
+  <div class="card mb-4">
+    <div class="card-header"><h6 class="mb-0">1. プリセット & 対象者を選択</h6></div>
+    <div class="card-body">
+      <%= form_tag new_task_path, method: :get, class: "row g-3" do %>
+        <div class="col-md-5">
+          <label class="form-label">プリセット</label>
+          <%= select_tag :preset_id, options_from_collection_for_select(@presets, :id, :name, params[:preset_id]), include_blank: "選択してください", class: "form-select" %>
+        </div>
+        <div class="col-md-5">
+          <label class="form-label">対象メンバー</label>
+          <%= select_tag :target_user_id, options_from_collection_for_select(@users, :id, :display_name, params[:target_user_id]), include_blank: "選択してください", class: "form-select" %>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <%= submit_tag "タスク生成", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <%# Step 2: タスク内容確認 & 作成 %>
+  <%= form_with model: @task, class: "card" do |f| %>
+    <div class="card-header"><h6 class="mb-0">2. タスク内容を確認して作成</h6></div>
+    <div class="card-body">
+      <% if @task.errors.any? %>
+        <div class="alert alert-danger">
+          <ul class="mb-0">
+            <% @task.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <%= f.label :title, "タイトル", class: "form-label" %>
+          <%= f.text_field :title, class: "form-control" %>
+        </div>
+        <div class="col-md-3">
+          <%= f.label :task_type, "種別", class: "form-label" %>
+          <%= f.select :task_type, [["入社", "onboarding"], ["退職", "offboarding"], ["異動", "transfer"]], {}, class: "form-select" %>
+        </div>
+        <div class="col-md-3">
+          <%= f.label :due_date, "期限", class: "form-label" %>
+          <%= f.date_field :due_date, class: "form-control" %>
+        </div>
+      </div>
+
+      <%= f.hidden_field :target_user_id %>
+
+      <h6>タスク項目（<%= @task.task_items.size %>件）</h6>
+      <table class="table table-sm">
+        <thead class="table-light">
+          <tr>
+            <th>種別</th>
+            <th>内容</th>
+            <th>対象SaaS</th>
+            <th>担当者</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= f.fields_for :task_items do |item_f| %>
+            <tr>
+              <td>
+                <%= item_f.hidden_field :action_type %>
+                <small><%= item_f.object.action_type %></small>
+              </td>
+              <td>
+                <%= item_f.hidden_field :description %>
+                <%= item_f.object.description %>
+              </td>
+              <td>
+                <%= item_f.hidden_field :saas_id %>
+                <%= item_f.object.saas&.name || "-" %>
+              </td>
+              <td>
+                <%= item_f.collection_select :assignee_id, User.order(:display_name), :id, :display_name, { include_blank: "未割当" }, class: "form-select form-select-sm" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-footer">
+      <%= f.submit "タスクを作成", class: "btn btn-primary" %>
+      <%= link_to "やり直す", new_task_path, class: "btn btn-outline-secondary ms-2" %>
+    </div>
+  <% end %>
+<% end %>

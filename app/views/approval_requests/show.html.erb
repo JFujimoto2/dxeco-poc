@@ -1,0 +1,101 @@
+<% content_for(:page_title) { "申請詳細" } %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4>申請詳細</h4>
+  <%= link_to "一覧に戻る", approval_requests_path, class: "btn btn-outline-secondary btn-sm" %>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row mb-3">
+      <div class="col-md-3 text-muted">ステータス</div>
+      <div class="col-md-9">
+        <% case @approval_request.status %>
+        <% when "pending" %>
+          <span class="badge bg-warning text-dark">承認待ち</span>
+        <% when "approved" %>
+          <span class="badge bg-success">承認</span>
+        <% when "rejected" %>
+          <span class="badge bg-danger">却下</span>
+        <% end %>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-3 text-muted">申請種別</div>
+      <div class="col-md-9">
+        <% case @approval_request.request_type %>
+        <% when "new_saas" %>
+          新規SaaS導入
+        <% when "add_account" %>
+          アカウント追加
+        <% when "remove_account" %>
+          アカウント削除
+        <% end %>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-3 text-muted">対象SaaS</div>
+      <div class="col-md-9"><%= @approval_request.target_saas_name %></div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-3 text-muted">申請者</div>
+      <div class="col-md-9"><%= @approval_request.requester.display_name %>（<%= @approval_request.requester.department %>）</div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-3 text-muted">申請日</div>
+      <div class="col-md-9"><%= @approval_request.created_at.strftime("%Y/%m/%d %H:%M") %></div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-3 text-muted">利用理由</div>
+      <div class="col-md-9"><%= simple_format(@approval_request.reason) %></div>
+    </div>
+    <% if @approval_request.user_count %>
+      <div class="row mb-3">
+        <div class="col-md-3 text-muted">利用予定人数</div>
+        <div class="col-md-9"><%= @approval_request.user_count %>名</div>
+      </div>
+    <% end %>
+    <% if @approval_request.estimated_cost %>
+      <div class="row mb-3">
+        <div class="col-md-3 text-muted">費用概算</div>
+        <div class="col-md-9"><%= number_to_currency(@approval_request.estimated_cost, unit: "¥", precision: 0) %>/月</div>
+      </div>
+    <% end %>
+
+    <% if @approval_request.approved_by %>
+      <hr>
+      <div class="row mb-3">
+        <div class="col-md-3 text-muted">承認/却下者</div>
+        <div class="col-md-9"><%= @approval_request.approved_by.display_name %></div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-3 text-muted">処理日</div>
+        <div class="col-md-9"><%= @approval_request.approved_at&.strftime("%Y/%m/%d %H:%M") %></div>
+      </div>
+      <% if @approval_request.rejection_reason.present? %>
+        <div class="row mb-3">
+          <div class="col-md-3 text-muted">却下理由</div>
+          <div class="col-md-9 text-danger"><%= @approval_request.rejection_reason %></div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<% if @approval_request.pending? && (current_user.admin? || current_user.manager?) %>
+  <div class="card border-primary">
+    <div class="card-header bg-primary bg-opacity-10">
+      <h6 class="mb-0">承認/却下</h6>
+    </div>
+    <div class="card-body">
+      <div class="d-flex gap-3">
+        <%= button_to "承認する", approve_approval_request_path(@approval_request), method: :post, class: "btn btn-success", data: { confirm: "この申請を承認しますか？" } %>
+
+        <%= form_with url: reject_approval_request_path(@approval_request), method: :post, class: "d-flex gap-2 flex-grow-1" do %>
+          <input type="text" name="rejection_reason" class="form-control" placeholder="却下理由を入力してください">
+          <button type="submit" class="btn btn-danger" data-confirm="この申請を却下しますか？">却下する</button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

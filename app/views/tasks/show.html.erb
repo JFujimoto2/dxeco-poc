@@ -1,0 +1,78 @@
+<% content_for(:page_title) { @task.title } %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4><%= @task.title %></h4>
+    <div class="text-muted">
+      <% case @task.task_type %>
+      <% when "onboarding" %>
+        <span class="badge bg-success me-1">入社</span>
+      <% when "offboarding" %>
+        <span class="badge bg-danger me-1">退職</span>
+      <% when "transfer" %>
+        <span class="badge bg-info me-1">異動</span>
+      <% end %>
+      <% case @task.status %>
+      <% when "open" %>
+        <span class="badge bg-secondary">未着手</span>
+      <% when "in_progress" %>
+        <span class="badge bg-primary">進行中</span>
+      <% when "completed" %>
+        <span class="badge bg-success">完了</span>
+      <% end %>
+      <span class="ms-2">対象: <%= @task.target_user.display_name %></span>
+      <span class="ms-2">期限: <%= @task.due_date&.strftime("%Y/%m/%d") || "未設定" %></span>
+      <span class="ms-2">作成: <%= @task.created_by.display_name %></span>
+    </div>
+  </div>
+  <%= link_to "一覧に戻る", tasks_path, class: "btn btn-outline-secondary btn-sm" %>
+</div>
+
+<div class="row mb-3">
+  <div class="col">
+    <div class="progress" style="height: 24px;">
+      <div class="progress-bar bg-success" style="width: <%= @task.completion_rate %>%">
+        <%= @task.completion_rate %>%
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h6 class="mb-0">チェックリスト（<%= @task_items.select(&:completed?).size %>/<%= @task_items.size %>）</h6>
+  </div>
+  <div class="list-group list-group-flush">
+    <% @task_items.each do |item| %>
+      <div class="list-group-item d-flex align-items-center">
+        <div class="me-3">
+          <% if item.completed? %>
+            <%= button_to task_item_path(item), params: { complete: "false" }, method: :patch, class: "btn btn-sm p-0 border-0" do %>
+              <i class="bi bi-check-square-fill text-success fs-5"></i>
+            <% end %>
+          <% else %>
+            <%= button_to task_item_path(item), params: { complete: "true" }, method: :patch, class: "btn btn-sm p-0 border-0" do %>
+              <i class="bi bi-square fs-5 text-muted"></i>
+            <% end %>
+          <% end %>
+        </div>
+        <div class="flex-grow-1">
+          <div class="<%= 'text-decoration-line-through text-muted' if item.completed? %>">
+            <%= item.description %>
+          </div>
+          <small class="text-muted">
+            <% if item.saas %>
+              <span class="badge bg-light text-dark"><%= item.saas.name %></span>
+            <% end %>
+            <% if item.assignee %>
+              <i class="bi bi-person ms-1"></i> <%= item.assignee.display_name %>
+            <% end %>
+            <% if item.completed_at %>
+              <i class="bi bi-check2 ms-1 text-success"></i> <%= item.completed_at.strftime("%m/%d %H:%M") %>
+            <% end %>
+          </small>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

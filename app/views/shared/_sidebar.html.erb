@@ -26,27 +26,27 @@
       <% end %>
     </li>
     <li class="nav-item">
-      <a href="#" class="nav-link text-white disabled">
+      <%= link_to surveys_path, class: "nav-link text-white #{'active' if controller_name == 'surveys'}" do %>
         <i class="bi bi-clipboard-check me-2"></i>サーベイ
-      </a>
+      <% end %>
     </li>
     <li class="nav-item">
-      <a href="#" class="nav-link text-white disabled">
+      <%= link_to tasks_path, class: "nav-link text-white #{'active' if controller_name == 'tasks' || controller_name == 'task_presets'}" do %>
         <i class="bi bi-list-task me-2"></i>タスク管理
-      </a>
+      <% end %>
     </li>
     <li class="nav-item">
-      <a href="#" class="nav-link text-white disabled">
+      <%= link_to approval_requests_path, class: "nav-link text-white #{'active' if controller_name == 'approval_requests'}" do %>
         <i class="bi bi-check2-square me-2"></i>申請・承認
-      </a>
+      <% end %>
     </li>
 
     <% if current_user&.admin? %>
       <li class="mt-3"><small class="text-secondary text-uppercase">管理者</small></li>
       <li class="nav-item">
-        <a href="#" class="nav-link text-white disabled">
+        <%= link_to admin_batches_path, class: "nav-link text-white #{'active' if controller_name == 'batches'}" do %>
           <i class="bi bi-gear me-2"></i>バッチ管理
-        </a>
+        <% end %>
       </li>
       <li class="nav-item">
         <a href="#" class="nav-link text-white disabled">

@@ -1,0 +1,45 @@
+<% content_for(:page_title) { "タスクプリセット" } %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4>タスクプリセット</h4>
+  <%= link_to "新規作成", new_task_preset_path, class: "btn btn-primary" %>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>名前</th>
+          <th>種別</th>
+          <th>項目数</th>
+          <th>説明</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @presets.each do |preset| %>
+          <tr>
+            <td><%= preset.name %></td>
+            <td>
+              <% case preset.task_type %>
+              <% when "onboarding" %>
+                <span class="badge bg-success">入社</span>
+              <% when "offboarding" %>
+                <span class="badge bg-danger">退職</span>
+              <% when "transfer" %>
+                <span class="badge bg-info">異動</span>
+              <% end %>
+            </td>
+            <td><%= preset.task_preset_items.size %></td>
+            <td class="small text-muted"><%= truncate(preset.description, length: 50) %></td>
+            <td>
+              <%= link_to "編集", edit_task_preset_path(preset), class: "btn btn-sm btn-outline-primary" %>
+              <%= button_to "削除", task_preset_path(preset), method: :delete, class: "btn btn-sm btn-outline-danger", data: { confirm: "削除しますか？" } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

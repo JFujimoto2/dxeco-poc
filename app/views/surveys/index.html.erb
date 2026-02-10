@@ -1,0 +1,56 @@
+<% content_for(:page_title) { "サーベイ" } %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4>サーベイ一覧</h4>
+  <% if current_user.admin? %>
+    <%= link_to "新規作成", new_survey_path, class: "btn btn-primary" %>
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>タイトル</th>
+          <th>種別</th>
+          <th>ステータス</th>
+          <th>回答率</th>
+          <th>期限</th>
+          <th>作成者</th>
+          <th>作成日</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @surveys.each do |survey| %>
+          <tr>
+            <td><%= link_to survey.title, survey_path(survey) %></td>
+            <td>
+              <% if survey.account_review? %>
+                <span class="badge bg-primary">アカウント棚卸し</span>
+              <% else %>
+                <span class="badge bg-info">PW更新</span>
+              <% end %>
+            </td>
+            <td>
+              <% case survey.status %>
+              <% when "draft" %>
+                <span class="badge bg-secondary">下書き</span>
+              <% when "active" %>
+                <span class="badge bg-success">配信中</span>
+              <% when "closed" %>
+                <span class="badge bg-dark">締切済み</span>
+              <% end %>
+            </td>
+            <td><%= survey.response_rate %>%</td>
+            <td><%= survey.deadline&.strftime("%Y/%m/%d") %></td>
+            <td><%= survey.created_by.display_name %></td>
+            <td><%= survey.created_at.strftime("%Y/%m/%d") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= paginate @surveys %>

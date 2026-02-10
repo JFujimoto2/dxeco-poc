@@ -17,5 +17,38 @@ Rails.application.routes.draw do
   resources :saas_accounts, except: [:show]
   resources :users, only: [:index, :show, :edit, :update]
 
+  # サーベイ
+  resources :surveys, only: [:index, :new, :create, :show] do
+    member do
+      patch :close
+      post :activate
+      post :remind
+    end
+  end
+  resources :survey_responses, only: [:update]
+
+  # タスク管理
+  resources :task_presets
+  resources :tasks, only: [:index, :new, :create, :show]
+  resources :task_items, only: [:update]
+
+  # 申請・承認
+  resources :approval_requests, only: [:index, :new, :create, :show] do
+    member do
+      post :approve
+      post :reject
+    end
+  end
+
+  # 管理者
+  namespace :admin do
+    resources :batches, only: [:index] do
+      collection do
+        post :sync_entra_users
+        post :detect_retired_accounts
+      end
+    end
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

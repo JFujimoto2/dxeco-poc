@@ -1,0 +1,64 @@
+<%= form_with model: preset, class: "card" do |f| %>
+  <div class="card-body">
+    <% if preset.errors.any? %>
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          <% preset.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <%= f.label :name, "プリセット名", class: "form-label" %>
+        <%= f.text_field :name, class: "form-control", placeholder: "例: 退職処理" %>
+      </div>
+      <div class="col-md-6">
+        <%= f.label :task_type, "種別", class: "form-label" %>
+        <%= f.select :task_type, [["入社", "onboarding"], ["退職", "offboarding"], ["異動", "transfer"]], {}, class: "form-select" %>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :description, "説明", class: "form-label" %>
+      <%= f.text_area :description, class: "form-control", rows: 2 %>
+    </div>
+
+    <hr>
+    <h6>テンプレート項目</h6>
+    <div id="preset-items">
+      <%= f.fields_for :task_preset_items do |item_f| %>
+        <div class="row mb-2 preset-item">
+          <div class="col-md-3">
+            <%= item_f.select :action_type, [
+              ["アカウント作成", "account_create"],
+              ["アカウント削除", "account_delete"],
+              ["PC返却", "pc_return"],
+              ["携帯返却", "phone_return"],
+              ["機密保持契約", "nda"],
+              ["その他", "other"]
+            ], {}, class: "form-select form-select-sm" %>
+          </div>
+          <div class="col-md-4">
+            <%= item_f.text_field :description, class: "form-control form-control-sm", placeholder: "タスク内容" %>
+          </div>
+          <div class="col-md-3">
+            <%= item_f.collection_select :default_assignee_id, User.order(:display_name), :id, :display_name, { include_blank: "担当者（任意）" }, class: "form-select form-select-sm" %>
+          </div>
+          <div class="col-md-2">
+            <%= item_f.check_box :_destroy, class: "form-check-input" %>
+            <%= item_f.label :_destroy, "削除", class: "form-check-label small" %>
+            <%= item_f.hidden_field :id %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <%= f.submit "保存", class: "btn btn-primary" %>
+    <%= link_to "キャンセル", task_presets_path, class: "btn btn-outline-secondary ms-2" %>
+  </div>
+<% end %>

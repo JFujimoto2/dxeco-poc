@@ -1,0 +1,153 @@
+<% content_for(:page_title) { @survey.title } %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4><%= @survey.title %></h4>
+    <div class="text-muted">
+      <% if @survey.account_review? %>
+        <span class="badge bg-primary me-1">アカウント棚卸し</span>
+      <% else %>
+        <span class="badge bg-info me-1">PW更新</span>
+      <% end %>
+      <% case @survey.status %>
+      <% when "draft" %>
+        <span class="badge bg-secondary">下書き</span>
+      <% when "active" %>
+        <span class="badge bg-success">配信中</span>
+      <% when "closed" %>
+        <span class="badge bg-dark">締切済み</span>
+      <% end %>
+      <span class="ms-2">期限: <%= @survey.deadline&.strftime("%Y/%m/%d") || "未設定" %></span>
+      <span class="ms-2">作成者: <%= @survey.created_by.display_name %></span>
+    </div>
+  </div>
+  <div>
+    <% if current_user.admin? %>
+      <% if @survey.draft? %>
+        <%= button_to "配信する", activate_survey_path(@survey), method: :post, class: "btn btn-success btn-sm", data: { confirm: "サーベイを配信しますか？" } %>
+      <% elsif @survey.active? %>
+        <%= button_to "リマインド送信", remind_survey_path(@survey), method: :post, class: "btn btn-warning btn-sm me-1" %>
+        <%= button_to "締め切る", close_survey_path(@survey), method: :patch, class: "btn btn-secondary btn-sm", data: { confirm: "サーベイを締め切りますか？" } %>
+      <% end %>
+    <% end %>
+    <%= link_to "一覧に戻る", surveys_path, class: "btn btn-outline-secondary btn-sm ms-1" %>
+  </div>
+</div>
+
+<% if current_user.admin? %>
+  <%# 管理者: 回答状況ダッシュボード %>
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5><%= @response_stats[:total] %></h5>
+          <small class="text-muted">対象アカウント数</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="text-success"><%= @response_stats[:responded] %></h5>
+          <small class="text-muted">回答済み</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5><%= @survey.response_rate %>%</h5>
+          <small class="text-muted">回答率</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="text-danger"><%= @response_stats[:not_using] %></h5>
+          <small class="text-muted">利用なし回答</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h6 class="mb-0">回答一覧</h6></div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>メンバー</th>
+            <th>SaaS</th>
+            <th>回答</th>
+            <th>回答日</th>
+            <th>備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @responses.each do |resp| %>
+            <tr class="<%= 'table-warning' if resp.response == 'not_using' %>">
+              <td><%= resp.user.display_name %></td>
+              <td><%= resp.saas_account&.saas&.name || "-" %></td>
+              <td>
+                <% case resp.response %>
+                <% when "using" %>
+                  <span class="badge bg-success">利用中</span>
+                <% when "not_using" %>
+                  <span class="badge bg-danger">利用なし</span>
+                <% when "updated" %>
+                  <span class="badge bg-info">更新済み</span>
+                <% else %>
+                  <span class="badge bg-secondary">未回答</span>
+                <% end %>
+              </td>
+              <td><%= resp.responded_at&.strftime("%Y/%m/%d %H:%M") || "-" %></td>
+              <td class="small"><%= resp.notes %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<% else %>
+  <%# 一般ユーザー: 回答フォーム %>
+  <div class="card">
+    <div class="card-header"><h6 class="mb-0">あなたのSaaSアカウント</h6></div>
+    <div class="card-body p-0">
+      <table class="table mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>SaaS</th>
+            <th>アカウント</th>
+            <th>回答</th>
+            <th>備考</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @my_responses.each do |resp| %>
+            <tr>
+              <td><%= resp.saas_account&.saas&.name %></td>
+              <td><%= resp.saas_account&.account_email %></td>
+              <td colspan="3">
+                <%= form_with model: resp, url: survey_response_path(resp), method: :patch, class: "d-flex align-items-center gap-2" do |f| %>
+                  <% if @survey.account_review? %>
+                    <%= f.select :response, [["--選択--", ""], ["利用中", "using"], ["利用していない", "not_using"]], { selected: resp.response }, class: "form-select form-select-sm", style: "width: 160px" %>
+                  <% else %>
+                    <%= f.select :response, [["--選択--", ""], ["更新済み", "updated"], ["未対応", ""]], { selected: resp.response }, class: "form-select form-select-sm", style: "width: 160px" %>
+                  <% end %>
+                  <%= f.text_field :notes, class: "form-control form-control-sm", placeholder: "備考", value: resp.notes, style: "width: 200px" %>
+                  <%= f.submit "保存", class: "btn btn-sm btn-outline-primary" %>
+                  <% if resp.responded_at %>
+                    <small class="text-success"><i class="bi bi-check-circle"></i></small>
+                  <% end %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>
