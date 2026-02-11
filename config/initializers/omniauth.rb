@@ -14,6 +14,15 @@ Rails.application.config.middleware.use OmniAuth::Builder do
         authorization_endpoint: "/#{ENV['ENTRA_TENANT_ID']}/oauth2/v2.0/authorize",
         token_endpoint: "/#{ENV['ENTRA_TENANT_ID']}/oauth2/v2.0/token"
       }
+  elsif Rails.env.test?
+    provider :openid_connect,
+      name: :entra_id,
+      scope: [ :openid ],
+      client_options: {
+        identifier: "test",
+        secret: "test",
+        redirect_uri: "http://localhost:3000/auth/entra_id/callback"
+      }
   end
 end
 
