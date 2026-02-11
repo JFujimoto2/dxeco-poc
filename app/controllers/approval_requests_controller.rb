@@ -22,6 +22,7 @@ class ApprovalRequestsController < ApplicationController
         title: "SaaS利用申請",
         body: "#{current_user.display_name}さんから申請があります。\n種別: #{@approval_request.request_type}\n対象: #{@approval_request.target_saas_name}\n理由: #{@approval_request.reason}"
       )
+      ApprovalRequestMailer.new_request(@approval_request).deliver_later
       redirect_to approval_requests_path, notice: "申請を送信しました"
     else
       @saases = Saas.where(status: "active").order(:name)
@@ -48,6 +49,7 @@ class ApprovalRequestsController < ApplicationController
       title: "申請が承認されました",
       body: "「#{request.target_saas_name}」の利用申請が#{current_user.display_name}によって承認されました。"
     )
+    ApprovalRequestMailer.approved(request).deliver_later
     redirect_to approval_request_path(request), notice: "承認しました"
   end
 
@@ -67,6 +69,7 @@ class ApprovalRequestsController < ApplicationController
       title: "申請が却下されました",
       body: "「#{request.target_saas_name}」の利用申請が却下されました。\n理由: #{request.rejection_reason}"
     )
+    ApprovalRequestMailer.rejected(request).deliver_later
     redirect_to approval_request_path(request), notice: "却下しました"
   end
 

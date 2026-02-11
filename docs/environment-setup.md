@@ -26,6 +26,20 @@
 | `TEAMS_WEBHOOK_URL` | Teams チャネルの Incoming Webhook URL（一般通知） | `https://xxxxx.webhook.office.com/...` |
 | `TEAMS_WEBHOOK_SURVEY_URL` | サーベイ専用チャネルの Webhook URL（未設定時は `TEAMS_WEBHOOK_URL` にフォールバック） | `https://xxxxx.webhook.office.com/...` |
 
+### メール通知（SMTP）
+
+| 変数名 | 用途 | 例 |
+|--------|------|-----|
+| `SMTP_ADDRESS` | SMTPサーバー | `smtp.office365.com` |
+| `SMTP_PORT` | ポート | `587` |
+| `SMTP_USERNAME` | ユーザー名 | `noreply@example.com` |
+| `SMTP_PASSWORD` | パスワード | `xxxxxxxxxx` |
+| `SMTP_DOMAIN` | HELOドメイン | `example.com` |
+| `MAILER_FROM` | 送信元アドレス | `noreply@example.com` |
+
+SMTP 変数が未設定の場合、メール通知はスキップされる（Teams通知と同じパターン）。
+開発環境では `letter_opener` gem で実際にメール送信せずブラウザで確認可能。
+
 ### オプション（インフラ）
 
 | 変数名 | 用途 | デフォルト値 |

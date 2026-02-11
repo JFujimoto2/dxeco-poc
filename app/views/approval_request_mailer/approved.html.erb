@@ -1,0 +1,9 @@
+<h2>申請が承認されました</h2>
+
+<p>「<strong><%= @request.target_saas_name %></strong>」の利用申請が承認されました。</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">
+  <tr><th>種別</th><td><%= @request.request_type %></td></tr>
+  <tr><th>対象SaaS</th><td><%= @request.target_saas_name %></td></tr>
+  <tr><th>承認者</th><td><%= @request.approved_by&.display_name %></td></tr>
+</table>

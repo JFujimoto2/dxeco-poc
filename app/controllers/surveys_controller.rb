@@ -50,6 +50,7 @@ class SurveysController < ApplicationController
       body: "「#{survey.title}」への回答をお願いします。\n期限: #{survey.deadline&.strftime('%Y/%m/%d')}",
       webhook_url: TeamsNotifier::SURVEY_WEBHOOK_URL
     )
+    SurveyMailer.distribution(survey).deliver_later
     redirect_to survey_path(survey), notice: "サーベイを配信しました"
   end
 
@@ -67,6 +68,7 @@ class SurveysController < ApplicationController
       body: "「#{survey.title}」に#{pending_count}名が未回答です。\n期限: #{survey.deadline&.strftime('%Y/%m/%d')}",
       webhook_url: TeamsNotifier::SURVEY_WEBHOOK_URL
     )
+    SurveyMailer.reminder(survey).deliver_later
     redirect_to survey_path(survey), notice: "リマインドを送信しました（未回答: #{pending_count}名）"
   end
 

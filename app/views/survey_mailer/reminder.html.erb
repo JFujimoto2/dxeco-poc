@@ -1,0 +1,7 @@
+<h2>【リマインド】サーベイ未回答</h2>
+
+<p>「<strong><%= @survey.title %></strong>」がまだ未回答です。回答をお願いします。</p>
+
+<p><strong>期限:</strong> <%= @survey.deadline&.strftime("%Y/%m/%d") || "未設定" %></p>
+
+<p>アプリにログインして、サーベイ画面から回答してください。</p>

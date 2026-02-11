@@ -41,14 +41,25 @@
 
 ## 通知一覧
 
-| トリガー | 送信先 | 件名プレフィックス |
-|----------|--------|-------------------|
-| タスク作成（アイテムにアサイン） | アサイン先ユーザー | `[SaaS管理] タスク対応のお願い` |
-| 承認申請の提出 | admin/manager 全員 | `[SaaS管理] 承認依頼` |
-| 申請の承認 | 申請者 | `[SaaS管理] 申請が承認されました` |
-| 申請の却下 | 申請者 | `[SaaS管理] 申請が却下されました` |
-| サーベイ配信 | 対象ユーザー全員 | `[SaaS管理] サーベイのお願い` |
-| サーベイリマインド | 未回答ユーザー | `[SaaS管理] 【リマインド】サーベイ未回答` |
+| トリガー | To（宛先） | CC | 件名プレフィックス |
+|----------|-----------|-----|-------------------|
+| タスク作成（アイテムにアサイン） | アサイン先ユーザー | 対象ユーザーの部署の部長（manager）+ タスク作成者 | `[SaaS管理] タスク対応のお願い` |
+| 承認申請の提出 | admin/manager 全員 | - | `[SaaS管理] 承認依頼` |
+| 申請の承認 | 申請者 | 対象SaaSのオーナー（`saas.owner`） | `[SaaS管理] 申請が承認されました` |
+| 申請の却下 | 申請者 | 対象SaaSのオーナー（`saas.owner`） | `[SaaS管理] 申請が却下されました` |
+| サーベイ配信 | 対象ユーザー全員 | - | `[SaaS管理] サーベイのお願い` |
+| サーベイリマインド | 未回答ユーザー | - | `[SaaS管理] 【リマインド】サーベイ未回答` |
+
+### CC ロジック
+
+| CC対象 | 取得方法 |
+|--------|---------|
+| 部署の部長（manager） | `User.manager.where(department: target_user.department)` |
+| タスク作成者 | `task.created_by` |
+| SaaSオーナー | `saas.owner`（SaaS台帳の管理責任者） |
+
+- CC 対象が To と重複する場合は除外する
+- CC 対象が存在しない（未設定・nil）場合はスキップ
 
 ## 技術設計
 
@@ -116,35 +127,35 @@ SurveyMailer.distribution(survey).deliver_later
 ## 成果物チェックリスト
 
 ### 環境構築
-- [ ] `letter_opener` gem 追加（development用）
-- [ ] SMTP 環境変数の設定（config/environments/production.rb）
-- [ ] ApplicationMailer の from アドレスを環境変数化
-- [ ] `.env.example` に SMTP 関連変数を追加
+- [x] `letter_opener` gem 追加（development用）
+- [x] SMTP 環境変数の設定（config/environments/production.rb）
+- [x] ApplicationMailer の from アドレスを環境変数化
+- [x] `.env.example` に SMTP 関連変数を追加
 
 ### Mailer 実装
-- [ ] TaskMailer（アサイン通知）
-- [ ] ApprovalRequestMailer（申請・承認・却下通知）
-- [ ] SurveyMailer（配信・リマインド通知）
+- [x] TaskMailer（アサイン通知 + CC: 部署manager, タスク作成者）
+- [x] ApprovalRequestMailer（申請・承認・却下通知 + CC: SaaSオーナー）
+- [x] SurveyMailer（配信・リマインド通知）
 
 ### ビュー（メールテンプレート）
-- [ ] タスクアサイン通知メール
-- [ ] 承認依頼メール
-- [ ] 承認結果メール（承認/却下）
-- [ ] サーベイ配信メール
-- [ ] サーベイリマインドメール
+- [x] タスクアサイン通知メール
+- [x] 承認依頼メール
+- [x] 承認結果メール（承認/却下）
+- [x] サーベイ配信メール
+- [x] サーベイリマインドメール
 
 ### コントローラー連携
-- [ ] TasksController に deliver_later 追加
-- [ ] ApprovalRequestsController に deliver_later 追加
-- [ ] SurveysController に deliver_later 追加
+- [x] TasksController に deliver_later 追加
+- [x] ApprovalRequestsController に deliver_later 追加
+- [x] SurveysController に deliver_later 追加
 
 ### テスト
-- [ ] TaskMailer spec
-- [ ] ApprovalRequestMailer spec
-- [ ] SurveyMailer spec
-- [ ] 既存リクエストスペックの更新（メール送信の確認）
+- [x] TaskMailer spec（7テスト）
+- [x] ApprovalRequestMailer spec（11テスト）
+- [x] SurveyMailer spec（6テスト）
+- [x] 全177テスト パス確認
 
 ### ドキュメント
-- [ ] docs/environment-setup.md に SMTP 設定手順を追記
-- [ ] docs/features/05_survey.md 更新
-- [ ] .env.example 更新
+- [x] docs/environment-setup.md に SMTP 設定手順を追記
+- [x] docs/features/05_survey.md 更新
+- [x] .env.example 更新

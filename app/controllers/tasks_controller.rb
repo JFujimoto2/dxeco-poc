@@ -59,6 +59,7 @@ class TasksController < ApplicationController
         title: "新しいタスクが作成されました",
         body: "「#{@task.title}」\n期限: #{@task.due_date}\n項目数: #{@task.task_items.count}"
       )
+      TaskMailer.assignment_notification(@task).deliver_later
       redirect_to @task, notice: "タスクを作成しました"
     else
       @presets = TaskPreset.all
