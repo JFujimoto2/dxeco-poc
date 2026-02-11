@@ -77,22 +77,30 @@ npx playwright test --ui
 
 ## Docker 環境構築
 
-ローカルの Ruby / PostgreSQL を使わずに Docker でアプリを起動できます。
+ローカルの Ruby / PostgreSQL を使わずに Docker だけでアプリを起動できます。
 
-### 前提条件
-
-- Docker がインストール済み
-
-### ビルド
+### Docker Compose（推奨）
 
 ```bash
-# WSL 環境の場合は --network=host を付ける
-docker build --network=host -t dxceco-poc:latest .
+# RAILS_MASTER_KEY を設定して起動
+RAILS_MASTER_KEY=$(cat config/master.key) docker compose up -d
+
+# ログ確認
+docker compose logs -f web
+
+# 停止 & クリーンアップ
+docker compose down -v
 ```
 
-### 起動（ローカル PostgreSQL を使う場合）
+http://localhost:8080 でアクセス可能（PostgreSQL も自動起動）。
+
+### 手動ビルド & 起動
 
 ```bash
+# ビルド（WSL 環境は --network=host が必要）
+docker build --network=host -t dxceco-poc:latest .
+
+# 起動（ローカル PostgreSQL を使う場合）
 docker run --rm --network=host \
   -e RAILS_MASTER_KEY=$(cat config/master.key) \
   -e DATABASE_URL="postgres://<DBユーザー>:<パスワード>@localhost:5433/dxceco_poc_production" \
@@ -107,21 +115,6 @@ docker run --rm --network=host \
   -e HTTP_PORT=8080 \
   dxceco-poc:latest
 ```
-
-http://localhost:8080 でアクセス可能（Entra ID SSO 設定済みの場合はログインリダイレクト）。
-
-### 環境変数（Docker / 本番用）
-
-| 変数 | 説明 | デフォルト |
-|------|------|-----------|
-| `RAILS_MASTER_KEY` | credentials 復号キー | - |
-| `DATABASE_URL` | PostgreSQL 接続URL（primary DB） | - |
-| `DXCECO_POC_DATABASE_PASSWORD` | DB パスワード（cache/queue/cable 用） | - |
-| `DB_HOST` | DB ホスト名（cache/queue/cable 用） | `localhost` |
-| `DB_USERNAME` | DB ユーザー名（cache/queue/cable 用） | `dxceco_poc` |
-| `SOLID_QUEUE_IN_PUMA` | Puma 内で Solid Queue 起動 | - |
-| `TARGET_PORT` | Puma のリッスンポート（Thruster 経由） | `3000` |
-| `HTTP_PORT` | Thruster のリッスンポート | `80` |
 
 ### Azure デプロイ
 

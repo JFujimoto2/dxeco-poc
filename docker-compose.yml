@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16
+    network_mode: host
+    environment:
+      POSTGRES_USER: dxceco_poc
+      POSTGRES_PASSWORD: password
+      PGPORT: "5434"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./infra/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dxceco_poc -p 5434"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      network: host
+    network_mode: host
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      DATABASE_URL: postgres://dxceco_poc:password@localhost:5434/dxceco_poc_production?sslmode=disable
+      DXCECO_POC_DATABASE_PASSWORD: password
+      DB_HOST: localhost
+      DB_USERNAME: dxceco_poc
+      PGPORT: "5434"
+      SOLID_QUEUE_IN_PUMA: "true"
+      APP_URL: http://localhost:8080
+      TARGET_PORT: "3080"
+      HTTP_PORT: "8080"
+
+volumes:
+  pg_data:
