@@ -6,6 +6,11 @@ module ApplicationHelper
     "(#{WEEKDAYS_JA[date.wday]})"
   end
 
+  def format_date_with_weekday(date)
+    return "" unless date
+    "#{date.strftime('%Y/%m/%d')} (#{WEEKDAYS_JA[date.wday]})"
+  end
+
   def safe_url_link(url)
     return "-" unless url.present?
 

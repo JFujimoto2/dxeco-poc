@@ -27,10 +27,10 @@
       <div class="col-md-6">
         <%= f.label :deadline, "回答期限", class: "form-label" %>
         <% default_deadline = 2.weeks.from_now.to_date %>
-        <div class="d-flex align-items-center gap-2">
+        <div class="date-weekday-wrap">
           <%= f.date_field :deadline, class: "form-control", id: "deadline-input", value: default_deadline,
-              onchange: "updateWeekday(this)" %>
-          <span id="deadline-weekday" class="text-muted fw-bold"><%= weekday_label(default_deadline) %></span>
+              onchange: "updateDateDisplay(this, 'deadline-display')" %>
+          <span id="deadline-display" class="date-weekday-display"><%= format_date_with_weekday(default_deadline) %></span>
         </div>
       </div>
     </div>
@@ -68,12 +68,13 @@
 <% end %>
 
 <script>
-  function updateWeekday(input) {
+  function updateDateDisplay(input, displayId) {
     var weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-    var span = document.getElementById("deadline-weekday");
+    var span = document.getElementById(displayId);
     if (input.value) {
+      var parts = input.value.split("-");
       var d = new Date(input.value + "T00:00:00");
-      span.textContent = "(" + weekdays[d.getDay()] + ")";
+      span.textContent = parts[0] + "/" + parts[1] + "/" + parts[2] + " (" + weekdays[d.getDay()] + ")";
     } else {
       span.textContent = "";
     }
