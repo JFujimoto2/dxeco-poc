@@ -40,4 +40,28 @@ RSpec.describe EntraClient do
       expect(users.size).to eq(2)
     end
   end
+
+  describe ".fetch_my_profile" do
+    it "ログインユーザーのプロフィールを取得する" do
+      stub_request(:get, "https://graph.microsoft.com/v1.0/me?$select=department,jobTitle,employeeId")
+        .to_return(status: 200, body: {
+          "department" => "情報システム部",
+          "jobTitle" => "主任",
+          "employeeId" => "EMP001"
+        }.to_json)
+
+      profile = EntraClient.fetch_my_profile("user-token")
+      expect(profile["department"]).to eq("情報システム部")
+      expect(profile["jobTitle"]).to eq("主任")
+      expect(profile["employeeId"]).to eq("EMP001")
+    end
+
+    it "API失敗時はnilを返す" do
+      stub_request(:get, "https://graph.microsoft.com/v1.0/me?$select=department,jobTitle,employeeId")
+        .to_return(status: 401, body: { error: "Unauthorized" }.to_json)
+
+      profile = EntraClient.fetch_my_profile("invalid-token")
+      expect(profile).to be_nil
+    end
+  end
 end

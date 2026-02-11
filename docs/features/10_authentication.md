@@ -24,8 +24,18 @@ Microsoft Entra ID（旧Azure AD）によるSSO認証と、3段階のロール�
 - OmniAuth + OpenID Connect（OIDC）でEntra IDに接続
 - OIDC Discovery で認可/トークンエンドポイントを自動解決
 - 初回ログイン時にユーザーレコードを自動作成（viewerロール）
+- ログイン時に Graph API（`/me`）で部門・役職・社員番号を自動取得
 - `ENTRA_CLIENT_ID` 環境変数が設定されている場合に有効
 - ログアウト時は Entra ID のセッションも終了（`/oauth2/v2.0/logout`）
+
+### ログイン時のプロフィール自動取得
+SSOログイン時に `User.Read` スコープで取得したアクセストークンを使い、Graph API `/me` エンドポイントから以下を取得・更新する:
+- `department`（部門）
+- `jobTitle`（役職）
+- `employeeId`（社員番号）
+
+Graph API への接続に失敗してもログイン自体は成功する（フォールバック動作）。
+バッチ同期（`EntraUserSyncJob`）でも同じ情報を全ユーザー一括で取得可能。
 
 ### 開発/テスト環境（dev_login）
 ```

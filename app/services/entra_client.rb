@@ -13,6 +13,15 @@ class EntraClient
     JSON.parse(response.body)["access_token"]
   end
 
+  def self.fetch_my_profile(token)
+    response = Faraday.get("#{BASE_URL}/me?$select=department,jobTitle,employeeId") do |req|
+      req.headers["Authorization"] = "Bearer #{token}"
+    end
+    return nil unless response.success?
+
+    JSON.parse(response.body)
+  end
+
   def self.fetch_all_users(token)
     url = "#{BASE_URL}/users?$select=id,displayName,mail,userPrincipalName,jobTitle,department,employeeId,accountEnabled&$top=999"
     users = []

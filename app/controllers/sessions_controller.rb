@@ -14,6 +14,16 @@ class SessionsController < ApplicationController
       display_name: auth.info.name,
       last_signed_in_at: Time.current
     )
+
+    if auth.credentials&.token.present?
+      profile = EntraClient.fetch_my_profile(auth.credentials.token)
+      if profile
+        user.department = profile["department"] if profile["department"].present?
+        user.job_title = profile["jobTitle"] if profile["jobTitle"].present?
+        user.employee_id = profile["employeeId"] if profile["employeeId"].present?
+      end
+    end
+
     user.role ||= "viewer"
     user.save!
 

@@ -2,7 +2,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   if ENV["ENTRA_CLIENT_ID"].present?
     provider :openid_connect,
       name: :entra_id,
-      scope: [ :openid, :profile, :email ],
+      scope: [ :openid, :profile, :email, "User.Read" ],
       discovery: true,
       issuer: "https://login.microsoftonline.com/#{ENV['ENTRA_TENANT_ID']}/v2.0",
       client_options: {
