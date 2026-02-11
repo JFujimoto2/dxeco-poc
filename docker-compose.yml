@@ -23,9 +23,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ./config/master.key:/rails/config/master.key:ro
     environment:
       RAILS_ENV: production
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       DATABASE_URL: postgres://dxceco_poc:password@localhost:5434/dxceco_poc_production?sslmode=disable
       DXCECO_POC_DATABASE_PASSWORD: password
       DB_HOST: localhost

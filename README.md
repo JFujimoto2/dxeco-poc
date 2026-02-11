@@ -82,8 +82,8 @@ npx playwright test --ui
 ### Docker Compose（推奨）
 
 ```bash
-# RAILS_MASTER_KEY を設定して起動
-RAILS_MASTER_KEY=$(cat config/master.key) docker compose up -d
+# 起動（PostgreSQL + Rails アプリ）
+docker compose up -d
 
 # ログ確認
 docker compose logs -f web
