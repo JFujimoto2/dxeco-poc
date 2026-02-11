@@ -87,6 +87,12 @@ RSpec.describe "Sessions", type: :request do
         credentials: { token: "mock-token" }
       )
       stub_request(:get, /graph\.microsoft\.com/).to_return(status: 200, body: "{}".to_json)
+
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with("ENTRA_CLIENT_ID").and_return("test-client-id")
+      allow(ENV).to receive(:[]).with("ENTRA_TENANT_ID").and_return("test-tenant-id")
+
       get "/auth/entra_id/callback"
 
       delete logout_path
