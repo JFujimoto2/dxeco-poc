@@ -114,14 +114,14 @@ IaC（Terraform, AWS CDK, etc.）やコンテナオーケストレーション�
 1. [Azure Portal](https://portal.azure.com) → **Microsoft Entra ID** → **アプリの登録** → **新規登録**
 2. 以下を入力:
    - **名前**: `SaaS管理ツール`（任意）
-   - **サポートされるアカウントの種類**: 「この組織ディレクトリのみに含まれるアカウント」
+   - **サポートされるアカウントの種類**: 「この組織ディレクトリのみに含まれるアカウント（シングルテナント）」
    - **リダイレクトURI**: `Web` → `http://localhost:3000/auth/entra_id/callback`（開発時）
 
 #### 2. クライアントシークレットを作成
 
 1. 登録したアプリの「証明書とシークレット」→「新しいクライアントシークレット」
-2. 説明: `SaaS管理ツール`、有効期限: 任意
-3. 作成されたシークレットの **値** をコピー（この画面でしか確認できない）
+2. 説明: `SaaS管理ツール`、有効期限: 任意（POCなら6ヶ月推奨）
+3. 作成されたシークレットの **値** をコピー（**この画面を離れると二度と確認できない**）
 
 #### 3. 必要な情報を取得
 
@@ -143,7 +143,27 @@ ENTRA_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 APP_URL=http://localhost:3000
 ```
 
-#### 5. 本番環境のリダイレクトURI追加
+#### 5. サーバーを再起動して確認
+
+OmniAuth の設定はミドルウェアとして初期化時に読み込まれるため、`.env` 変更後は **`bin/dev` の再起動が必要**。
+
+```bash
+# Ctrl+C で停止後
+bin/dev
+```
+
+1. http://localhost:3000/login にアクセス
+2. 「Microsoft アカウントでログイン」ボタンが表示される
+3. クリックして会社の Microsoft アカウントで認証
+4. ダッシュボードにリダイレクトされれば成功
+
+初回ログイン時は `viewer` ロールで自動登録される。Rails コンソールでロールを変更可能:
+
+```ruby
+User.find_by(email: "your-email@example.com").update!(role: "admin")
+```
+
+#### 6. 本番環境のリダイレクトURI追加
 
 本番デプロイ時、Entra ID のアプリ登録に本番URLのリダイレクトURIを追加する。
 
@@ -152,6 +172,16 @@ https://saas-mgmt.example.com/auth/entra_id/callback
 ```
 
 `APP_URL` も本番URLに合わせて変更する。
+
+#### トラブルシューティング
+
+| エラー | 原因 | 対処 |
+|--------|------|------|
+| `No Host Info` (RuntimeError) | OIDC クライアントがホスト情報を解決できない | `config/initializers/omniauth.rb` で `discovery: true` と `host`/`scheme`/エンドポイントが明示されているか確認 |
+| `Authentication failure! invalid_credentials` | クライアントシークレットが間違っている | Azure Portal でシークレットを再作成し `.env` を更新 |
+| `redirect_uri_mismatch` | リダイレクトURIが一致しない | Azure Portal のアプリ登録で `http://localhost:3000/auth/entra_id/callback` が登録されているか確認 |
+| SSO ボタンが表示されない | `ENTRA_CLIENT_ID` が未設定 | `.env` に設定後、`bin/dev` を再起動 |
+| ログイン後に `viewer` ロールになる | 初回ログインのデフォルト動作 | Rails コンソールで `User.find_by(email: "...").update!(role: "admin")` |
 
 ---
 

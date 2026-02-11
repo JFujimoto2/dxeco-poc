@@ -15,11 +15,17 @@ Microsoft Entra ID（旧Azure AD）によるSSO認証と、3段階のロール�
 
 ### 本番環境（Entra ID SSO）
 ```
-ログイン画面 → Entra ID認証 → コールバック → ダッシュボード
+ログイン画面 → 「Microsoft アカウントでログイン」クリック
+  → Entra ID (login.microsoftonline.com) にリダイレクト
+  → Microsoft アカウントで認証
+  → /auth/entra_id/callback にリダイレクト
+  → ユーザー作成 or 更新 → ダッシュボード
 ```
-- OmniAuth + OIDC でEntra IDに接続
+- OmniAuth + OpenID Connect（OIDC）でEntra IDに接続
+- OIDC Discovery で認可/トークンエンドポイントを自動解決
 - 初回ログイン時にユーザーレコードを自動作成（viewerロール）
 - `ENTRA_CLIENT_ID` 環境変数が設定されている場合に有効
+- ログアウト時は Entra ID のセッションも終了（`/oauth2/v2.0/logout`）
 
 ### 開発/テスト環境（dev_login）
 ```
@@ -55,4 +61,15 @@ Microsoft Entra ID（旧Azure AD）によるSSO認証と、3段階のロール�
 - `session[:user_id]` でログイン状態を管理
 - `require_login` フィルタで未認証アクセスをリダイレクト
 - `require_admin` フィルタでadmin専用画面を保護
-- ログアウト時にEntra IDのセッションも終了（本番のみ）
+- ログアウト時にEntra IDのセッションも終了（SSO有効時のみ）
+
+## 必要な環境変数
+
+| 変数名 | 用途 |
+|--------|------|
+| `ENTRA_CLIENT_ID` | Entra ID アプリのクライアントID |
+| `ENTRA_CLIENT_SECRET` | クライアントシークレット |
+| `ENTRA_TENANT_ID` | Azure テナントID |
+| `APP_URL` | アプリの公開URL（リダイレクトURI生成に使用） |
+
+設定手順の詳細は [環境変数・外部サービス接続ガイド](../environment-setup.md#entra-id-sso-の設定) を参照。
