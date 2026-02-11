@@ -12,7 +12,9 @@ class SessionsController < ApplicationController
     Rails.logger.info "[SSO] OmniAuth info: #{auth.info.to_h}"
     Rails.logger.info "[SSO] OmniAuth extra.raw_info: #{auth.extra&.raw_info&.to_h}" if auth.extra&.raw_info
 
-    user = User.find_or_initialize_by(entra_id_sub: auth.uid)
+    entra_id = auth.extra&.raw_info&.[]("oid") || auth.uid
+    user = User.find_by(entra_id_sub: entra_id) || User.find_by(email: auth.info.email) || User.new
+    user.entra_id_sub = entra_id
     user.assign_attributes(
       email: auth.info.email,
       display_name: auth.info.name,

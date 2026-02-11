@@ -15,7 +15,8 @@ RSpec.describe "Sessions", type: :request do
         provider: "entra_id",
         uid: "entra-sso-123",
         info: { email: "sso@example.com", name: "SSO太郎" },
-        credentials: { token: "mock-access-token" }
+        credentials: { token: "mock-access-token" },
+        extra: { raw_info: { "oid" => "entra-oid-456" } }
       )
     end
 
@@ -33,10 +34,18 @@ RSpec.describe "Sessions", type: :request do
         }.to_json)
 
       get "/auth/entra_id/callback"
-      user = User.find_by(entra_id_sub: "entra-sso-123")
+      user = User.find_by(entra_id_sub: "entra-oid-456")
       expect(user.department).to eq("営業部")
       expect(user.job_title).to eq("課長")
       expect(user.employee_id).to eq("EMP042")
+    end
+
+    it "entra_id_subにOIDCのsubではなくoidを使用する" do
+      stub_request(:get, /graph\.microsoft\.com/).to_return(status: 200, body: "{}".to_json)
+
+      get "/auth/entra_id/callback"
+      expect(User.find_by(entra_id_sub: "entra-oid-456")).to be_present
+      expect(User.find_by(entra_id_sub: "entra-sso-123")).to be_nil
     end
 
     it "Graph API失敗時もログインは成功する" do
@@ -45,7 +54,7 @@ RSpec.describe "Sessions", type: :request do
 
       get "/auth/entra_id/callback"
       expect(response).to redirect_to(root_path)
-      expect(User.find_by(entra_id_sub: "entra-sso-123")).to be_present
+      expect(User.find_by(entra_id_sub: "entra-oid-456")).to be_present
     end
   end
 

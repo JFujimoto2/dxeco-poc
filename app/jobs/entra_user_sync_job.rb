@@ -9,7 +9,9 @@ class EntraUserSyncJob < ApplicationJob
     entra_users = EntraClient.fetch_all_users(token)
 
     entra_users.each do |eu|
-      user = User.find_or_initialize_by(entra_id_sub: eu["id"])
+      email = eu["mail"] || eu["userPrincipalName"]
+      user = User.find_by(entra_id_sub: eu["id"]) || User.find_by(email: email) || User.new
+      user.entra_id_sub = eu["id"]
       user.assign_attributes(
         email: eu["mail"] || eu["userPrincipalName"],
         display_name: eu["displayName"],
