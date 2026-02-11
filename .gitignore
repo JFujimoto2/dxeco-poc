@@ -34,6 +34,9 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+# Infra secrets
+/infra/.env.azure
+
 # Node / Playwright
 /node_modules/
 /playwright-report/
