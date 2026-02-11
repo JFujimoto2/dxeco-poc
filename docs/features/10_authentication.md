@@ -28,14 +28,49 @@ Microsoft Entra ID（旧Azure AD）によるSSO認証と、3段階のロール�
 - `ENTRA_CLIENT_ID` 環境変数が設定されている場合に有効
 - ログアウト時は Entra ID のセッションも終了（`/oauth2/v2.0/logout`）
 
-### ログイン時のプロフィール自動取得
-SSOログイン時に `User.Read` スコープで取得したアクセストークンを使い、Graph API `/me` エンドポイントから以下を取得・更新する:
-- `department`（部門）
-- `jobTitle`（役職）
-- `employeeId`（社員番号）
+### SSOログイン時に取得する情報
+
+#### 1. OIDC ID トークン（OmniAuth info）
+
+| フィールド | 内容 | 対応カラム |
+|-----------|------|-----------|
+| `uid` (sub) | Entra ID ユーザー識別子 | `users.entra_id_sub` |
+| `info.email` | メールアドレス | `users.email` |
+| `info.name` | 表示名 | `users.display_name` |
+| `info.first_name` | 名 | - |
+| `info.last_name` | 姓 | - |
+| `info.nickname` | ユーザープリンシパル名 | - |
+| `info.image` | プロフィール画像URL | - |
+| `extra.raw_info.oid` | Entra ID オブジェクトID | - |
+| `extra.raw_info.tid` | テナントID | - |
+| `extra.raw_info.preferred_username` | ユーザープリンシパル名 | - |
+
+#### 2. Graph API `/me`（アクセストークンで取得）
+
+| Graph APIフィールド | 内容 | 対応カラム |
+|-------------------|------|-----------|
+| `department` | 部門 | `users.department` |
+| `jobTitle` | 役職 | `users.job_title` |
+| `employeeId` | 社員番号 | `users.employee_id` |
 
 Graph API への接続に失敗してもログイン自体は成功する（フォールバック動作）。
-バッチ同期（`EntraUserSyncJob`）でも同じ情報を全ユーザー一括で取得可能。
+
+#### 3. バッチ同期（Graph API `/users`）
+
+`EntraUserSyncJob` で全ユーザーの情報を一括取得・更新する。ログイン時と同じフィールドに加え `accountEnabled`（アカウント有効/無効）も取得する。
+
+### ログ出力
+
+SSOログイン時に以下のログが出力される（`Rails.logger.info`）:
+
+```
+[SSO] OmniAuth uid=..., email=..., name=...
+[SSO] OmniAuth info: {name, email, first_name, last_name, nickname, image, ...}
+[SSO] OmniAuth extra.raw_info: {sub, oid, tid, preferred_username, ...}
+[SSO] Graph API /me response: {department, jobTitle, employeeId}
+```
+
+Graph API 取得失敗時は `[SSO] Graph API profile fetch failed for ...` が `warn` レベルで出力される。
 
 ### 開発/テスト環境（dev_login）
 ```
