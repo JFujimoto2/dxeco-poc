@@ -48,7 +48,11 @@
         </div>
         <div class="col-md-3">
           <%= f.label :due_date, "期限", class: "form-label" %>
-          <%= f.date_field :due_date, class: "form-control" %>
+          <div class="d-flex align-items-center gap-2">
+            <%= f.date_field :due_date, class: "form-control", id: "due-date-input",
+                onchange: "updateTaskWeekday(this)" %>
+            <span id="due-date-weekday" class="text-muted fw-bold"><%= weekday_label(@task.due_date) %></span>
+          </div>
         </div>
       </div>
 
@@ -94,3 +98,16 @@
     </div>
   <% end %>
 <% end %>
+
+<script>
+  function updateTaskWeekday(input) {
+    var weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+    var span = document.getElementById("due-date-weekday");
+    if (input.value) {
+      var d = new Date(input.value + "T00:00:00");
+      span.textContent = "(" + weekdays[d.getDay()] + ")";
+    } else {
+      span.textContent = "";
+    }
+  }
+</script>

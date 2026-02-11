@@ -1,4 +1,11 @@
 module ApplicationHelper
+  WEEKDAYS_JA = %w[日 月 火 水 木 金 土].freeze
+
+  def weekday_label(date)
+    return "" unless date
+    "(#{WEEKDAYS_JA[date.wday]})"
+  end
+
   def safe_url_link(url)
     return "-" unless url.present?
 
