@@ -33,7 +33,8 @@ class RetiredAccountDetectionJob < ApplicationJob
           "#{r[:user_name]} (#{r[:user_email]})\n" +
           r[:accounts].map { |a| "  - #{a[:saas_name]}: #{a[:email]}" }.join("\n")
         }.join("\n\n"),
-        level: :warning
+        level: :warning,
+        link: "#{ENV.fetch('APP_URL', 'http://localhost:3000')}/admin/batches"
       )
     end
   rescue => e

@@ -23,7 +23,8 @@ class ApprovalRequestsController < ApplicationController
     if @approval_request.save
       TeamsNotifier.notify(
         title: "SaaS利用申請",
-        body: "#{current_user.display_name}さんから申請があります。\n種別: #{@approval_request.request_type}\n対象: #{@approval_request.target_saas_name}\n理由: #{@approval_request.reason}"
+        body: "#{current_user.display_name}さんから申請があります。\n種別: #{@approval_request.request_type}\n対象: #{@approval_request.target_saas_name}\n理由: #{@approval_request.reason}",
+        link: "#{ENV.fetch('APP_URL', 'http://localhost:3000')}/approval_requests/#{@approval_request.id}"
       )
       ApprovalRequestMailer.new_request(@approval_request).deliver_later
       redirect_to approval_requests_path, notice: "申請を送信しました"
@@ -51,7 +52,8 @@ class ApprovalRequestsController < ApplicationController
     )
     TeamsNotifier.notify(
       title: "申請が承認されました",
-      body: "「#{request.target_saas_name}」の利用申請が#{current_user.display_name}によって承認されました。"
+      body: "「#{request.target_saas_name}」の利用申請が#{current_user.display_name}によって承認されました。",
+      link: "#{ENV.fetch('APP_URL', 'http://localhost:3000')}/approval_requests/#{request.id}"
     )
     ApprovalRequestMailer.approved(request).deliver_later
     redirect_to approval_request_path(request), notice: "承認しました"
@@ -71,7 +73,8 @@ class ApprovalRequestsController < ApplicationController
     )
     TeamsNotifier.notify(
       title: "申請が却下されました",
-      body: "「#{request.target_saas_name}」の利用申請が却下されました。\n理由: #{request.rejection_reason}"
+      body: "「#{request.target_saas_name}」の利用申請が却下されました。\n理由: #{request.rejection_reason}",
+      link: "#{ENV.fetch('APP_URL', 'http://localhost:3000')}/approval_requests/#{request.id}"
     )
     ApprovalRequestMailer.rejected(request).deliver_later
     redirect_to approval_request_path(request), notice: "却下しました"
