@@ -794,6 +794,7 @@ add_index :approval_requests, :status
 # approval_request.rb
 class ApprovalRequest < ApplicationRecord
   belongs_to :requester, class_name: "User"
+  belongs_to :approver, class_name: "User", optional: true
   belongs_to :saas, class_name: "Saas", optional: true
   belongs_to :approved_by, class_name: "User", optional: true
 
