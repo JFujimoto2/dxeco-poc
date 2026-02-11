@@ -35,6 +35,12 @@
       <%= f.text_area :reason, class: "form-control", rows: 3, placeholder: "利用目的、必要性を記載してください" %>
     </div>
 
+    <div class="mb-3">
+      <%= f.label :approver_id, "承認者", class: "form-label" %>
+      <%= f.collection_select :approver_id, @approvers, :id, :display_name, { include_blank: "-- 指定しない --" }, class: "form-select" %>
+      <div class="form-text">未指定の場合、全承認者に通知されます。</div>
+    </div>
+
     <div class="row mb-3">
       <div class="col-md-6">
         <%= f.label :user_count, "利用予定人数", class: "form-label" %>

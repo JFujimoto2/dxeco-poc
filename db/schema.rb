@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_10_123657) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_11_003901) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "approval_requests", force: :cascade do |t|
     t.datetime "approved_at"
     t.bigint "approved_by_id"
+    t.bigint "approver_id"
     t.datetime "created_at", null: false
     t.integer "estimated_cost"
     t.text "reason"
@@ -29,6 +30,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_123657) do
     t.datetime "updated_at", null: false
     t.integer "user_count"
     t.index ["approved_by_id"], name: "index_approval_requests_on_approved_by_id"
+    t.index ["approver_id"], name: "index_approval_requests_on_approver_id"
     t.index ["requester_id"], name: "index_approval_requests_on_requester_id"
     t.index ["saas_id"], name: "index_approval_requests_on_saas_id"
     t.index ["status"], name: "index_approval_requests_on_status"
@@ -206,6 +208,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_123657) do
 
   add_foreign_key "approval_requests", "saases"
   add_foreign_key "approval_requests", "users", column: "approved_by_id"
+  add_foreign_key "approval_requests", "users", column: "approver_id"
   add_foreign_key "approval_requests", "users", column: "requester_id"
   add_foreign_key "audit_logs", "users"
   add_foreign_key "saas_accounts", "saases"

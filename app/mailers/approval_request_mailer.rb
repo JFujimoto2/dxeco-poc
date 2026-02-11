@@ -1,11 +1,20 @@
 class ApprovalRequestMailer < ApplicationMailer
   def new_request(approval_request)
     @request = approval_request
-    to_emails = User.where(role: [ :admin, :manager ]).pluck(:email)
+
+    if @request.approver.present?
+      to_emails = [ @request.approver.email ]
+      exclude_ids = [ @request.approver_id, @request.requester_id ]
+      cc_emails = User.where(role: [ :admin, :manager ]).where.not(id: exclude_ids).pluck(:email)
+    else
+      to_emails = User.where(role: [ :admin, :manager ]).pluck(:email)
+      cc_emails = nil
+    end
     return if to_emails.empty?
 
     mail(
       to: to_emails,
+      cc: cc_emails.presence,
       subject: "[SaaS管理] 承認依頼: #{@request.target_saas_name}"
     )
   end

@@ -12,6 +12,9 @@ class ApprovalRequestsController < ApplicationController
   def new
     @approval_request = ApprovalRequest.new
     @saases = Saas.where(status: "active").order(:name)
+    @approvers = User.where(role: [ :admin, :manager ]).order(:display_name)
+    default_approver = @approvers.find_by(department: "情報システム部", role: :manager)
+    @approval_request.approver_id = default_approver&.id
   end
 
   def create
@@ -26,6 +29,7 @@ class ApprovalRequestsController < ApplicationController
       redirect_to approval_requests_path, notice: "申請を送信しました"
     else
       @saases = Saas.where(status: "active").order(:name)
+      @approvers = User.where(role: [ :admin, :manager ]).order(:display_name)
       render :new, status: :unprocessable_entity
     end
   end
@@ -76,6 +80,6 @@ class ApprovalRequestsController < ApplicationController
   private
 
   def request_params
-    params.require(:approval_request).permit(:request_type, :saas_id, :saas_name, :reason, :estimated_cost, :user_count)
+    params.require(:approval_request).permit(:request_type, :saas_id, :saas_name, :reason, :estimated_cost, :user_count, :approver_id)
   end
 end

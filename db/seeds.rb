@@ -339,6 +339,7 @@ unless ApprovalRequest.count >= 4
     reason: "営業部のナレッジ共有のため、Notionアカウントを追加したい。",
     estimated_cost: 1000,
     user_count: 1,
+    approver: it_user,
     status: "approved",
     approved_by: admin_user,
     approved_at: 1.week.ago
@@ -351,6 +352,7 @@ unless ApprovalRequest.count >= 4
     reason: "企画部でのAI活用推進のため、ChatGPTアカウントを追加したい。",
     estimated_cost: 3000,
     user_count: 3,
+    approver: it_user,
     status: "approved",
     approved_by: admin_user,
     approved_at: 3.days.ago
@@ -364,6 +366,7 @@ unless ApprovalRequest.count >= 4
     reason: "デザインチームで利用するUI/UXデザインツール。現在PowerPointで代用しているが効率が悪い。",
     estimated_cost: 5000,
     user_count: 3,
+    approver: it_user,
     status: "rejected",
     approved_by: admin_user,
     approved_at: 5.days.ago,
@@ -378,6 +381,7 @@ unless ApprovalRequest.count >= 4
     reason: "リモートでのブレスト・ワークショップ用にオンラインホワイトボードを導入したい。",
     estimated_cost: 2000,
     user_count: 5,
+    approver: it_user,
     status: "pending"
   )
 end

@@ -41,6 +41,12 @@
       <div class="col-md-3 text-muted">申請者</div>
       <div class="col-md-9"><%= @approval_request.requester.display_name %>（<%= @approval_request.requester.department %>）</div>
     </div>
+    <% if @approval_request.approver %>
+      <div class="row mb-3">
+        <div class="col-md-3 text-muted">承認者（指定）</div>
+        <div class="col-md-9"><%= @approval_request.approver.display_name %>（<%= @approval_request.approver.department %>）</div>
+      </div>
+    <% end %>
     <div class="row mb-3">
       <div class="col-md-3 text-muted">申請日</div>
       <div class="col-md-9"><%= @approval_request.created_at.strftime("%Y/%m/%d %H:%M") %></div>

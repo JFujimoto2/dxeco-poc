@@ -15,22 +15,51 @@ RSpec.describe ApprovalRequestMailer do
   end
 
   describe ".new_request" do
-    let(:mail) { described_class.new_request(approval_request) }
+    context "approver未指定の場合" do
+      let(:mail) { described_class.new_request(approval_request) }
 
-    it "admin/managerに送信される" do
-      expect(mail.to).to include(admin1.email)
-      expect(mail.to).to include(manager1.email)
+      it "admin/manager全員がToに入る" do
+        expect(mail.to).to include(admin1.email)
+        expect(mail.to).to include(manager1.email)
+      end
+
+      it "CCがない" do
+        expect(mail.cc).to be_nil
+      end
+
+      it "件名に対象SaaS名が含まれる" do
+        expect(mail.subject).to eq("[SaaS管理] 承認依頼: Notion")
+      end
+
+      it "本文に申請情報が含まれる" do
+        body = mail.body.encoded
+        expect(body).to include("申請者")
+        expect(body).to include("Notion")
+        expect(body).to include("プロジェクト管理に必要")
+      end
     end
 
-    it "件名に対象SaaS名が含まれる" do
-      expect(mail.subject).to eq("[SaaS管理] 承認依頼: Notion")
-    end
+    context "approver指定ありの場合" do
+      let(:approval_request_with_approver) do
+        create(:approval_request,
+          requester: requester,
+          saas: saas,
+          saas_name: "Notion",
+          request_type: "new_saas",
+          reason: "プロジェクト管理に必要",
+          approver: manager1)
+      end
+      let(:mail) { described_class.new_request(approval_request_with_approver) }
 
-    it "本文に申請情報が含まれる" do
-      body = mail.body.encoded
-      expect(body).to include("申請者")
-      expect(body).to include("Notion")
-      expect(body).to include("プロジェクト管理に必要")
+      it "Toが指定承認者のみ" do
+        expect(mail.to).to eq([ manager1.email ])
+      end
+
+      it "CCに他のadmin/managerが入る（approverとrequesterを除く）" do
+        expect(mail.cc).to include(admin1.email)
+        expect(mail.cc).not_to include(manager1.email)
+        expect(mail.cc).not_to include(requester.email)
+      end
     end
   end
 

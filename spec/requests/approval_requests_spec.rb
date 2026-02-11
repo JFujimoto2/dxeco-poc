@@ -35,6 +35,18 @@ RSpec.describe "ApprovalRequests", type: :request do
         }
       }.to change(ApprovalRequest, :count).by(1)
     end
+
+    it "承認者を指定して申請を作成" do
+      login_as(viewer)
+      manager = create(:user, :manager)
+      post approval_requests_path, params: {
+        approval_request: {
+          request_type: "new_saas", saas_name: "Figma",
+          reason: "デザインツールが必要", approver_id: manager.id
+        }
+      }
+      expect(ApprovalRequest.last.approver).to eq(manager)
+    end
   end
 
   describe "POST /approval_requests/:id/approve" do
