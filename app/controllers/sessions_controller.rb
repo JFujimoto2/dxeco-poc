@@ -28,6 +28,7 @@ class SessionsController < ApplicationController
     user.save!
 
     session[:user_id] = user.id
+    session[:login_method] = :sso
     redirect_to root_path, notice: "ログインしました"
   end
 
@@ -38,8 +39,9 @@ class SessionsController < ApplicationController
 
   # DELETE /logout
   def destroy
+    sso_login = session[:login_method].to_s == "sso"
     reset_session
-    if entra_id_configured?
+    if sso_login && entra_id_configured?
       redirect_to "https://login.microsoftonline.com/#{ENV['ENTRA_TENANT_ID']}/oauth2/v2.0/logout?post_logout_redirect_uri=#{ERB::Util.url_encode(ENV.fetch('APP_URL', 'http://localhost:3000'))}", allow_other_host: true
     else
       redirect_to login_path, notice: "ログアウトしました"

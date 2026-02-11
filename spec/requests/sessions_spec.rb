@@ -64,10 +64,27 @@ RSpec.describe "Sessions", type: :request do
   end
 
   describe "DELETE /logout" do
-    it "ログアウトしてリダイレクトされる" do
+    it "開発ログインの場合はログイン画面にリダイレクト" do
       post dev_login_path, params: { email: "test@example.com", display_name: "テスト" }
       delete logout_path
-      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(login_path)
+    end
+
+    it "SSOログインの場合はEntra IDのログアウトにリダイレクト" do
+      OmniAuth.config.test_mode = true
+      OmniAuth.config.mock_auth[:entra_id] = OmniAuth::AuthHash.new(
+        provider: "entra_id", uid: "entra-logout-test",
+        info: { email: "sso@example.com", name: "SSO" },
+        credentials: { token: "mock-token" }
+      )
+      stub_request(:get, /graph\.microsoft\.com/).to_return(status: 200, body: "{}".to_json)
+      get "/auth/entra_id/callback"
+
+      delete logout_path
+      expect(response).to redirect_to(/login\.microsoftonline\.com/)
+
+      OmniAuth.config.test_mode = false
+      OmniAuth.config.mock_auth[:entra_id] = nil
     end
   end
 end
