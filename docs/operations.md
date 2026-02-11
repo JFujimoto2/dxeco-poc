@@ -7,6 +7,7 @@
 - [ブランチ運用](#ブランチ運用)
 - [CI パイプライン](#ci-パイプライン)
 - [テスト戦略](#テスト戦略)
+- [メール通知（開発環境）](#メール通知開発環境)
 - [DB 操作](#db-操作)
 - [デモ環境の準備](#デモ環境の準備)
 - [トラブルシューティング](#トラブルシューティング)
@@ -212,6 +213,56 @@ npx playwright test e2e/smoke.spec.ts
 npx playwright test --reporter=html
 npx playwright show-report
 ```
+
+---
+
+## メール通知（開発環境）
+
+開発環境では `letter_opener_web` を使い、実際にメールを送信せずブラウザで確認できる。
+
+### 確認手順
+
+1. `bin/dev` でサーバーを起動
+2. アプリ上でメール送信を伴う操作を行う（タスク作成、承認申請など）
+3. **http://localhost:3000/letter_opener** にアクセス
+4. 送信されたメールの一覧が表示される
+
+### Rails console から手動送信
+
+```bash
+bin/rails console
+```
+
+```ruby
+# タスクアサイン通知
+TaskMailer.assignment_notification(Task.last).deliver_now
+
+# 承認依頼通知
+ApprovalRequestMailer.new_request(ApprovalRequest.last).deliver_now
+
+# サーベイ配信通知
+SurveyMailer.distribution(Survey.last).deliver_now
+
+# サーベイリマインド通知
+SurveyMailer.reminder(Survey.last).deliver_now
+```
+
+### メール種別一覧
+
+| Mailer | メソッド | To | CC |
+|--------|---------|-----|-----|
+| TaskMailer | `assignment_notification` | アサイン先 | 部署manager + タスク作成者 |
+| ApprovalRequestMailer | `new_request` | admin/manager 全員 | - |
+| ApprovalRequestMailer | `approved` | 申請者 | SaaSオーナー |
+| ApprovalRequestMailer | `rejected` | 申請者 | SaaSオーナー |
+| SurveyMailer | `distribution` | 対象ユーザー全員 | - |
+| SurveyMailer | `reminder` | 未回答ユーザーのみ | - |
+
+### 注意事項
+
+- 開発環境では dev_login を使うため、メール内リンクをクリックするとログイン画面に遷移する。リンクURLが正しいことを letter_opener 上で確認すればOK
+- 本番環境（Entra ID SSO）ではリンクから直接該当ページに遷移する
+- 本番でメール送信を有効にするには `.env` に `SMTP_*` 変数を設定する（[環境変数ガイド](environment-setup.md) 参照）
 
 ---
 

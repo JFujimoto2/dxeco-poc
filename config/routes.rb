@@ -9,6 +9,8 @@ Rails.application.routes.draw do
     post "dev_login", to: "sessions#dev_create", as: :dev_login
   end
 
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
+
   # ダッシュボード
   root "dashboard#index"
 

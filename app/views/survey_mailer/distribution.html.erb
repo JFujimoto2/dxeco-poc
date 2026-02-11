@@ -4,4 +4,4 @@
 
 <p><strong>期限:</strong> <%= @survey.deadline&.strftime("%Y/%m/%d") || "未設定" %></p>
 
-<p>アプリにログインして、サーベイ画面から回答してください。</p>
+<p><%= link_to "サーベイに回答する", survey_url(@survey) %></p>

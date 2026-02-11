@@ -25,3 +25,5 @@
   <strong>対象者:</strong> <%= @task.target_user.display_name %><br>
   <strong>期限:</strong> <%= @task.due_date&.strftime("%Y/%m/%d") || "未設定" %>
 </p>
+
+<p><%= link_to "タスクを確認する", task_url(@task) %></p>

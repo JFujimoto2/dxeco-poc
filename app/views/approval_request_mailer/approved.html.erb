@@ -7,3 +7,5 @@
   <tr><th>対象SaaS</th><td><%= @request.target_saas_name %></td></tr>
   <tr><th>承認者</th><td><%= @request.approved_by&.display_name %></td></tr>
 </table>
+
+<p><%= link_to "申請を確認する", approval_request_url(@request) %></p>

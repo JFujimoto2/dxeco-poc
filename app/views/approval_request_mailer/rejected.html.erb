@@ -8,3 +8,5 @@
   <tr><th>却下者</th><td><%= @request.approved_by&.display_name %></td></tr>
   <tr><th>却下理由</th><td><%= @request.rejection_reason %></td></tr>
 </table>
+
+<p><%= link_to "申請を確認する", approval_request_url(@request) %></p>
