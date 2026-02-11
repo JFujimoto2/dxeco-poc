@@ -75,6 +75,58 @@ npx playwright test
 npx playwright test --ui
 ```
 
+## Docker 環境構築
+
+ローカルの Ruby / PostgreSQL を使わずに Docker でアプリを起動できます。
+
+### 前提条件
+
+- Docker がインストール済み
+
+### ビルド
+
+```bash
+# WSL 環境の場合は --network=host を付ける
+docker build --network=host -t dxceco-poc:latest .
+```
+
+### 起動（ローカル PostgreSQL を使う場合）
+
+```bash
+docker run --rm --network=host \
+  -e RAILS_MASTER_KEY=$(cat config/master.key) \
+  -e DATABASE_URL="postgres://<DBユーザー>:<パスワード>@localhost:5433/dxceco_poc_production" \
+  -e DXCECO_POC_DATABASE_PASSWORD=<パスワード> \
+  -e DB_HOST=localhost \
+  -e DB_USERNAME=<DBユーザー> \
+  -e PGPORT=5433 \
+  -e RAILS_ENV=production \
+  -e SOLID_QUEUE_IN_PUMA=true \
+  -e APP_URL=http://localhost:8080 \
+  -e TARGET_PORT=3080 \
+  -e HTTP_PORT=8080 \
+  dxceco-poc:latest
+```
+
+http://localhost:8080 でアクセス可能（Entra ID SSO 設定済みの場合はログインリダイレクト）。
+
+### 環境変数（Docker / 本番用）
+
+| 変数 | 説明 | デフォルト |
+|------|------|-----------|
+| `RAILS_MASTER_KEY` | credentials 復号キー | - |
+| `DATABASE_URL` | PostgreSQL 接続URL（primary DB） | - |
+| `DXCECO_POC_DATABASE_PASSWORD` | DB パスワード（cache/queue/cable 用） | - |
+| `DB_HOST` | DB ホスト名（cache/queue/cable 用） | `localhost` |
+| `DB_USERNAME` | DB ユーザー名（cache/queue/cable 用） | `dxceco_poc` |
+| `SOLID_QUEUE_IN_PUMA` | Puma 内で Solid Queue 起動 | - |
+| `TARGET_PORT` | Puma のリッスンポート（Thruster 経由） | `3000` |
+| `HTTP_PORT` | Thruster のリッスンポート | `80` |
+
+### Azure デプロイ
+
+Azure Container Apps へのデプロイ手順は **[インフラ構成](infra/インフラ構成.md)** を参照。
+
 ## 開発運用フロー
 
 詳細は **[運用手順書](docs/operations.md)** を参照。
@@ -96,7 +148,7 @@ push / PR 時に自動実行（全パスしないと main にマージ不可）:
 | lint | Rubocop | ~18s |
 | scan_ruby | Brakeman + bundler-audit | ~14s |
 | scan_js | importmap audit | ~14s |
-| test | RSpec (151テスト) | ~37s |
+| test | RSpec (194テスト) | ~37s |
 | e2e | Playwright (54テスト) | ~2m30s |
 
 ### E2Eテスト初回セットアップ
