@@ -285,6 +285,11 @@ Teams チャネルに Adaptive Card 形式のメッセージが届けば成功�
 
 ## PostgreSQL の設定
 
+### タイムゾーン
+
+アプリケーション・DBともに **JST（日本標準時）** で統一している（`config/application.rb`）。
+DBに保存されるタイムスタンプ（`created_at`, `updated_at` 等）はすべてJST。
+
 ### 開発環境
 
 `config/database.yml` のデフォルト設定で動作する。WSL 環境ではポートに注意。

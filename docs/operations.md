@@ -266,6 +266,21 @@ SurveyMailer.reminder(Survey.last).deliver_now
 
 ---
 
+## タイムゾーン
+
+アプリケーション・DBともに **JST（日本標準時）** で統一している。
+
+| 設定 | 値 | 説明 |
+|------|-----|------|
+| `config.time_zone` | `"Tokyo"` | Rails のデフォルトタイムゾーン（表示・ビジネスロジック） |
+| `config.active_record.default_timezone` | `:local` | DBへのタイムスタンプ保存をJSTで行う |
+
+- `Time.current` / `Time.zone.now` は常にJSTを返す
+- DB の `created_at` / `updated_at` 等もJSTで保存される
+- 設定ファイル: `config/application.rb`
+
+---
+
 ## DB 操作
 
 ### よく使うコマンド
