@@ -156,16 +156,44 @@ RAILS_ENV=test bin/rails assets:precompile
 
 `rails db:seed` で以下のデモデータが投入されます:
 
-- ユーザー 5名（admin, manager, viewer）
+- ユーザー 15名（admin 2名、manager 3名、viewer 10名 / 5部門）
 - SaaS 12件（一般 7件 + 不動産管理 5件）
-- アカウント 約20件
+- アカウント・サーベイ・タスク・承認申請 等
 
 ## ドキュメント
 
+### 運用・開発
+
 - **[ユーザー運用ガイド](docs/user-guide.md)** - 管理者・マネージャー・一般ユーザー向けの操作手順
 - **[開発運用手順書](docs/operations.md)** - 開発フロー、ブランチ運用、CI、テスト戦略、DB操作
-- **[環境変数・外部サービス接続ガイド](docs/environment-setup.md)** - Entra ID SSO、Teams通知、DB設定
-- **[機能一覧](docs/features/)** - 各画面・機能の詳細ドキュメント
+- **[環境変数・外部サービス接続ガイド](docs/environment-setup.md)** - Entra ID SSO、Teams通知、SMTP、DB設定
+
+### インフラ・デプロイ
+
+- **[インフラ構成](infra/インフラ構成.md)** - Azure Container Apps 構成・セットアップ手順・運用
+- **[コスト比較](docs/コスト比較_DXECO_vs_自社開発.md)** - DXECO vs 自社開発のコスト比較
+
+### 機能ドキュメント
+
+- [01. ダッシュボード](docs/features/01_dashboard.md)
+- [02. SaaS台帳](docs/features/02_saas_ledger.md)
+- [03. アカウント管理](docs/features/03_account_management.md)
+- [04. メンバー管理](docs/features/04_members.md)
+- [05. サーベイ](docs/features/05_survey.md)
+- [06. タスク管理](docs/features/06_task_management.md)
+- [07. 承認ワークフロー](docs/features/07_approval_workflow.md)
+- [08. バッチ管理](docs/features/08_batch_management.md)
+- [09. 操作ログ](docs/features/09_audit_log.md)
+- [10. 認証](docs/features/10_authentication.md)
+- [11. CSV インポート](docs/features/11_csv_import.md)
+
+### 設計・調査
+
+- **[バッチ処理設計](docs/バッチ処理設計.md)**
+- **[認証方式の実装方針](docs/認証方式の実装方針.md)**
+- **[DXECO 調査レポート](docs/デクセコ_調査レポート_.md)**
+- **[機能一覧](docs/自社開発_タスク_機能一覧.md)**
+- **[運用ルール](docs/運用ルール.md)**
 
 ## ディレクトリ構成
 
@@ -175,14 +203,23 @@ app/
 ├── models/          # モデル
 ├── views/           # ビュー
 │   └── shared/      # 共通パーシャル（sidebar, flash等）
+├── helpers/         # ビューヘルパー
+├── mailers/         # メール送信
 ├── jobs/            # バックグラウンドジョブ
-└── services/        # 外部API連携
+└── services/        # 外部API連携（EntraClient, TeamsNotifier）
 
 docs/
-├── features/        # 機能別ドキュメント（01_dashboard.md 〜 11_csv_import.md）
+├── features/        # 機能別ドキュメント（01〜11）
 ├── plans/           # 実装計画書
-├── operations.md    # 運用手順書
+├── operations.md    # 開発運用手順書
+├── user-guide.md    # ユーザー運用ガイド
 └── *.md             # 調査レポート・設計書
+
+infra/               # Azure デプロイ関連
+├── インフラ構成.md    # 構成・手順書
+├── setup.sh         # Azure リソース一括作成スクリプト
+├── deploy.yml       # GitHub Actions デプロイワークフロー
+└── .env.azure.example
 
 e2e/                 # Playwright E2Eテスト
 spec/                # RSpecテスト
