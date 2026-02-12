@@ -1,5 +1,6 @@
 class SaasesController < ApplicationController
   before_action :set_saas, only: [ :show, :edit, :update, :destroy ]
+  before_action :require_admin_or_manager, only: [ :import ]
 
   def index
     @saases = Saas.search_by_name(params[:q])
@@ -58,6 +59,14 @@ class SaasesController < ApplicationController
     else
       redirect_to saases_path, alert: "成功: #{result[:success_count]}件, エラー: #{result[:error_count]}件 (#{result[:errors].first(3).join(' / ')})"
     end
+  end
+
+  def download_template
+    csv_data = "\uFEFF" + CSV.generate { |csv|
+      csv << %w[name category url admin_url description status]
+      csv << [ "サンプルSaaS", "一般", "https://example.com", "", "サービスの説明", "active" ]
+    }
+    send_data csv_data, filename: "saas_template.csv", type: "text/csv; charset=utf-8"
   end
 
   private

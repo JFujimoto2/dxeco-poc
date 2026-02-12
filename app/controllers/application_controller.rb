@@ -29,6 +29,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def require_admin_or_manager
+    unless current_user&.admin? || current_user&.manager?
+      redirect_to root_path, alert: "管理者またはマネージャー権限が必要です"
+    end
+  end
+
   def entra_id_configured?
     ENV["ENTRA_CLIENT_ID"].present?
   end

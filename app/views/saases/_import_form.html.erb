@@ -1,13 +1,18 @@
 <div class="modal fade" id="importModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
-      <%= form_tag(import_saases_path, multipart: true) do %>
+      <%= form_tag(import_saases_path, multipart: true, data: { turbo: false }) do %>
         <div class="modal-header">
           <h5 class="modal-title">SaaS CSVインポート</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <p class="text-muted small">CSVフォーマット: name, category, url, admin_url, description, status</p>
+          <p class="mb-3">
+            <%= link_to download_template_saases_path, class: "text-decoration-none" do %>
+              <i class="bi bi-download me-1"></i>テンプレートをダウンロード
+            <% end %>
+          </p>
           <div class="mb-3">
             <label class="form-label">CSVファイル</label>
             <%= file_field_tag :file, accept: ".csv", class: "form-control" %>

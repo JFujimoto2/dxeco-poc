@@ -18,11 +18,13 @@ Rails.application.routes.draw do
   resources :saases do
     collection do
       post :import
+      get :download_template
     end
   end
   resources :saas_accounts, except: [ :show ] do
     collection do
       post :import
+      get :download_template
     end
   end
   resources :users, only: [ :index, :show, :edit, :update ]

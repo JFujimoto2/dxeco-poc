@@ -69,4 +69,53 @@ RSpec.describe "Saases", type: :request do
       }.to change(Saas, :count).by(-1)
     end
   end
+
+  describe "POST /saases/import" do
+    let(:csv_file) { fixture_file_upload("saas_import.csv", "text/csv") }
+
+    it "CSVからSaaSを一括登録する" do
+      expect {
+        post import_saases_path, params: { file: csv_file }
+      }.to change(Saas, :count).by(3)
+      expect(response).to redirect_to(saases_path)
+      follow_redirect!
+      expect(response.body).to include("3件のSaaSをインポートしました")
+    end
+
+    it "ファイル未選択でエラーメッセージを表示する" do
+      post import_saases_path
+      expect(response).to redirect_to(saases_path)
+      follow_redirect!
+      expect(response.body).to include("ファイルを選択してください")
+    end
+
+    context "viewer権限の場合" do
+      let(:user) { create(:user) } # role: viewer
+
+      it "ダッシュボードにリダイレクトされる" do
+        post import_saases_path, params: { file: csv_file }
+        expect(response).to redirect_to(root_path)
+      end
+    end
+
+    context "manager権限の場合" do
+      let(:user) { create(:user, :manager) }
+
+      it "インポートを実行できる" do
+        expect {
+          post import_saases_path, params: { file: csv_file }
+        }.to change(Saas, :count).by(3)
+      end
+    end
+  end
+
+  describe "GET /saases/download_template" do
+    it "CSVテンプレートをダウンロードできる" do
+      get download_template_saases_path
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to include("text/csv")
+      expect(response.headers["Content-Disposition"]).to include("saas_template.csv")
+      expect(response.body).to include("name,category,url")
+    end
+  end
 end
