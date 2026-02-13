@@ -1,5 +1,5 @@
 class SurveysController < ApplicationController
-  before_action :require_admin, only: [ :new, :create, :activate, :close, :remind ]
+  before_action :require_admin, only: [ :new, :create, :activate, :close, :remind, :create_cleanup_task ]
 
   def index
     @surveys = if current_user.admin?
@@ -59,6 +59,43 @@ class SurveysController < ApplicationController
     survey = Survey.find(params[:id])
     survey.update!(status: :closed)
     redirect_to survey_path(survey), notice: "サーベイを締め切りました"
+  end
+
+  def create_cleanup_task
+    survey = Survey.find(params[:id])
+    not_using_responses = survey.survey_responses.not_using.includes(saas_account: :saas)
+
+    if not_using_responses.empty?
+      redirect_to survey_path(survey), alert: "利用なし回答がありません"
+      return
+    end
+
+    task = Task.new(
+      title: "サーベイ「#{survey.title}」不要アカウント削除",
+      task_type: "account_cleanup",
+      created_by: current_user,
+      status: "open",
+      due_date: 2.weeks.from_now.to_date
+    )
+
+    not_using_responses.each do |resp|
+      next unless resp.saas_account
+
+      task.task_items.build(
+        action_type: "account_delete",
+        description: "#{resp.saas_account.saas.name} アカウント削除（#{resp.user.display_name}）",
+        saas: resp.saas_account.saas
+      )
+    end
+
+    task.save!
+    TeamsNotifier.notify(
+      title: "不要アカウント削除タスクが作成されました",
+      body: "サーベイ「#{survey.title}」から#{task.task_items.count}件の削除タスクを生成しました",
+      link: "#{ENV.fetch('APP_URL', 'http://localhost:3000')}/tasks/#{task.id}"
+    )
+    TaskMailer.assignment_notification(task).deliver_later
+    redirect_to survey_path(survey), notice: "削除タスクを生成しました（#{task.task_items.count}件）"
   end
 
   def remind

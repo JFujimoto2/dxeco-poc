@@ -35,6 +35,7 @@ Rails.application.routes.draw do
       patch :close
       post :activate
       post :remind
+      post :create_cleanup_task
     end
   end
   resources :survey_responses, only: [ :update ]

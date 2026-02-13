@@ -1,12 +1,12 @@
 class Task < ApplicationRecord
   include Auditable
 
-  belongs_to :target_user, class_name: "User"
+  belongs_to :target_user, class_name: "User", optional: true
   belongs_to :created_by, class_name: "User"
   has_many :task_items, dependent: :destroy
   accepts_nested_attributes_for :task_items, allow_destroy: true
 
-  enum :task_type, { onboarding: "onboarding", offboarding: "offboarding", transfer: "transfer" }
+  enum :task_type, { onboarding: "onboarding", offboarding: "offboarding", transfer: "transfer", account_cleanup: "account_cleanup" }
   enum :status, { open: "open", in_progress: "in_progress", completed: "completed" }
 
   validates :title, presence: true
