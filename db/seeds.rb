@@ -142,6 +142,20 @@ backoffice_saases_data.each do |data|
   end
 end
 
+# デモ用: 一部の契約に期限切れ・7日以内・30日以内の期限を設定
+demo_expiry = {
+  "Slack" => 5.days.from_now.to_date,         # 7日以内
+  "Zoom" => 3.days.from_now.to_date,           # 7日以内
+  "Box" => 20.days.from_now.to_date,           # 30日以内
+  "いえらぶCLOUD" => 25.days.from_now.to_date, # 30日以内
+  "freee会計" => 5.days.ago.to_date            # 期限切れ
+}
+
+demo_expiry.each do |saas_name, expires_on|
+  saas = Saas.find_by(name: saas_name)
+  saas&.saas_contract&.update!(expires_on: expires_on)
+end
+
 puts "  SaaS: #{Saas.count}"
 
 # --- SaaS Accounts ---

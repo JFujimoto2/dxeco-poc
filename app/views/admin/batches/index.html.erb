@@ -24,6 +24,13 @@
           <%= button_to "実行", detect_retired_accounts_admin_batches_path, method: :post, class: "btn btn-warning btn-sm", data: { confirm: "退職者アカウント検出を実行しますか？" } %>
         </div>
       </div>
+      <div class="col-md-6">
+        <div class="border rounded p-3">
+          <h6><i class="bi bi-calendar-event me-1"></i>契約更新チェック</h6>
+          <p class="text-muted small mb-2">30日以内に更新期限が来るSaaS契約を検出し、Teams通知を送信します。</p>
+          <%= button_to "実行", check_contract_renewals_admin_batches_path, method: :post, class: "btn btn-info btn-sm", data: { confirm: "契約更新チェックを実行しますか？" } %>
+        </div>
+      </div>
     </div>
   </div>
 </div>
