@@ -61,6 +61,26 @@ class SaasesController < ApplicationController
     end
   end
 
+  def export
+    saases = Saas.search_by_name(params[:q])
+                 .filter_by_category(params[:category])
+                 .filter_by_status(params[:status])
+                 .includes(:saas_contract, :owner)
+                 .order(:name)
+    csv_data = "\uFEFF" + CSV.generate { |csv|
+      csv << %w[SaaS名 カテゴリ ステータス URL 担当者 プラン 月額 請求サイクル 契約期限]
+      saases.each do |saas|
+        c = saas.saas_contract
+        csv << [
+          saas.name, saas.category, saas.status, saas.url,
+          saas.owner&.display_name,
+          c&.plan_name, c&.price_cents, c&.billing_cycle, c&.expires_on
+        ]
+      end
+    }
+    send_data csv_data, filename: "saas_export_#{Date.current}.csv", type: "text/csv; charset=utf-8"
+  end
+
   def download_template
     csv_data = "\uFEFF" + CSV.generate { |csv|
       csv << %w[name category url admin_url description status]

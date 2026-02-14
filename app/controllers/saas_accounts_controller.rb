@@ -54,6 +54,24 @@ class SaasAccountsController < ApplicationController
     end
   end
 
+  def export
+    accounts = SaasAccount.includes(:saas, :user)
+    accounts = accounts.where(saas_id: params[:saas_id]) if params[:saas_id].present?
+    accounts = accounts.where(user_id: params[:user_id]) if params[:user_id].present?
+    accounts = accounts.where(status: params[:status]) if params[:status].present?
+    accounts = accounts.order("saases.name, users.display_name")
+    csv_data = "\uFEFF" + CSV.generate { |csv|
+      csv << %w[SaaS名 メンバー名 部署 アカウントメール ロール ステータス 最終ログイン]
+      accounts.each do |a|
+        csv << [
+          a.saas.name, a.user.display_name, a.user.department,
+          a.account_email, a.role, a.status, a.last_login_at&.strftime("%Y/%m/%d %H:%M")
+        ]
+      end
+    }
+    send_data csv_data, filename: "saas_accounts_export_#{Date.current}.csv", type: "text/csv; charset=utf-8"
+  end
+
   def download_template
     csv_data = "\uFEFF" + CSV.generate { |csv|
       csv << %w[saas_name user_email account_email role status]

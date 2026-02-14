@@ -118,4 +118,27 @@ RSpec.describe "Saases", type: :request do
       expect(response.body).to include("name,category,url")
     end
   end
+
+  describe "GET /saases/export" do
+    it "CSV形式でエクスポートできる" do
+      saas = create(:saas, name: "Slack", category: "一般IT")
+      create(:saas_contract, saas: saas, plan_name: "Business", price_cents: 50000, billing_cycle: "monthly")
+
+      get export_saases_path
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to include("text/csv")
+      expect(response.headers["Content-Disposition"]).to include("saas_export")
+      expect(response.body).to include("Slack")
+      expect(response.body).to include("Business")
+    end
+
+    it "フィルタ条件を適用してエクスポートできる" do
+      create(:saas, name: "Slack", category: "一般IT")
+      create(:saas, name: "いえらぶ", category: "不動産管理")
+
+      get export_saases_path, params: { category: "一般IT" }
+      expect(response.body).to include("Slack")
+      expect(response.body).not_to include("いえらぶ")
+    end
+  end
 end

@@ -19,12 +19,14 @@ Rails.application.routes.draw do
     collection do
       post :import
       get :download_template
+      get :export
     end
   end
   resources :saas_accounts, except: [ :show ] do
     collection do
       post :import
       get :download_template
+      get :export
     end
   end
   resources :users, only: [ :index, :show, :edit, :update ]
@@ -63,7 +65,11 @@ Rails.application.routes.draw do
         post :sync_entra_accounts
       end
     end
-    resources :audit_logs, only: [ :index, :show ]
+    resources :audit_logs, only: [ :index, :show ] do
+      collection do
+        get :export
+      end
+    end
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

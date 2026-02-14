@@ -107,4 +107,30 @@ RSpec.describe "SaasAccounts", type: :request do
       expect(response.body).to include("saas_name,user_email")
     end
   end
+
+  describe "GET /saas_accounts/export" do
+    it "CSV形式でエクスポートできる" do
+      saas = create(:saas, name: "Slack")
+      create(:saas_account, saas: saas, user: user, account_email: "admin@slack.com")
+
+      get export_saas_accounts_path
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to include("text/csv")
+      expect(response.headers["Content-Disposition"]).to include("saas_accounts_export")
+      expect(response.body).to include("Slack")
+      expect(response.body).to include("admin@slack.com")
+    end
+
+    it "SaaSで絞り込んでエクスポートできる" do
+      saas1 = create(:saas, name: "Slack")
+      saas2 = create(:saas, name: "Zoom")
+      create(:saas_account, saas: saas1, user: user)
+      other_user = create(:user)
+      create(:saas_account, saas: saas2, user: other_user)
+
+      get export_saas_accounts_path, params: { saas_id: saas1.id }
+      expect(response.body).to include("Slack")
+      expect(response.body).not_to include("Zoom")
+    end
+  end
 end
