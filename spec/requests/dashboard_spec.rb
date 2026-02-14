@@ -70,4 +70,36 @@ RSpec.describe "Dashboard", type: :request do
       expect(response.body).not_to include("パスワード期限アラート")
     end
   end
+
+  describe "コスト可視化" do
+    let(:user) { create(:user) }
+
+    before { login_as(user) }
+
+    it "月額・年額コスト合計を表示する" do
+      saas = create(:saas, category: "一般IT")
+      create(:saas_contract, saas: saas, price_cents: 50000, billing_cycle: "monthly")
+
+      get root_path
+      expect(response.body).to include("コスト概要")
+      expect(response.body).to include("月額コスト")
+      expect(response.body).to include("年額コスト")
+    end
+
+    it "カテゴリ別コスト内訳を表示する" do
+      saas1 = create(:saas, category: "一般IT")
+      create(:saas_contract, saas: saas1, price_cents: 50000, billing_cycle: "monthly")
+      saas2 = create(:saas, category: "バックオフィス")
+      create(:saas_contract, saas: saas2, price_cents: 30000, billing_cycle: "monthly")
+
+      get root_path
+      expect(response.body).to include("一般IT")
+      expect(response.body).to include("バックオフィス")
+    end
+
+    it "契約がなければコストセクションを表示しない" do
+      get root_path
+      expect(response.body).not_to include("コスト概要")
+    end
+  end
 end

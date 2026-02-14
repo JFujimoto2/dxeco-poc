@@ -59,4 +59,40 @@ RSpec.describe SaasContract, type: :model do
       end
     end
   end
+
+  describe "コスト計算" do
+    describe "#monthly_cost_cents" do
+      it "月額契約はそのまま返す" do
+        contract = build(:saas_contract, price_cents: 10000, billing_cycle: "monthly")
+        expect(contract.monthly_cost_cents).to eq(10000)
+      end
+
+      it "年額契約は12で割る" do
+        contract = build(:saas_contract, price_cents: 120000, billing_cycle: "yearly")
+        expect(contract.monthly_cost_cents).to eq(10000)
+      end
+
+      it "price_centsがnilなら0を返す" do
+        contract = build(:saas_contract, price_cents: nil, billing_cycle: "monthly")
+        expect(contract.monthly_cost_cents).to eq(0)
+      end
+    end
+
+    describe "#annual_cost_cents" do
+      it "月額契約は12倍する" do
+        contract = build(:saas_contract, price_cents: 10000, billing_cycle: "monthly")
+        expect(contract.annual_cost_cents).to eq(120000)
+      end
+
+      it "年額契約はそのまま返す" do
+        contract = build(:saas_contract, price_cents: 120000, billing_cycle: "yearly")
+        expect(contract.annual_cost_cents).to eq(120000)
+      end
+
+      it "price_centsがnilなら0を返す" do
+        contract = build(:saas_contract, price_cents: nil, billing_cycle: "yearly")
+        expect(contract.annual_cost_cents).to eq(0)
+      end
+    end
+  end
 end
