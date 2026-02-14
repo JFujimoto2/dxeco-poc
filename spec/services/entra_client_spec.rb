@@ -26,7 +26,7 @@ RSpec.describe EntraClient do
     end
 
     it "ページネーションに対応する" do
-      stub_request(:get, "https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName,jobTitle,department,employeeId,accountEnabled&$top=999")
+      stub_request(:get, "https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName,jobTitle,department,employeeId,accountEnabled,lastPasswordChangeDateTime&$top=999")
         .to_return(status: 200, body: {
           value: [ { "id" => "user-1" } ],
           "@odata.nextLink" => "https://graph.microsoft.com/v1.0/users?$skiptoken=abc"
@@ -62,6 +62,53 @@ RSpec.describe EntraClient do
 
       profile = EntraClient.fetch_my_profile("invalid-token")
       expect(profile).to be_nil
+    end
+  end
+
+  describe ".fetch_service_principals" do
+    it "SSO連携済みエンタープライズアプリ一覧を取得する" do
+      stub_request(:get, /graph\.microsoft\.com\/v1\.0\/servicePrincipals/)
+        .to_return(status: 200, body: {
+          value: [
+            { "id" => "sp-1", "displayName" => "Slack", "appId" => "app-1" },
+            { "id" => "sp-2", "displayName" => "Zoom", "appId" => "app-2" }
+          ]
+        }.to_json)
+
+      apps = EntraClient.fetch_service_principals("test-token")
+      expect(apps.size).to eq(2)
+      expect(apps.first["displayName"]).to eq("Slack")
+    end
+
+    it "ページネーションに対応する" do
+      stub_request(:get, /servicePrincipals\?/)
+        .to_return(status: 200, body: {
+          value: [ { "id" => "sp-1" } ],
+          "@odata.nextLink" => "https://graph.microsoft.com/v1.0/servicePrincipals?$skiptoken=abc"
+        }.to_json)
+      stub_request(:get, "https://graph.microsoft.com/v1.0/servicePrincipals?$skiptoken=abc")
+        .to_return(status: 200, body: {
+          value: [ { "id" => "sp-2" } ]
+        }.to_json)
+
+      apps = EntraClient.fetch_service_principals("test-token")
+      expect(apps.size).to eq(2)
+    end
+  end
+
+  describe ".fetch_app_role_assignments" do
+    it "指定アプリのユーザー割り当てを取得する" do
+      stub_request(:get, "https://graph.microsoft.com/v1.0/servicePrincipals/sp-1/appRoleAssignedTo")
+        .to_return(status: 200, body: {
+          value: [
+            { "principalId" => "user-1", "principalDisplayName" => "テスト太郎", "principalType" => "User" },
+            { "principalId" => "group-1", "principalDisplayName" => "営業部", "principalType" => "Group" }
+          ]
+        }.to_json)
+
+      assignments = EntraClient.fetch_app_role_assignments("test-token", "sp-1")
+      expect(assignments.size).to eq(1)
+      expect(assignments.first["principalId"]).to eq("user-1")
     end
   end
 end

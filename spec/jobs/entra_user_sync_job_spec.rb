@@ -36,4 +36,20 @@ RSpec.describe EntraUserSyncJob, type: :job do
     expect(user.entra_id_sub).to eq("oid-001")
     expect(user.display_name).to eq("テスト太郎")
   end
+
+  it "lastPasswordChangeDateTimeを同期する" do
+    entra_users_with_pwd = [
+      { "id" => "oid-001", "displayName" => "テスト太郎", "mail" => "taro@example.com",
+        "department" => "営業部", "jobTitle" => "課長", "employeeId" => "EMP001",
+        "accountEnabled" => true, "lastPasswordChangeDateTime" => "2026-01-15T10:30:00Z" }
+    ]
+    stub_request(:get, /graph\.microsoft\.com/).to_return(
+      status: 200, body: { value: entra_users_with_pwd }.to_json
+    )
+
+    EntraUserSyncJob.perform_now
+    user = User.find_by(entra_id_sub: "oid-001")
+    expect(user.last_password_change_at).to be_present
+    expect(user.last_password_change_at).to eq(Time.parse("2026-01-15T10:30:00Z"))
+  end
 end

@@ -18,7 +18,8 @@ class EntraUserSyncJob < ApplicationJob
         department: eu["department"],
         job_title: eu["jobTitle"],
         employee_id: eu["employeeId"],
-        account_enabled: eu["accountEnabled"]
+        account_enabled: eu["accountEnabled"],
+        last_password_change_at: eu["lastPasswordChangeDateTime"]
       )
       user.role ||= "viewer"
       stats[:created_count] += 1 if user.new_record?

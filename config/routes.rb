@@ -60,6 +60,7 @@ Rails.application.routes.draw do
         post :sync_entra_users
         post :detect_retired_accounts
         post :check_contract_renewals
+        post :sync_entra_accounts
       end
     end
     resources :audit_logs, only: [ :index, :show ]

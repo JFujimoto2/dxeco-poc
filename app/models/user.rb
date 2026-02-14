@@ -11,6 +11,18 @@ class User < ApplicationRecord
   validates :email, presence: true
   validates :role, presence: true
 
+  PASSWORD_EXPIRY_DAYS = 90
+
   scope :search_by_name, ->(q) { where("display_name ILIKE ? OR email ILIKE ?", "%#{q}%", "%#{q}%") if q.present? }
   scope :filter_by_department, ->(d) { where(department: d) if d.present? }
+  scope :password_expired, -> {
+    where("last_password_change_at < ?", PASSWORD_EXPIRY_DAYS.days.ago)
+      .where(account_enabled: true)
+  }
+  scope :password_expiring_soon, ->(warn_days = 14) {
+    cutoff = PASSWORD_EXPIRY_DAYS.days.ago
+    warn_cutoff = (PASSWORD_EXPIRY_DAYS - warn_days).days.ago
+    where(last_password_change_at: cutoff..warn_cutoff)
+      .where(account_enabled: true)
+  }
 end

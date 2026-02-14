@@ -77,7 +77,7 @@ class SaasesController < ApplicationController
 
   def saas_params
     params.require(:saas).permit(
-      :name, :category, :url, :admin_url, :description, :owner_id, :status,
+      :name, :category, :url, :admin_url, :description, :owner_id, :status, :entra_app_id,
       saas_contract_attributes: [ :id, :plan_name, :price_cents, :billing_cycle, :started_on, :expires_on, :vendor, :notes ]
     )
   end

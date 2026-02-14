@@ -156,6 +156,21 @@ demo_expiry.each do |saas_name, expires_on|
   saas&.saas_contract&.update!(expires_on: expires_on)
 end
 
+# デモ用: パスワード期限切れ・期限間近ユーザー
+password_demo = {
+  "tanaka@example.com" => 100.days.ago,   # 期限切れ
+  "sato@example.com" => 95.days.ago,      # 期限切れ
+  "watanabe@example.com" => 82.days.ago,  # 期限間近（残8日）
+  "kobayashi@example.com" => 80.days.ago # 期限間近（残10日）
+}
+password_demo.each do |email, changed_at|
+  User.find_by(email: email)&.update!(last_password_change_at: changed_at)
+end
+# 正常ユーザーにも最終変更日を設定
+User.where(last_password_change_at: nil).find_each do |u|
+  u.update!(last_password_change_at: rand(10..60).days.ago)
+end
+
 puts "  SaaS: #{Saas.count}"
 
 # --- SaaS Accounts ---

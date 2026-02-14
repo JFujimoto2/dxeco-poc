@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_13_032024) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_14_113219) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -100,12 +100,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_13_032024) do
     t.datetime "created_at", null: false
     t.jsonb "custom_fields", default: {}
     t.text "description"
+    t.string "entra_app_id"
     t.string "name", null: false
     t.bigint "owner_id"
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
     t.string "url"
     t.index ["category"], name: "index_saases_on_category"
+    t.index ["entra_app_id"], name: "index_saases_on_entra_app_id", unique: true
     t.index ["name"], name: "index_saases_on_name"
     t.index ["owner_id"], name: "index_saases_on_owner_id"
     t.index ["status"], name: "index_saases_on_status"
@@ -199,6 +201,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_13_032024) do
     t.string "employee_id"
     t.string "entra_id_sub", null: false
     t.string "job_title"
+    t.datetime "last_password_change_at"
     t.datetime "last_signed_in_at"
     t.string "role", default: "viewer", null: false
     t.datetime "updated_at", null: false

@@ -31,6 +31,13 @@
           <%= button_to "実行", check_contract_renewals_admin_batches_path, method: :post, class: "btn btn-info btn-sm", data: { confirm: "契約更新チェックを実行しますか？" } %>
         </div>
       </div>
+      <div class="col-md-6">
+        <div class="border rounded p-3">
+          <h6><i class="bi bi-arrow-repeat me-1"></i>SaaSアカウント同期</h6>
+          <p class="text-muted small mb-2">Entra IDのエンタープライズアプリからSSO連携済みSaaSのアカウントを自動同期します。</p>
+          <%= button_to "実行", sync_entra_accounts_admin_batches_path, method: :post, class: "btn btn-success btn-sm", data: { confirm: "SaaSアカウント同期を実行しますか？" } %>
+        </div>
+      </div>
     </div>
   </div>
 </div>

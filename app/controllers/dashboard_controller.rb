@@ -11,5 +11,8 @@ class DashboardController < ApplicationController
 
     @expiring_contracts = SaasContract.expiring_soon.includes(:saas).order(:expires_on)
     @expired_contracts_count = SaasContract.expired.count
+
+    @password_expired_users = User.password_expired.order(:last_password_change_at)
+    @password_expiring_users = User.password_expiring_soon.order(:last_password_change_at)
   end
 end

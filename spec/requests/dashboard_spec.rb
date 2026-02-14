@@ -43,4 +43,31 @@ RSpec.describe "Dashboard", type: :request do
       expect(response.body).not_to include("契約更新アラート")
     end
   end
+
+  describe "パスワード期限アラート" do
+    let(:user) { create(:user, :admin) }
+
+    before { login_as(user) }
+
+    it "パスワード期限切れユーザーを表示する" do
+      expired_user = create(:user, display_name: "期限切れ太郎", last_password_change_at: 100.days.ago, account_enabled: true)
+
+      get root_path
+      expect(response.body).to include("パスワード期限アラート")
+      expect(response.body).to include("期限切れ太郎")
+    end
+
+    it "パスワード期限間近ユーザーを表示する" do
+      expiring_user = create(:user, display_name: "間近花子", last_password_change_at: 80.days.ago, account_enabled: true)
+
+      get root_path
+      expect(response.body).to include("パスワード期限アラート")
+      expect(response.body).to include("間近花子")
+    end
+
+    it "該当ユーザーがいなければアラートセクションを表示しない" do
+      get root_path
+      expect(response.body).not_to include("パスワード期限アラート")
+    end
+  end
 end

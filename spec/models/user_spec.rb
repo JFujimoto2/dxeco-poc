@@ -45,4 +45,35 @@ RSpec.describe User, type: :model do
       expect(user).to be_admin
     end
   end
+
+  describe "パスワード期限スコープ" do
+    before do
+      @expired_user = create(:user, last_password_change_at: 100.days.ago, account_enabled: true)
+      @expiring_user = create(:user, last_password_change_at: 80.days.ago, account_enabled: true)
+      @safe_user = create(:user, last_password_change_at: 10.days.ago, account_enabled: true)
+      @disabled_user = create(:user, last_password_change_at: 100.days.ago, account_enabled: false)
+      @no_password_user = create(:user, last_password_change_at: nil, account_enabled: true)
+    end
+
+    describe ".password_expired" do
+      it "90日以上パスワード変更していない有効ユーザーを返す" do
+        result = User.password_expired
+        expect(result).to include(@expired_user)
+        expect(result).not_to include(@expiring_user, @safe_user, @disabled_user, @no_password_user)
+      end
+    end
+
+    describe ".password_expiring_soon" do
+      it "14日以内にパスワードが期限切れになる有効ユーザーを返す" do
+        result = User.password_expiring_soon
+        expect(result).to include(@expiring_user)
+        expect(result).not_to include(@expired_user, @safe_user, @disabled_user, @no_password_user)
+      end
+
+      it "カスタム警告日数を指定できる" do
+        result = User.password_expiring_soon(30)
+        expect(result).to include(@expiring_user)
+      end
+    end
+  end
 end

@@ -45,6 +45,11 @@
           <%= f.select :owner_id, User.order(:display_name).map { |u| [u.display_name || u.email, u.id] },
               { include_blank: "未設定" }, class: "form-select" %>
         </div>
+        <div class="col-md-6 mb-3">
+          <%= f.label :entra_app_id, "Entra ID アプリID", class: "form-label" %>
+          <%= f.text_field :entra_app_id, class: "form-control", placeholder: "自動同期時に自動設定されます" %>
+          <div class="form-text">Entra IDのサービスプリンシパルIDです。SaaSアカウント同期で自動設定されます。</div>
+        </div>
       </div>
 
       <div class="mb-3">
