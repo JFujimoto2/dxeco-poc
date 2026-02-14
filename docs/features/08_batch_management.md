@@ -9,18 +9,32 @@ Entra IDとのユーザー同期や退職者アカウントの検出など、自
 | バッチ一覧 | `GET /admin/batches` |
 | Entra IDユーザー同期 | `POST /admin/batches/sync_entra_users` |
 | 退職者アカウント検出 | `POST /admin/batches/detect_retired_accounts` |
+| 契約更新チェック | `POST /admin/batches/check_contract_renewals` |
+| SaaSアカウント同期 | `POST /admin/batches/sync_entra_accounts` |
 
 ## バッチ種別
 
 ### Entra IDユーザー同期
 - Microsoft Graph APIから全ユーザー情報を取得
 - メンバー情報（名前、メール、部署、役職、アカウント状態）を更新
+- `lastPasswordChangeDateTime` を取得し `last_password_change_at` に保存
 - 完了後、退職者アカウント検出を自動実行
 
 ### 退職者アカウント検出
 - Entra IDで無効化されたユーザーを特定
 - そのユーザーがまだ保持しているSaaSアカウントを検出
 - 削除漏れアカウントの発見に活用
+
+### Entra ID SaaSアカウント同期
+- Graph API `/servicePrincipals` からエンタープライズアプリ一覧を取得
+- `/appRoleAssignedTo` から各アプリのユーザー割り当てを取得
+- SaaS台帳の `entra_app_id` またはSaaS名で照合し、アカウントを自動同期
+- 新規割り当て → アカウント作成、割り当て解除 → ステータスを `suspended` に更新
+- 同期結果をTeams通知で送信
+
+### 契約更新チェック
+- 契約期限が30日以内・7日以内・期限切れのSaaSを検出
+- Teams通知で更新期限アラートを送信
 
 ## 実行履歴テーブル
 | 項目 | 説明 |
