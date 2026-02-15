@@ -44,4 +44,24 @@ RSpec.describe "Admin::Batches", type: :request do
       expect(response).to redirect_to(admin_batches_path)
     end
   end
+
+  describe "POST /admin/batches/check_contract_renewals" do
+    it "ジョブをキューイングする" do
+      login_as(admin)
+      expect {
+        post check_contract_renewals_admin_batches_path
+      }.to have_enqueued_job(ContractRenewalAlertJob)
+      expect(response).to redirect_to(admin_batches_path)
+    end
+  end
+
+  describe "POST /admin/batches/sync_entra_accounts" do
+    it "ジョブをキューイングする" do
+      login_as(admin)
+      expect {
+        post sync_entra_accounts_admin_batches_path
+      }.to have_enqueued_job(EntraAccountSyncJob)
+      expect(response).to redirect_to(admin_batches_path)
+    end
+  end
 end

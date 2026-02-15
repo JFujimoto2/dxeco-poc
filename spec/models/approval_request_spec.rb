@@ -31,4 +31,18 @@ RSpec.describe ApprovalRequest, type: :model do
     request = build(:approval_request, saas: nil, saas_name: "Figma")
     expect(request.target_saas_name).to eq("Figma")
   end
+
+  describe "approver" do
+    it "approverを指定できる" do
+      approver = create(:user, :manager)
+      request = build(:approval_request, approver: approver)
+      expect(request).to be_valid
+      expect(request.approver).to eq(approver)
+    end
+
+    it "approverなしでも有効" do
+      request = build(:approval_request, approver: nil)
+      expect(request).to be_valid
+    end
+  end
 end

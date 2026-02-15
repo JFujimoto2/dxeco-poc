@@ -36,6 +36,11 @@
 
           <dt class="col-sm-3">説明</dt>
           <dd class="col-sm-9"><%= @saas.description || "-" %></dd>
+
+          <% if @saas.entra_app_id.present? %>
+            <dt class="col-sm-3">Entra ID連携</dt>
+            <dd class="col-sm-9"><span class="badge bg-info">SSO連携済み</span> <small class="text-muted"><%= @saas.entra_app_id %></small></dd>
+          <% end %>
         </dl>
       </div>
     </div>

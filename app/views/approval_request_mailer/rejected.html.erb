@@ -1,0 +1,12 @@
+<h2>申請が却下されました</h2>
+
+<p>「<strong><%= @request.target_saas_name %></strong>」の利用申請が却下されました。</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">
+  <tr><th>種別</th><td><%= @request.request_type %></td></tr>
+  <tr><th>対象SaaS</th><td><%= @request.target_saas_name %></td></tr>
+  <tr><th>却下者</th><td><%= @request.approved_by&.display_name %></td></tr>
+  <tr><th>却下理由</th><td><%= @request.rejection_reason %></td></tr>
+</table>
+
+<p><%= link_to "申請を確認する", approval_request_url(@request) %></p>

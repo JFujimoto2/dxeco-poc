@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_10_123657) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_14_113219) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "approval_requests", force: :cascade do |t|
     t.datetime "approved_at"
     t.bigint "approved_by_id"
+    t.bigint "approver_id"
     t.datetime "created_at", null: false
     t.integer "estimated_cost"
     t.text "reason"
@@ -29,6 +30,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_123657) do
     t.datetime "updated_at", null: false
     t.integer "user_count"
     t.index ["approved_by_id"], name: "index_approval_requests_on_approved_by_id"
+    t.index ["approver_id"], name: "index_approval_requests_on_approver_id"
     t.index ["requester_id"], name: "index_approval_requests_on_requester_id"
     t.index ["saas_id"], name: "index_approval_requests_on_saas_id"
     t.index ["status"], name: "index_approval_requests_on_status"
@@ -98,12 +100,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_123657) do
     t.datetime "created_at", null: false
     t.jsonb "custom_fields", default: {}
     t.text "description"
+    t.string "entra_app_id"
     t.string "name", null: false
     t.bigint "owner_id"
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
     t.string "url"
     t.index ["category"], name: "index_saases_on_category"
+    t.index ["entra_app_id"], name: "index_saases_on_entra_app_id", unique: true
     t.index ["name"], name: "index_saases_on_name"
     t.index ["owner_id"], name: "index_saases_on_owner_id"
     t.index ["status"], name: "index_saases_on_status"
@@ -179,7 +183,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_123657) do
     t.bigint "created_by_id", null: false
     t.date "due_date"
     t.string "status", default: "open", null: false
-    t.bigint "target_user_id", null: false
+    t.bigint "target_user_id"
     t.string "task_type", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
@@ -197,6 +201,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_123657) do
     t.string "employee_id"
     t.string "entra_id_sub", null: false
     t.string "job_title"
+    t.datetime "last_password_change_at"
     t.datetime "last_signed_in_at"
     t.string "role", default: "viewer", null: false
     t.datetime "updated_at", null: false
@@ -206,6 +211,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_10_123657) do
 
   add_foreign_key "approval_requests", "saases"
   add_foreign_key "approval_requests", "users", column: "approved_by_id"
+  add_foreign_key "approval_requests", "users", column: "approver_id"
   add_foreign_key "approval_requests", "users", column: "requester_id"
   add_foreign_key "audit_logs", "users"
   add_foreign_key "saas_accounts", "saases"

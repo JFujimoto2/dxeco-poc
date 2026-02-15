@@ -34,7 +34,18 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+# Infra secrets
+/infra/.env.azure
+/infra/DB接続情報.md
+
 # Node / Playwright
 /node_modules/
 /playwright-report/
 /test-results/
+
+# Coverage
+/coverage/
+
+# DBeaver
+/.dbeaver/
+*.dbp

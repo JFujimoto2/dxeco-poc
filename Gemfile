@@ -72,9 +72,14 @@ group :development, :test do
   gem "rspec-rails"
   gem "factory_bot_rails"
   gem "webmock"
+  gem "simplecov", require: false
 end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Preview emails in browser instead of sending
+  gem "letter_opener"
+  gem "letter_opener_web"
 end

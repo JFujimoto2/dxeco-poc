@@ -36,8 +36,7 @@ test.describe("サイドバーナビゲーション", () => {
 
     for (const link of sidebarLinks) {
       await page.locator("nav .nav-link").getByText(link.text, { exact: true }).click();
-      await page.waitForLoadState("networkidle");
-      expect(page.url()).toContain(link.url);
+      await page.waitForURL(`**${link.url}`, { timeout: 10000 });
 
       const body = await page.locator("body").textContent();
       expect(body).not.toContain("No route matches");

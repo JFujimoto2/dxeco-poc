@@ -89,8 +89,9 @@ production:
   primary: &primary_production
     <<: *default
     database: dxceco_poc_production
-    username: dxceco_poc
+    username: <%= ENV.fetch("DB_USERNAME", "dxceco_poc") %>
     password: <%= ENV["DXCECO_POC_DATABASE_PASSWORD"] %>
+    host: <%= ENV.fetch("DB_HOST", "localhost") %>
   cache:
     <<: *primary_production
     database: dxceco_poc_production_cache

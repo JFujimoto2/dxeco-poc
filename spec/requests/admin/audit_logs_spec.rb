@@ -60,4 +60,23 @@ RSpec.describe "Admin::AuditLogs", type: :request do
       expect(response).to redirect_to(root_path)
     end
   end
+
+  describe "GET /admin/audit_logs/export" do
+    it "adminはCSVエクスポートできる" do
+      login_as(admin)
+      create(:audit_log, action: "create", resource_type: "Saas", resource_id: 1)
+
+      get export_admin_audit_logs_path
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to include("text/csv")
+      expect(response.headers["Content-Disposition"]).to include("audit_logs_export")
+      expect(response.body).to include("Saas")
+    end
+
+    it "viewerはエクスポートできない" do
+      login_as(viewer)
+      get export_admin_audit_logs_path
+      expect(response).to redirect_to(root_path)
+    end
+  end
 end

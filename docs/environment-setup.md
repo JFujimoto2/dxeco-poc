@@ -26,6 +26,20 @@
 | `TEAMS_WEBHOOK_URL` | Teams チャネルの Incoming Webhook URL（一般通知） | `https://xxxxx.webhook.office.com/...` |
 | `TEAMS_WEBHOOK_SURVEY_URL` | サーベイ専用チャネルの Webhook URL（未設定時は `TEAMS_WEBHOOK_URL` にフォールバック） | `https://xxxxx.webhook.office.com/...` |
 
+### メール通知（SMTP）
+
+| 変数名 | 用途 | 例 |
+|--------|------|-----|
+| `SMTP_ADDRESS` | SMTPサーバー | `smtp.office365.com` |
+| `SMTP_PORT` | ポート | `587` |
+| `SMTP_USERNAME` | ユーザー名 | `noreply@example.com` |
+| `SMTP_PASSWORD` | パスワード | `xxxxxxxxxx` |
+| `SMTP_DOMAIN` | HELOドメイン | `example.com` |
+| `MAILER_FROM` | 送信元アドレス | `noreply@example.com` |
+
+SMTP 変数が未設定の場合、メール通知はスキップされる（Teams通知と同じパターン）。
+開発環境では `letter_opener` gem で実際にメール送信せずブラウザで確認可能。
+
 ### オプション（インフラ）
 
 | 変数名 | 用途 | デフォルト値 |
@@ -100,14 +114,14 @@ IaC（Terraform, AWS CDK, etc.）やコンテナオーケストレーション�
 1. [Azure Portal](https://portal.azure.com) → **Microsoft Entra ID** → **アプリの登録** → **新規登録**
 2. 以下を入力:
    - **名前**: `SaaS管理ツール`（任意）
-   - **サポートされるアカウントの種類**: 「この組織ディレクトリのみに含まれるアカウント」
+   - **サポートされるアカウントの種類**: 「この組織ディレクトリのみに含まれるアカウント（シングルテナント）」
    - **リダイレクトURI**: `Web` → `http://localhost:3000/auth/entra_id/callback`（開発時）
 
 #### 2. クライアントシークレットを作成
 
 1. 登録したアプリの「証明書とシークレット」→「新しいクライアントシークレット」
-2. 説明: `SaaS管理ツール`、有効期限: 任意
-3. 作成されたシークレットの **値** をコピー（この画面でしか確認できない）
+2. 説明: `SaaS管理ツール`、有効期限: 任意（POCなら6ヶ月推奨）
+3. 作成されたシークレットの **値** をコピー（**この画面を離れると二度と確認できない**）
 
 #### 3. 必要な情報を取得
 
@@ -129,7 +143,27 @@ ENTRA_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 APP_URL=http://localhost:3000
 ```
 
-#### 5. 本番環境のリダイレクトURI追加
+#### 5. サーバーを再起動して確認
+
+OmniAuth の設定はミドルウェアとして初期化時に読み込まれるため、`.env` 変更後は **`bin/dev` の再起動が必要**。
+
+```bash
+# Ctrl+C で停止後
+bin/dev
+```
+
+1. http://localhost:3000/login にアクセス
+2. 「Microsoft アカウントでログイン」ボタンが表示される
+3. クリックして会社の Microsoft アカウントで認証
+4. ダッシュボードにリダイレクトされれば成功
+
+初回ログイン時は `viewer` ロールで自動登録される。Rails コンソールでロールを変更可能:
+
+```ruby
+User.find_by(email: "your-email@example.com").update!(role: "admin")
+```
+
+#### 6. 本番環境のリダイレクトURI追加
 
 本番デプロイ時、Entra ID のアプリ登録に本番URLのリダイレクトURIを追加する。
 
@@ -138,6 +172,16 @@ https://saas-mgmt.example.com/auth/entra_id/callback
 ```
 
 `APP_URL` も本番URLに合わせて変更する。
+
+#### トラブルシューティング
+
+| エラー | 原因 | 対処 |
+|--------|------|------|
+| `No Host Info` (RuntimeError) | OIDC クライアントがホスト情報を解決できない | `config/initializers/omniauth.rb` で `discovery: true` と `host`/`scheme`/エンドポイントが明示されているか確認 |
+| `Authentication failure! invalid_credentials` | クライアントシークレットが間違っている | Azure Portal でシークレットを再作成し `.env` を更新 |
+| `redirect_uri_mismatch` | リダイレクトURIが一致しない | Azure Portal のアプリ登録で `http://localhost:3000/auth/entra_id/callback` が登録されているか確認 |
+| SSO ボタンが表示されない | `ENTRA_CLIENT_ID` が未設定 | `.env` に設定後、`bin/dev` を再起動 |
+| ログイン後に `viewer` ロールになる | 初回ログインのデフォルト動作 | Rails コンソールで `User.find_by(email: "...").update!(role: "admin")` |
 
 ---
 
@@ -155,7 +199,17 @@ SSO と同じアプリ登録を使うが、追加の API アクセス許可が�
    - `User.Read.All`（全ユーザー情報の読み取り）
 4. **「（テナント名）に管理者の同意を与えます」** をクリック
 
-#### 2. 動作確認
+#### 2. API アクセス許可の追加（SSO ログイン時のプロフィール取得）
+
+SSOログイン時に Graph API でユーザーの部門・役職・社員番号を自動取得するため、**委任されたアクセス許可** も追加する。
+
+1. Azure Portal → アプリの登録 → **API のアクセス許可** → **アクセス許可の追加**
+2. **Microsoft Graph** → **委任されたアクセス許可** を選択
+3. `User.Read` を追加（ログインユーザー自身のプロフィール読み取り）
+
+> **注意:** `User.Read.All`（手順1）は「アプリケーションの許可」、`User.Read`（手順2）は「委任されたアクセス許可」。両方必要。
+
+#### 3. 動作確認
 
 ```bash
 # Railsコンソールで接続テスト
@@ -169,11 +223,67 @@ puts "取得ユーザー数: #{users.count}"
 puts users.first&.slice("displayName", "mail", "department")
 ```
 
-#### 3. バッチ管理画面から同期実行
+#### 5. バッチ管理画面から同期実行
 
 1. 管理者でログイン
 2. サイドバー「バッチ管理」
 3. 「Entra IDユーザー同期」→「実行」
+
+### SaaSアカウント同期の設定
+
+SSO連携済みSaaSのアカウントを自動同期する場合の追加設定。
+
+#### 1. Azure Portal でSaaSをエンタープライズアプリに登録
+
+1. **Microsoft Entra ID** → **エンタープライズ アプリケーション** → **新しいアプリケーション**
+2. ギャラリーからSaaSを検索、なければ **独自のアプリケーション** を作成
+3. **シングル サインオン** → **SAML** を選択
+4. SaaS側のSP情報（Entity ID, ACS URL）を設定
+5. **ユーザーとグループ** → 利用者を割り当て
+
+> **注意:** 「アプリの登録」ではなく「エンタープライズ アプリケーション」から作成すること。「アプリの登録」で作成するとOIDCモードになり、SAML SSO を選択できない。
+
+#### 2. ツール側でSaaSと紐付け
+
+SaaS台帳の編集画面で **「Entra ID アプリID」** にエンタープライズアプリのオブジェクトIDを入力する。
+未入力の場合はSaaS名とアプリの `displayName` で自動照合する（大文字小文字を無視）。
+
+#### 3. 動作確認
+
+```bash
+rails console
+
+# エンタープライズアプリ一覧を取得
+token = EntraClient.fetch_app_token
+sps = EntraClient.fetch_service_principals(token)
+puts "エンタープライズアプリ数: #{sps.count}"
+sps.first(5).each { |sp| puts "  #{sp['displayName']} (#{sp['id']})" }
+
+# 特定アプリのユーザー割り当てを確認
+app_id = sps.find { |sp| sp['displayName'] =~ /Slack/i }&.dig('id')
+if app_id
+  assignments = EntraClient.fetch_app_role_assignments(token, app_id)
+  puts "割り当てユーザー数: #{assignments.count}"
+end
+```
+
+#### 4. バッチ管理画面からアカウント同期を実行
+
+1. 管理者でログイン
+2. サイドバー「バッチ管理」
+3. 「Entra ID SaaSアカウント同期」→「実行」
+4. 実行結果で新規作成・停止件数を確認
+
+#### SSO 設定のテスト（RSA Test Service Provider）
+
+Entra ID の IdP 設定が正しいかを、実際のSaaSなしで検証できるテストサービス。
+
+1. Azure Portal でエンタープライズアプリを作成（独自アプリ）→ SAML を選択
+2. 基本的な SAML 構成:
+   - **識別子**: `IAMShowcase`
+   - **応答 URL**: `https://sptest.iamshowcase.com/acs`
+3. ユーザーを割り当て → 「テスト」ボタンでSSO実行
+4. [sptest.iamshowcase.com](https://sptest.iamshowcase.com/) に SAML Assertion の内容が表示されれば成功
 
 ---
 
@@ -210,7 +320,20 @@ puts users.first&.slice("displayName", "mail", "department")
 TEAMS_WEBHOOK_URL=https://xxxxx.webhook.office.com/webhookb2/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx@xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/IncomingWebhook/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-#### 3. 動作確認
+#### 3. SaaSアカウント同期用の API アクセス許可を追加
+
+SSO連携済みSaaSのアカウントを自動同期するには、追加の API 権限が必要。
+
+1. Azure Portal → アプリの登録 → **API のアクセス許可** → **アクセス許可の追加**
+2. **Microsoft Graph** → **アプリケーションの許可** を選択
+3. 以下を追加:
+   - `Application.Read.All`（エンタープライズアプリ一覧の読み取り）
+   - `AppRoleAssignment.ReadWrite.All`（アプリのユーザー割り当て読み取り）
+4. **「（テナント名）に管理者の同意を与えます」** をクリック
+
+> **注意:** 既に `User.Read.All` が設定済みの場合、上記2つを追加するだけでOK。
+
+#### 4. 動作確認
 
 ```bash
 rails console
@@ -230,6 +353,11 @@ Teams チャネルに Adaptive Card 形式のメッセージが届けば成功�
 ---
 
 ## PostgreSQL の設定
+
+### タイムゾーン
+
+アプリケーション・DBともに **JST（日本標準時）** で統一している（`config/application.rb`）。
+DBに保存されるタイムスタンプ（`created_at`, `updated_at` 等）はすべてJST。
 
 ### 開発環境
 
@@ -312,12 +440,28 @@ TeamsNotifier.notify(title: "接続テスト", body: "SaaS管理ツールから�
 - Webhook URL が正しいか（有効期限切れでないか）
 - Teams チャネルでコネクタが有効か
 
-### Step 4: 全体統合テスト
+### Step 4: SaaSアカウント同期
+
+```bash
+rails console
+
+# エンタープライズアプリの取得テスト
+token = EntraClient.fetch_app_token
+sps = EntraClient.fetch_service_principals(token)
+puts "OK: #{sps.count} エンタープライズアプリ取得"
+```
+
+**失敗時の確認ポイント:**
+- API のアクセス許可 `Application.Read.All` / `AppRoleAssignment.ReadWrite.All` が付与されているか
+- 管理者の同意が与えられているか
+
+### Step 5: 全体統合テスト
 
 1. SSO でログイン
 2. バッチ管理 → Entra ID ユーザー同期を実行
-3. 申請・承認 → 新規申請を作成（Teams 通知が飛ぶことを確認）
-4. 操作ログで各操作が記録されていることを確認
+3. バッチ管理 → Entra ID SaaSアカウント同期を実行（SSO対応SaaSのアカウントが台帳に反映されることを確認）
+4. 申請・承認 → 新規申請を作成（Teams 通知 + メール通知が飛ぶことを確認）
+5. 操作ログで各操作が記録されていることを確認
 
 ---
 

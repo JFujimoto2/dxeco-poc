@@ -27,15 +27,7 @@
   <%= form_with model: @task, class: "card" do |f| %>
     <div class="card-header"><h6 class="mb-0">2. タスク内容を確認して作成</h6></div>
     <div class="card-body">
-      <% if @task.errors.any? %>
-        <div class="alert alert-danger">
-          <ul class="mb-0">
-            <% @task.errors.full_messages.each do |msg| %>
-              <li><%= msg %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
+      <%= render "shared/error_messages", model: @task %>
 
       <div class="row mb-3">
         <div class="col-md-6">
@@ -48,7 +40,11 @@
         </div>
         <div class="col-md-3">
           <%= f.label :due_date, "期限", class: "form-label" %>
-          <%= f.date_field :due_date, class: "form-control" %>
+          <div class="date-weekday-wrap">
+            <%= f.date_field :due_date, class: "form-control", id: "due-date-input",
+                onchange: "updateDateDisplay(this, 'due-date-display')" %>
+            <span id="due-date-display" class="date-weekday-display"><%= format_date_with_weekday(@task.due_date) %></span>
+          </div>
         </div>
       </div>
 
@@ -94,3 +90,16 @@
     </div>
   <% end %>
 <% end %>
+
+<script>
+  function updateDateDisplay(input, displayId) {
+    var weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+    var span = document.getElementById(displayId);
+    if (input.value) {
+      var parts = input.value.split("-");
+      var d = new Date(input.value + "T00:00:00");
+      span.textContent = parts[0] + "/" + parts[1] + "/" + parts[2] + " (" + weekdays[d.getDay()] + ")";
+    } else {
+      span.textContent = "";
+  }
+</script>

@@ -13,8 +13,17 @@ class EntraClient
     JSON.parse(response.body)["access_token"]
   end
 
+  def self.fetch_my_profile(token)
+    response = Faraday.get("#{BASE_URL}/me?$select=department,jobTitle,employeeId") do |req|
+      req.headers["Authorization"] = "Bearer #{token}"
+    end
+    return nil unless response.success?
+
+    JSON.parse(response.body)
+  end
+
   def self.fetch_all_users(token)
-    url = "#{BASE_URL}/users?$select=id,displayName,mail,userPrincipalName,jobTitle,department,employeeId,accountEnabled&$top=999"
+    url = "#{BASE_URL}/users?$select=id,displayName,mail,userPrincipalName,jobTitle,department,employeeId,accountEnabled,lastPasswordChangeDateTime&$top=999"
     users = []
     loop do
       response = Faraday.get(url) do |req|
@@ -26,5 +35,28 @@ class EntraClient
       break unless url
     end
     users
+  end
+
+  def self.fetch_service_principals(token)
+    url = "#{BASE_URL}/servicePrincipals?$filter=tags/any(t:t eq 'WindowsAzureActiveDirectoryIntegratedApp')&$select=id,displayName,appId&$top=999"
+    apps = []
+    loop do
+      response = Faraday.get(url) do |req|
+        req.headers["Authorization"] = "Bearer #{token}"
+      end
+      data = JSON.parse(response.body)
+      apps.concat(data["value"] || [])
+      url = data["@odata.nextLink"]
+      break unless url
+    end
+    apps
+  end
+
+  def self.fetch_app_role_assignments(token, service_principal_id)
+    response = Faraday.get("#{BASE_URL}/servicePrincipals/#{service_principal_id}/appRoleAssignedTo") do |req|
+      req.headers["Authorization"] = "Bearer #{token}"
+    end
+    data = JSON.parse(response.body)
+    (data["value"] || []).select { |a| a["principalType"] == "User" }
   end
 end

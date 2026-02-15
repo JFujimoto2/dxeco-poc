@@ -7,6 +7,7 @@
 - [ブランチ運用](#ブランチ運用)
 - [CI パイプライン](#ci-パイプライン)
 - [テスト戦略](#テスト戦略)
+- [メール通知（開発環境）](#メール通知開発環境)
 - [DB 操作](#db-操作)
 - [デモ環境の準備](#デモ環境の準備)
 - [トラブルシューティング](#トラブルシューティング)
@@ -15,27 +16,13 @@
 
 ## 日常の開発フロー
 
-### 1. 小さな修正・バグフィックス
+すべての変更は **PR 経由** で `main` にマージする（直接 push 不可）。
 
-リポジトリオーナーは main に直接 push 可能。
-
-```bash
-# コード修正
-vim app/...
-
-# テスト + Lint
-bundle exec rspec
-bin/rubocop
-
-# コミット & push
-git add -p
-git commit -m "Fix ..."
-git push origin main
+```
+feature/xxx ──PR──▶ main ──PR──▶ prod ──自動デプロイ──▶ Azure
 ```
 
-### 2. 機能開発（PR経由）
-
-外部コントリビューターや大きめの変更はブランチを切ってPR。
+### 1. 開発（feature → main）
 
 ```bash
 # ブランチ作成
@@ -43,6 +30,7 @@ git checkout -b feature/xxx
 
 # 開発 → テスト → コミット（繰り返し）
 bundle exec rspec
+bin/rubocop
 git commit ...
 
 # push & PR作成
@@ -51,6 +39,20 @@ gh pr create --title "Add xxx" --body "..."
 ```
 
 CI（lint, scan_ruby, scan_js, test, e2e）が全てパスしないとマージ不可。
+
+### 2. デプロイ（main → prod）
+
+`main` の変更を本番に反映する場合、`main` → `prod` への PR を作成してマージする。
+
+```bash
+# main → prod の PR を作成
+gh pr create --base prod --head main --title "Release: xxx"
+```
+
+`prod` へのマージで GitHub Actions が自動実行:
+1. Docker イメージをビルド
+2. Azure Container Registry (ACR) にプッシュ
+3. Azure Container Apps を更新
 
 ---
 
@@ -96,13 +98,23 @@ CLAUDE.md に定義された TDD フローに従う。
 
 ## ブランチ運用
 
-### ブランチ保護ルール（main）
+### ブランチ構成
+
+| ブランチ | 用途 | デプロイ |
+|----------|------|---------|
+| `main` | 開発統合ブランチ | - |
+| `prod` | 本番リリースブランチ | マージ時に Azure へ自動デプロイ |
+| `feature/*` 等 | 作業ブランチ | - |
+
+### ブランチ保護ルール（main / prod 共通）
 
 | ルール | 設定 |
 |--------|------|
+| PR マージ必須 | 直接 push 不可 |
 | 必須 CI チェック | lint, scan_ruby, scan_js, test, e2e |
 | ステータスチェック最新性 | 必須（strict） |
-| admin バイパス | 許可（オーナーは直接 push 可） |
+| 承認レビュー | 0人（一人開発のため） |
+| admin バイパス | 許可（オーナーは緊急時のみ） |
 | force push | 禁止 |
 | ブランチ削除 | 禁止 |
 
@@ -117,9 +129,11 @@ CLAUDE.md に定義された TDD フローに従う。
 
 ---
 
-## CI パイプライン
+## CI/CD パイプライン
 
-push / PR 時に GitHub Actions で自動実行される。
+### CI（`.github/workflows/ci.yml`）
+
+`main` への push / PR 時に自動実行。
 
 ```
 ┌─────────┐  ┌──────────┐  ┌─────────┐
@@ -129,11 +143,11 @@ push / PR 時に GitHub Actions で自動実行される。
      └────────────┼─────────────┘
                   ▼
            ┌──────────┐
-           │   test   │  ← RSpec (151テスト)
+           │   test   │  ← RSpec
            └────┬─────┘
                 ▼
            ┌──────────┐
-           │   e2e    │  ← Playwright (54テスト)
+           │   e2e    │  ← Playwright
            └──────────┘
 ```
 
@@ -144,6 +158,40 @@ push / PR 時に GitHub Actions で自動実行される。
 | scan_js | importmap audit（JS依存関係の脆弱性） | ~14s |
 | test | RSpec ユニット/リクエストテスト | ~37s |
 | e2e | Playwright ブラウザテスト（test 完了後に実行） | ~2m30s |
+
+### CD（`.github/workflows/deploy.yml`）
+
+`prod` への push 時に自動実行。
+
+```
+┌───────────────┐     ┌───────────────┐     ┌──────────────────┐
+│ Azure ログイン │ ──▶ │ ACR ログイン   │ ──▶ │ Docker ビルド     │
+└───────────────┘     └───────────────┘     │ & ACR プッシュ    │
+                                            └────────┬─────────┘
+                                                     ▼
+                                            ┌──────────────────┐
+                                            │ Container Apps   │
+                                            │ 更新              │
+                                            └──────────────────┘
+```
+
+| ステップ | 内容 | 所要時間 |
+|----------|------|---------|
+| Azure ログイン | サービスプリンシパルで認証 | ~5s |
+| ACR ログイン | Azure Container Registry に認証 | ~5s |
+| Docker ビルド & プッシュ | イメージをビルドして ACR にプッシュ（SHA タグ + latest） | ~2m |
+| Container Apps 更新 | 新しいイメージでコンテナを更新 | ~20s |
+
+**GitHub Secrets（CD 用）:**
+
+| シークレット名 | 用途 |
+|---------------|------|
+| `AZURE_CLIENT_ID` | サービスプリンシパルのクライアントID |
+| `AZURE_CLIENT_SECRET` | サービスプリンシパルのシークレット |
+| `AZURE_TENANT_ID` | Azure テナントID |
+| `AZURE_SUBSCRIPTION_ID` | Azure サブスクリプションID |
+| `ACR_LOGIN_SERVER` | ACR ログインサーバー（例: `acrdxcecopoc.azurecr.io`） |
+| `ACR_NAME` | ACR 名（例: `acrdxcecopoc`） |
 
 ### CI が失敗した場合
 
@@ -212,6 +260,71 @@ npx playwright test e2e/smoke.spec.ts
 npx playwright test --reporter=html
 npx playwright show-report
 ```
+
+---
+
+## メール通知（開発環境）
+
+開発環境では `letter_opener_web` を使い、実際にメールを送信せずブラウザで確認できる。
+
+### 確認手順
+
+1. `bin/dev` でサーバーを起動
+2. アプリ上でメール送信を伴う操作を行う（タスク作成、承認申請など）
+3. **http://localhost:3000/letter_opener** にアクセス
+4. 送信されたメールの一覧が表示される
+
+### Rails console から手動送信
+
+```bash
+bin/rails console
+```
+
+```ruby
+# タスクアサイン通知
+TaskMailer.assignment_notification(Task.last).deliver_now
+
+# 承認依頼通知
+ApprovalRequestMailer.new_request(ApprovalRequest.last).deliver_now
+
+# サーベイ配信通知
+SurveyMailer.distribution(Survey.last).deliver_now
+
+# サーベイリマインド通知
+SurveyMailer.reminder(Survey.last).deliver_now
+```
+
+### メール種別一覧
+
+| Mailer | メソッド | To | CC |
+|--------|---------|-----|-----|
+| TaskMailer | `assignment_notification` | アサイン先 | 部署manager + タスク作成者 |
+| ApprovalRequestMailer | `new_request` | admin/manager 全員 | - |
+| ApprovalRequestMailer | `approved` | 申請者 | SaaSオーナー |
+| ApprovalRequestMailer | `rejected` | 申請者 | SaaSオーナー |
+| SurveyMailer | `distribution` | 対象ユーザー全員 | - |
+| SurveyMailer | `reminder` | 未回答ユーザーのみ | - |
+
+### 注意事項
+
+- 開発環境では dev_login を使うため、メール内リンクをクリックするとログイン画面に遷移する。リンクURLが正しいことを letter_opener 上で確認すればOK
+- 本番環境（Entra ID SSO）ではリンクから直接該当ページに遷移する
+- 本番でメール送信を有効にするには `.env` に `SMTP_*` 変数を設定する（[環境変数ガイド](environment-setup.md) 参照）
+
+---
+
+## タイムゾーン
+
+アプリケーション・DBともに **JST（日本標準時）** で統一している。
+
+| 設定 | 値 | 説明 |
+|------|-----|------|
+| `config.time_zone` | `"Tokyo"` | Rails のデフォルトタイムゾーン（表示・ビジネスロジック） |
+| `config.active_record.default_timezone` | `:local` | DBへのタイムスタンプ保存をJSTで行う |
+
+- `Time.current` / `Time.zone.now` は常にJSTを返す
+- DB の `created_at` / `updated_at` 等もJSTで保存される
+- 設定ファイル: `config/application.rb`
 
 ---
 

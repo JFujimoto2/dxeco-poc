@@ -142,6 +142,35 @@ backoffice_saases_data.each do |data|
   end
 end
 
+# デモ用: 一部の契約に期限切れ・7日以内・30日以内の期限を設定
+demo_expiry = {
+  "Slack" => 5.days.from_now.to_date,         # 7日以内
+  "Zoom" => 3.days.from_now.to_date,           # 7日以内
+  "Box" => 20.days.from_now.to_date,           # 30日以内
+  "いえらぶCLOUD" => 25.days.from_now.to_date, # 30日以内
+  "freee会計" => 5.days.ago.to_date            # 期限切れ
+}
+
+demo_expiry.each do |saas_name, expires_on|
+  saas = Saas.find_by(name: saas_name)
+  saas&.saas_contract&.update!(expires_on: expires_on)
+end
+
+# デモ用: パスワード期限切れ・期限間近ユーザー
+password_demo = {
+  "tanaka@example.com" => 100.days.ago,   # 期限切れ
+  "sato@example.com" => 95.days.ago,      # 期限切れ
+  "watanabe@example.com" => 82.days.ago,  # 期限間近（残8日）
+  "kobayashi@example.com" => 80.days.ago # 期限間近（残10日）
+}
+password_demo.each do |email, changed_at|
+  User.find_by(email: email)&.update!(last_password_change_at: changed_at)
+end
+# 正常ユーザーにも最終変更日を設定
+User.where(last_password_change_at: nil).find_each do |u|
+  u.update!(last_password_change_at: rand(10..60).days.ago)
+end
+
 puts "  SaaS: #{Saas.count}"
 
 # --- SaaS Accounts ---
@@ -339,6 +368,7 @@ unless ApprovalRequest.count >= 4
     reason: "営業部のナレッジ共有のため、Notionアカウントを追加したい。",
     estimated_cost: 1000,
     user_count: 1,
+    approver: it_user,
     status: "approved",
     approved_by: admin_user,
     approved_at: 1.week.ago
@@ -351,6 +381,7 @@ unless ApprovalRequest.count >= 4
     reason: "企画部でのAI活用推進のため、ChatGPTアカウントを追加したい。",
     estimated_cost: 3000,
     user_count: 3,
+    approver: it_user,
     status: "approved",
     approved_by: admin_user,
     approved_at: 3.days.ago
@@ -364,6 +395,7 @@ unless ApprovalRequest.count >= 4
     reason: "デザインチームで利用するUI/UXデザインツール。現在PowerPointで代用しているが効率が悪い。",
     estimated_cost: 5000,
     user_count: 3,
+    approver: it_user,
     status: "rejected",
     approved_by: admin_user,
     approved_at: 5.days.ago,
@@ -378,6 +410,7 @@ unless ApprovalRequest.count >= 4
     reason: "リモートでのブレスト・ワークショップ用にオンラインホワイトボードを導入したい。",
     estimated_cost: 2000,
     user_count: 5,
+    approver: it_user,
     status: "pending"
   )
 end

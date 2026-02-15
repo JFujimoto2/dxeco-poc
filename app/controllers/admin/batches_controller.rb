@@ -14,4 +14,14 @@ class Admin::BatchesController < ApplicationController
     RetiredAccountDetectionJob.perform_later
     redirect_to admin_batches_path, notice: "退職者アカウント検出を開始しました"
   end
+
+  def check_contract_renewals
+    ContractRenewalAlertJob.perform_later
+    redirect_to admin_batches_path, notice: "契約更新チェックを開始しました"
+  end
+
+  def sync_entra_accounts
+    EntraAccountSyncJob.perform_later
+    redirect_to admin_batches_path, notice: "SaaSアカウント同期を開始しました"
+  end
 end

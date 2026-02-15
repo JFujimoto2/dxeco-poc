@@ -3,6 +3,9 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h4>SaaS台帳</h4>
   <div>
+    <%= link_to export_saases_path(q: params[:q], category: params[:category], status: params[:status]), class: "btn btn-outline-success me-1" do %>
+      <i class="bi bi-download me-1"></i>CSVエクスポート
+    <% end %>
     <button class="btn btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#importModal">
       <i class="bi bi-upload me-1"></i>CSVインポート
     </button>

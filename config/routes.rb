@@ -9,6 +9,8 @@ Rails.application.routes.draw do
     post "dev_login", to: "sessions#dev_create", as: :dev_login
   end
 
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
+
   # ダッシュボード
   root "dashboard#index"
 
@@ -16,11 +18,15 @@ Rails.application.routes.draw do
   resources :saases do
     collection do
       post :import
+      get :download_template
+      get :export
     end
   end
   resources :saas_accounts, except: [ :show ] do
     collection do
       post :import
+      get :download_template
+      get :export
     end
   end
   resources :users, only: [ :index, :show, :edit, :update ]
@@ -31,6 +37,7 @@ Rails.application.routes.draw do
       patch :close
       post :activate
       post :remind
+      post :create_cleanup_task
     end
   end
   resources :survey_responses, only: [ :update ]
@@ -54,9 +61,15 @@ Rails.application.routes.draw do
       collection do
         post :sync_entra_users
         post :detect_retired_accounts
+        post :check_contract_renewals
+        post :sync_entra_accounts
       end
     end
-    resources :audit_logs, only: [ :index, :show ]
+    resources :audit_logs, only: [ :index, :show ] do
+      collection do
+        get :export
+      end
+    end
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

@@ -8,3 +8,22 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/* 日付入力: ネイティブのテキストを隠して自前フォーマットをオーバーレイ */
+.date-weekday-wrap {
+  position: relative;
+}
+.date-weekday-wrap input[type="date"] {
+  color: transparent;
+}
+.date-weekday-wrap input[type="date"]::-webkit-datetime-edit {
+  color: transparent;
+}
+.date-weekday-wrap .date-weekday-display {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--bs-body-color);
+}

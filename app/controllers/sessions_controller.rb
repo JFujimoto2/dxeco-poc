@@ -8,16 +8,36 @@ class SessionsController < ApplicationController
   # POST /auth/entra_id/callback (OmniAuth callback)
   def create
     auth = request.env["omniauth.auth"]
-    user = User.find_or_initialize_by(entra_id_sub: auth.uid)
+    Rails.logger.info "[SSO] OmniAuth uid=#{auth.uid}, email=#{auth.info.email}, name=#{auth.info.name}"
+    Rails.logger.info "[SSO] OmniAuth info: #{auth.info.to_h}"
+    Rails.logger.info "[SSO] OmniAuth extra.raw_info: #{auth.extra&.raw_info&.to_h}" if auth.extra&.raw_info
+
+    entra_id = auth.extra&.raw_info&.[]("oid") || auth.uid
+    user = User.find_by(entra_id_sub: entra_id) || User.find_by(email: auth.info.email) || User.new
+    user.entra_id_sub = entra_id
     user.assign_attributes(
       email: auth.info.email,
       display_name: auth.info.name,
       last_signed_in_at: Time.current
     )
+
+    if auth.credentials&.token.present?
+      profile = EntraClient.fetch_my_profile(auth.credentials.token)
+      if profile
+        Rails.logger.info "[SSO] Graph API /me response: #{profile}"
+        user.department = profile["department"] if profile["department"].present?
+        user.job_title = profile["jobTitle"] if profile["jobTitle"].present?
+        user.employee_id = profile["employeeId"] if profile["employeeId"].present?
+      else
+        Rails.logger.warn "[SSO] Graph API profile fetch failed for #{auth.info.email}"
+      end
+    end
+
     user.role ||= "viewer"
     user.save!
 
     session[:user_id] = user.id
+    session[:login_method] = :sso
     redirect_to root_path, notice: "ログインしました"
   end
 
@@ -28,8 +48,9 @@ class SessionsController < ApplicationController
 
   # DELETE /logout
   def destroy
+    sso_login = session[:login_method].to_s == "sso"
     reset_session
-    if entra_id_configured?
+    if sso_login && entra_id_configured?
       redirect_to "https://login.microsoftonline.com/#{ENV['ENTRA_TENANT_ID']}/oauth2/v2.0/logout?post_logout_redirect_uri=#{ERB::Util.url_encode(ENV.fetch('APP_URL', 'http://localhost:3000'))}", allow_other_host: true
     else
       redirect_to login_path, notice: "ログアウトしました"

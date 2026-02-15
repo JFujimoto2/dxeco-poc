@@ -9,14 +9,17 @@ class EntraUserSyncJob < ApplicationJob
     entra_users = EntraClient.fetch_all_users(token)
 
     entra_users.each do |eu|
-      user = User.find_or_initialize_by(entra_id_sub: eu["id"])
+      email = eu["mail"] || eu["userPrincipalName"]
+      user = User.find_by(entra_id_sub: eu["id"]) || User.find_by(email: email) || User.new
+      user.entra_id_sub = eu["id"]
       user.assign_attributes(
         email: eu["mail"] || eu["userPrincipalName"],
         display_name: eu["displayName"],
         department: eu["department"],
         job_title: eu["jobTitle"],
         employee_id: eu["employeeId"],
-        account_enabled: eu["accountEnabled"]
+        account_enabled: eu["accountEnabled"],
+        last_password_change_at: eu["lastPasswordChangeDateTime"]
       )
       user.role ||= "viewer"
       stats[:created_count] += 1 if user.new_record?
@@ -24,6 +27,7 @@ class EntraUserSyncJob < ApplicationJob
       user.save!
       stats[:processed_count] += 1
     rescue => e
+      Rails.logger.error("EntraUserSync: email=#{email} Error=#{e.message}")
       stats[:error_count] += 1
     end
 
