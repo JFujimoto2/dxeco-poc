@@ -175,12 +175,15 @@
 <% if @password_expired_users.any? || @password_expiring_users.any? %>
   <div class="card mt-4 border-danger">
     <div class="card-header bg-danger bg-opacity-10">
-      <h6 class="mb-0"><i class="bi bi-shield-lock me-1 text-danger"></i>パスワード期限アラート</h6>
+      <h6 class="mb-0"><i class="bi bi-shield-lock me-1 text-danger"></i>Entra ID パスワード期限アラート</h6>
     </div>
     <div class="card-body">
+      <p class="text-muted small mb-2">
+        <i class="bi bi-info-circle me-1"></i>Entra ID（社内アカウント）のパスワード更新状況です。<%= User::PASSWORD_EXPIRY_DAYS %>日ポリシーに基づいて表示しています。
+      </p>
       <% if @password_expired_users.any? %>
         <div class="alert alert-danger py-2 mb-3">
-          <i class="bi bi-x-circle me-1"></i>パスワード期限切れのユーザーが <strong><%= @password_expired_users.size %>名</strong> います
+          <i class="bi bi-x-circle me-1"></i>Entra ID パスワード期限切れのユーザーが <strong><%= @password_expired_users.size %>名</strong> います
         </div>
       <% end %>
 
@@ -189,7 +192,7 @@
           <tr>
             <th>ユーザー名</th>
             <th>部署</th>
-            <th>最終パスワード変更日</th>
+            <th>最終PW変更日（Entra ID）</th>
             <th>状態</th>
           </tr>
         </thead>
