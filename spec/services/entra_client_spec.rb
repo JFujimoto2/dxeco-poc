@@ -96,6 +96,55 @@ RSpec.describe EntraClient do
     end
   end
 
+  describe ".fetch_group_members" do
+    let(:group_id) { "group-123" }
+    let(:base_url) { "https://graph.microsoft.com/v1.0/groups/#{group_id}/members" }
+
+    it "指定グループのユーザーメンバーを取得する" do
+      stub_request(:get, /groups\/group-123\/members/)
+        .to_return(status: 200, body: {
+          value: [
+            { "@odata.type" => "#microsoft.graph.user", "id" => "user-1", "displayName" => "テスト太郎", "mail" => "taro@example.com", "accountEnabled" => true },
+            { "@odata.type" => "#microsoft.graph.user", "id" => "user-2", "displayName" => "テスト花子", "mail" => "hanako@example.com", "accountEnabled" => true }
+          ]
+        }.to_json)
+
+      members = EntraClient.fetch_group_members("test-token", group_id)
+      expect(members.size).to eq(2)
+      expect(members.first["displayName"]).to eq("テスト太郎")
+    end
+
+    it "ユーザー以外のメンバー（デバイス等）を除外する" do
+      stub_request(:get, /groups\/group-123\/members/)
+        .to_return(status: 200, body: {
+          value: [
+            { "@odata.type" => "#microsoft.graph.user", "id" => "user-1", "displayName" => "テスト太郎" },
+            { "@odata.type" => "#microsoft.graph.device", "id" => "device-1", "displayName" => "PC-001" },
+            { "@odata.type" => "#microsoft.graph.group", "id" => "nested-group-1", "displayName" => "サブグループ" }
+          ]
+        }.to_json)
+
+      members = EntraClient.fetch_group_members("test-token", group_id)
+      expect(members.size).to eq(1)
+      expect(members.first["id"]).to eq("user-1")
+    end
+
+    it "ページネーションに対応する" do
+      stub_request(:get, /groups\/group-123\/members\?/)
+        .to_return(status: 200, body: {
+          value: [ { "@odata.type" => "#microsoft.graph.user", "id" => "user-1" } ],
+          "@odata.nextLink" => "https://graph.microsoft.com/v1.0/groups/group-123/members?$skiptoken=abc"
+        }.to_json)
+      stub_request(:get, "https://graph.microsoft.com/v1.0/groups/group-123/members?$skiptoken=abc")
+        .to_return(status: 200, body: {
+          value: [ { "@odata.type" => "#microsoft.graph.user", "id" => "user-2" } ]
+        }.to_json)
+
+      members = EntraClient.fetch_group_members("test-token", group_id)
+      expect(members.size).to eq(2)
+    end
+  end
+
   describe ".fetch_app_role_assignments" do
     it "指定アプリのユーザー割り当てを取得する" do
       stub_request(:get, "https://graph.microsoft.com/v1.0/servicePrincipals/sp-1/appRoleAssignedTo")

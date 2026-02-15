@@ -37,6 +37,23 @@ class EntraClient
     users
   end
 
+  def self.fetch_group_members(token, group_id)
+    select_fields = "id,displayName,mail,userPrincipalName,jobTitle,department,employeeId,accountEnabled,lastPasswordChangeDateTime"
+    url = "#{BASE_URL}/groups/#{group_id}/members?$select=#{select_fields}&$top=999"
+    members = []
+    loop do
+      response = Faraday.get(url) do |req|
+        req.headers["Authorization"] = "Bearer #{token}"
+      end
+      data = JSON.parse(response.body)
+      users_only = (data["value"] || []).select { |m| m["@odata.type"] == "#microsoft.graph.user" }
+      members.concat(users_only)
+      url = data["@odata.nextLink"]
+      break unless url
+    end
+    members
+  end
+
   def self.fetch_service_principals(token)
     url = "#{BASE_URL}/servicePrincipals?$filter=tags/any(t:t eq 'WindowsAzureActiveDirectoryIntegratedApp')&$select=id,displayName,appId&$top=999"
     apps = []

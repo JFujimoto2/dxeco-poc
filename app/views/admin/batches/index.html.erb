@@ -13,7 +13,14 @@
       <div class="col-md-6">
         <div class="border rounded p-3">
           <h6><i class="bi bi-people me-1"></i>Entra IDユーザー同期</h6>
-          <p class="text-muted small mb-2">Graph APIから全ユーザー情報を取得し、メンバー情報を最新化します。完了後、退職者アカウント検出が自動実行されます。</p>
+          <p class="text-muted small mb-2">
+            <% if ENV["ENTRA_SYNC_GROUP_ID"].present? %>
+              指定グループのメンバーのみをGraph APIから取得し、メンバー情報を最新化します。
+            <% else %>
+              Graph APIから全ユーザー情報を取得し、メンバー情報を最新化します。
+            <% end %>
+            完了後、退職者アカウント検出が自動実行されます。
+          </p>
           <%= button_to "実行", sync_entra_users_admin_batches_path, method: :post, class: "btn btn-primary btn-sm", data: { confirm: "Entra IDユーザー同期を実行しますか？" } %>
         </div>
       </div>
