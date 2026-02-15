@@ -94,12 +94,28 @@ RSpec.describe "ApprovalRequests", type: :request do
   end
 
   describe "GET /approval_requests/:id" do
-    it "申請詳細を表示" do
+    it "adminは任意の申請詳細を表示できる" do
       login_as(admin)
       request = create(:approval_request, requester: viewer, saas_name: "DetailApp")
       get approval_request_path(request)
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("DetailApp")
+    end
+
+    it "viewerは自分の申請を表示できる" do
+      login_as(viewer)
+      request = create(:approval_request, requester: viewer, saas_name: "MyRequest")
+      get approval_request_path(request)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("MyRequest")
+    end
+
+    it "viewerは他人の申請を表示できない" do
+      login_as(viewer)
+      other = create(:user)
+      request = create(:approval_request, requester: other, saas_name: "OtherRequest")
+      get approval_request_path(request)
+      expect(response).to redirect_to(approval_requests_path)
     end
   end
 

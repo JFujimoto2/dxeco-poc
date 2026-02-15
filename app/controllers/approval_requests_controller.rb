@@ -37,6 +37,9 @@ class ApprovalRequestsController < ApplicationController
 
   def show
     @approval_request = ApprovalRequest.find(params[:id])
+    unless current_user.admin? || current_user.manager? || @approval_request.requester == current_user
+      redirect_to approval_requests_path, alert: "閲覧権限がありません"
+    end
   end
 
   def approve

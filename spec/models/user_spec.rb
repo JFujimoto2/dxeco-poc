@@ -23,6 +23,12 @@ RSpec.describe User, type: :model do
       expect(user).not_to be_valid
     end
 
+    it "email が一意" do
+      create(:user, email: "same@example.com")
+      user = build(:user, email: "same@example.com")
+      expect(user).not_to be_valid
+    end
+
     it "role が必須" do
       user = build(:user, role: nil)
       expect(user).not_to be_valid

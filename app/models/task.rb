@@ -13,7 +13,9 @@ class Task < ApplicationRecord
   validates :task_type, presence: true
 
   def completion_rate
-    return 0 if task_items.count.zero?
-    (task_items.where(status: "completed").count.to_f / task_items.count * 100).round(1)
+    items = task_items.loaded? ? task_items : task_items.to_a
+    return 0 if items.empty?
+    completed = items.count(&:completed?)
+    (completed.to_f / items.size * 100).round(1)
   end
 end

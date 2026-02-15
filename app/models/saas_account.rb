@@ -6,6 +6,7 @@ class SaasAccount < ApplicationRecord
   has_many :survey_responses, dependent: :nullify
 
   enum :status, { active: "active", suspended: "suspended", deleted: "deleted" }
+  enum :role, { member: "member", admin: "admin", owner: "owner" }
 
   validates :saas_id, uniqueness: { scope: :user_id }
 
