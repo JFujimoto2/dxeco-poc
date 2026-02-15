@@ -23,7 +23,41 @@ Entra ID（Microsoft Graph API）と連携し、エンタープライズアプ�
 2. 一致しない場合、SaaS名とアプリの `displayName` で大文字小文字を無視して照合
 
 ### 設定方法
-SaaS台帳の編集画面で「Entra ID アプリID」フィールドにエンタープライズアプリのオブジェクトIDを設定する。
+
+#### ツール側
+SaaS台帳の編集画面で「Entra ID アプリID」フィールドにエンタープライズアプリのオブジェクトIDを入力する。未設定の場合はSaaS名とアプリの `displayName` で自動照合する。
+
+#### Azure Portal 側（SSO対応SaaSの場合）
+
+SSO連携するSaaSは、Azure Portal でエンタープライズアプリケーションとして登録し、SAML SSO を設定する必要がある。
+
+**手順:**
+
+1. **Microsoft Entra ID** → **エンタープライズ アプリケーション** → **新しいアプリケーション**
+2. ギャラリーからSaaSを検索（Slack, Salesforce, Box 等）、なければ **独自のアプリケーションの作成** → 「ギャラリーに見つからないその他のアプリケーションを統合します」を選択
+3. **シングル サインオン** → **SAML** を選択
+4. **基本的な SAML 構成** を編集:
+   - **識別子 (Entity ID)**: SaaS側のSP Entity ID（SaaS側の管理画面で確認）
+   - **応答 URL (ACS URL)**: SaaS側のAssertion Consumer Service URL
+   - **NameID 形式**: `emailAddress` を推奨
+5. **属性とクレーム**: デフォルトでOK（`user.userprincipalname` が NameID として送信される）
+6. **SAML 署名証明書**: 「フェデレーション メタデータ XML」をダウンロードし、SaaS側に設定
+7. **ユーザーとグループ** → 利用者を割り当て（個別 or セキュリティグループ）
+
+**設定完了後:**
+- Azure Portal の「テスト」ボタンでSSO動作を確認
+- ツールの「Entra ID SaaSアカウント同期」バッチを実行すると、割り当てユーザーが台帳に自動登録される
+
+#### SSO設定のテスト（RSA Test Service Provider）
+
+実際のSaaSを設定する前に、[RSA SAML Test Service Provider](https://sptest.iamshowcase.com/) で Entra ID の IdP 設定を検証できる。アカウント不要。
+
+| 設定項目 | 値 |
+|----------|-----|
+| 識別子 (Entity ID) | `IAMShowcase` |
+| 応答 URL (ACS URL) | `https://sptest.iamshowcase.com/acs` |
+
+テスト成功時、RSA Test SP 画面に SAML Assertion の内容（NameID、displayname、emailaddress 等）が表示される。
 
 ## パスワード期限検出
 
