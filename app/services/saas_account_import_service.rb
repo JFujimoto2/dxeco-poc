@@ -32,7 +32,7 @@ class SaasAccountImportService < BaseCsvImportService
       saas: saas,
       user: user,
       account_email: row["account_email"],
-      role: row["role"],
+      role: row["role"].presence || "member",
       status: row["status"].presence || "active"
     )
 

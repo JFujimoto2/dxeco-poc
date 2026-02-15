@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_14_113219) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_15_124845) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -62,6 +62,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_113219) do
     t.string "status", default: "running", null: false
     t.datetime "updated_at", null: false
     t.integer "updated_count", default: 0
+    t.index ["created_at"], name: "index_batch_execution_logs_on_created_at"
+    t.index ["job_name"], name: "index_batch_execution_logs_on_job_name"
+    t.index ["status"], name: "index_batch_execution_logs_on_status"
   end
 
   create_table "saas_accounts", force: :cascade do |t|
@@ -122,6 +125,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_113219) do
     t.bigint "survey_id", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["responded_at"], name: "index_survey_responses_on_responded_at"
     t.index ["saas_account_id"], name: "index_survey_responses_on_saas_account_id"
     t.index ["survey_id", "user_id", "saas_account_id"], name: "idx_survey_responses_unique", unique: true
     t.index ["survey_id"], name: "index_survey_responses_on_survey_id"
@@ -190,6 +194,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_113219) do
     t.index ["created_by_id"], name: "index_tasks_on_created_by_id"
     t.index ["status"], name: "index_tasks_on_status"
     t.index ["target_user_id"], name: "index_tasks_on_target_user_id"
+    t.index ["task_type"], name: "index_tasks_on_task_type"
   end
 
   create_table "users", force: :cascade do |t|
@@ -205,7 +210,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_113219) do
     t.datetime "last_signed_in_at"
     t.string "role", default: "viewer", null: false
     t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_users_on_email"
+    t.index ["department"], name: "index_users_on_department"
+    t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["entra_id_sub"], name: "index_users_on_entra_id_sub", unique: true
   end
 

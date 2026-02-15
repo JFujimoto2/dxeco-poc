@@ -2,7 +2,7 @@ class TasksController < ApplicationController
   before_action :require_admin, only: [ :new, :create ]
 
   def index
-    @tasks = Task.includes(:target_user, :created_by)
+    @tasks = Task.includes(:target_user, :created_by, :task_items)
     @tasks = @tasks.where(status: params[:status]) if params[:status].present?
     @tasks = @tasks.where(task_type: params[:task_type]) if params[:task_type].present?
     @tasks = @tasks.order(created_at: :desc).page(params[:page])

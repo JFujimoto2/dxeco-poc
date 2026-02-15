@@ -26,5 +26,14 @@ RSpec.describe SaasAccount, type: :model do
       account = build(:saas_account, status: "suspended")
       expect(account).to be_suspended
     end
+
+    it "role enum が正しく定義されている" do
+      account = build(:saas_account, role: "admin")
+      expect(account).to be_admin
+    end
+
+    it "不正なroleは例外を発生させる" do
+      expect { build(:saas_account, role: "superadmin") }.to raise_error(ArgumentError)
+    end
   end
 end

@@ -40,7 +40,7 @@
 
 <div class="card">
   <div class="card-header">
-    <h6 class="mb-0">チェックリスト（<%= @task_items.select(&:completed?).size %>/<%= @task_items.size %>）</h6>
+    <h6 class="mb-0">チェックリスト（<%= @task_items.count(&:completed?) %>/<%= @task_items.size %>）</h6>
   </div>
   <div class="list-group list-group-flush">
     <% @task_items.each do |item| %>
