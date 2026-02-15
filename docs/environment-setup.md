@@ -197,6 +197,8 @@ SSO と同じアプリ登録を使うが、追加の API アクセス許可が�
 2. **Microsoft Graph** → **アプリケーションの許可** を選択
 3. 以下を追加:
    - `User.Read.All`（全ユーザー情報の読み取り）
+   - `GroupMember.Read.All`（グループメンバー取得 — グループベース同期時に必要）
+   - `Application.Read.All`（エンタープライズアプリ・割り当て取得 — SaaSアカウント同期時に必要）
 4. **「（テナント名）に管理者の同意を与えます」** をクリック
 
 #### 2. API アクセス許可の追加（SSO ログイン時のプロフィール取得）
@@ -284,6 +286,28 @@ Entra ID の IdP 設定が正しいかを、実際のSaaSなしで検証でき�
    - **応答 URL**: `https://sptest.iamshowcase.com/acs`
 3. ユーザーを割り当て → 「テスト」ボタンでSSO実行
 4. [sptest.iamshowcase.com](https://sptest.iamshowcase.com/) に SAML Assertion の内容が表示されれば成功
+
+### グループベース同期の設定（推奨）
+
+テナント全ユーザーではなく、特定グループのメンバーのみを同期する設定。大規模テナント（数百〜数千人）では必ず設定を推奨。
+
+1. **Azure Portal → Entra ID → グループ** で新しいセキュリティグループを作成
+   - グループ名: 「SaaS管理ツール対象ユーザー」（任意）
+   - グループの種類: セキュリティ
+   - メンバーシップの種類: 割り当て済み（手動管理）または動的（部署等で自動）
+2. 対象ユーザーをメンバーとして追加
+3. グループの **オブジェクトID** をメモ
+4. 環境変数に設定:
+   ```bash
+   # 開発環境
+   ENTRA_SYNC_GROUP_ID=<グループのオブジェクトID>
+
+   # 本番環境（Container Apps）
+   az containerapp update --name app-dxceco-poc --resource-group rg-dxceco-poc \
+     --set-env-vars ENTRA_SYNC_GROUP_ID=<グループのオブジェクトID>
+   ```
+
+> **未設定の場合**: テナント内の全ユーザーが同期される。POCや小規模テナントではこれでも問題ない。
 
 ---
 
