@@ -8,4 +8,8 @@ class SaasAccount < ApplicationRecord
   enum :status, { active: "active", suspended: "suspended", deleted: "deleted" }
 
   validates :saas_id, uniqueness: { scope: :user_id }
+
+  scope :filter_by_saas, ->(saas_id) { saas_id.present? ? where(saas_id: saas_id) : all }
+  scope :filter_by_user, ->(user_id) { user_id.present? ? where(user_id: user_id) : all }
+  scope :filter_by_status, ->(status) { status.present? ? where(status: status) : all }
 end

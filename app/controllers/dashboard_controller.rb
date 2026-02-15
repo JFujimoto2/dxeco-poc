@@ -15,11 +15,8 @@ class DashboardController < ApplicationController
     @password_expired_users = User.password_expired.order(:last_password_change_at)
     @password_expiring_users = User.password_expiring_soon.order(:last_password_change_at)
 
-    contracts = SaasContract.includes(:saas).where.not(price_cents: nil)
-    @total_monthly_cost = contracts.sum(&:monthly_cost_cents)
-    @total_annual_cost = contracts.sum(&:annual_cost_cents)
-    @cost_by_category = contracts.group_by { |c| c.saas.category || "未分類" }
-      .transform_values { |cs| cs.sum(&:monthly_cost_cents) }
-      .sort_by { |_, v| -v }
+    @total_monthly_cost = SaasContract.total_monthly_cost
+    @total_annual_cost = SaasContract.total_annual_cost
+    @cost_by_category = SaasContract.monthly_cost_by_category
   end
 end

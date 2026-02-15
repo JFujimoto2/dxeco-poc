@@ -1,5 +1,7 @@
 module Admin
   class AuditLogsController < ApplicationController
+    include CsvExportable
+
     before_action :require_admin
 
     def index
@@ -23,17 +25,16 @@ module Admin
                      .by_user(params[:user_id])
                      .by_date_range(params[:date_from], params[:date_to])
                      .recent
-      csv_data = "\uFEFF" + CSV.generate { |csv|
-        csv << %w[日時 操作 リソース種別 リソースID ユーザー IPアドレス]
-        logs.each do |log|
-          csv << [
-            log.created_at.strftime("%Y/%m/%d %H:%M:%S"),
-            log.action, log.resource_type, log.resource_id,
-            log.user&.display_name || "システム", log.ip_address
-          ]
-        end
-      }
-      send_data csv_data, filename: "audit_logs_export_#{Date.current}.csv", type: "text/csv; charset=utf-8"
+      rows = logs.map do |log|
+        [ log.created_at.strftime("%Y/%m/%d %H:%M:%S"),
+         log.action, log.resource_type, log.resource_id,
+         log.user&.display_name || "システム", log.ip_address ]
+      end
+      send_csv(
+        filename: "audit_logs_export",
+        headers: %w[日時 操作 リソース種別 リソースID ユーザー IPアドレス],
+        rows: rows
+      )
     end
   end
 end

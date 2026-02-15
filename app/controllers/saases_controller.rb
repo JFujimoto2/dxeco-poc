@@ -1,4 +1,6 @@
 class SaasesController < ApplicationController
+  include CsvExportable
+
   before_action :set_saas, only: [ :show, :edit, :update, :destroy ]
   before_action :require_admin_or_manager, only: [ :import ]
 
@@ -6,6 +8,7 @@ class SaasesController < ApplicationController
     @saases = Saas.search_by_name(params[:q])
                   .filter_by_category(params[:category])
                   .filter_by_status(params[:status])
+                  .includes(:saas_accounts, :owner)
                   .order(:name)
                   .page(params[:page]).per(25)
     @categories = Saas.distinct.pluck(:category).compact.sort
@@ -67,18 +70,16 @@ class SaasesController < ApplicationController
                  .filter_by_status(params[:status])
                  .includes(:saas_contract, :owner)
                  .order(:name)
-    csv_data = "\uFEFF" + CSV.generate { |csv|
-      csv << %w[SaaS名 カテゴリ ステータス URL 担当者 プラン 月額 請求サイクル 契約期限]
-      saases.each do |saas|
-        c = saas.saas_contract
-        csv << [
-          saas.name, saas.category, saas.status, saas.url,
-          saas.owner&.display_name,
-          c&.plan_name, c&.price_cents, c&.billing_cycle, c&.expires_on
-        ]
-      end
-    }
-    send_data csv_data, filename: "saas_export_#{Date.current}.csv", type: "text/csv; charset=utf-8"
+    rows = saases.map do |saas|
+      c = saas.saas_contract
+      [ saas.name, saas.category, saas.status, saas.url, saas.owner&.display_name,
+       c&.plan_name, c&.price_cents, c&.billing_cycle, c&.expires_on ]
+    end
+    send_csv(
+      filename: "saas_export",
+      headers: %w[SaaS名 カテゴリ ステータス URL 担当者 プラン 月額 請求サイクル 契約期限],
+      rows: rows
+    )
   end
 
   def download_template

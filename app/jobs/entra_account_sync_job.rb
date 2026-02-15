@@ -14,32 +14,34 @@ class EntraAccountSyncJob < ApplicationJob
       next unless saas
 
       matched_saas_count += 1
-      saas.update!(entra_app_id: sp["id"]) if saas.entra_app_id.blank?
 
-      assignments = EntraClient.fetch_app_role_assignments(token, sp["id"])
-      assigned_user_ids = []
+      ActiveRecord::Base.transaction do
+        saas.update!(entra_app_id: sp["id"]) if saas.entra_app_id.blank?
 
-      assignments.each do |assignment|
-        user = User.find_by(entra_id_sub: assignment["principalId"])
-        next unless user
+        assignments = EntraClient.fetch_app_role_assignments(token, sp["id"])
+        assigned_user_ids = []
 
-        assigned_user_ids << user.id
-        account = SaasAccount.find_or_initialize_by(saas: saas, user: user)
-        if account.new_record?
-          account.account_email = user.email
-          account.status = "active"
-          account.save!
-          stats[:created_count] += 1
+        assignments.each do |assignment|
+          user = User.find_by(entra_id_sub: assignment["principalId"])
+          next unless user
+
+          assigned_user_ids << user.id
+          account = SaasAccount.find_or_initialize_by(saas: saas, user: user)
+          if account.new_record?
+            account.account_email = user.email
+            account.status = "active"
+            account.save!
+            stats[:created_count] += 1
+          end
+          stats[:processed_count] += 1
+        rescue => e
+          Rails.logger.error("EntraAccountSync: SaaS=#{saas.name} User=#{assignment['principalId']} Error=#{e.message}")
+          stats[:error_count] += 1
         end
-        stats[:processed_count] += 1
-      rescue => e
-        stats[:error_count] += 1
-      end
 
-      # 割り当て解除されたアカウントを suspended に
-      saas.saas_accounts.active.where.not(user_id: assigned_user_ids).find_each do |account|
-        account.update!(status: "suspended")
-        stats[:updated_count] += 1
+        # 割り当て解除されたアカウントを suspended に
+        suspended_count = saas.saas_accounts.active.where.not(user_id: assigned_user_ids).update_all(status: "suspended")
+        stats[:updated_count] += suspended_count
       end
     end
 

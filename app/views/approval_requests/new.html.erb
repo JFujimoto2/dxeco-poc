@@ -4,15 +4,7 @@
 
 <%= form_with model: @approval_request, class: "card" do |f| %>
   <div class="card-body">
-    <% if @approval_request.errors.any? %>
-      <div class="alert alert-danger">
-        <ul class="mb-0">
-          <% @approval_request.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+    <%= render "shared/error_messages", model: @approval_request %>
 
     <div class="mb-3">
       <%= f.label :request_type, "申請種別", class: "form-label" %>

@@ -14,6 +14,13 @@ RSpec.describe "TaskPresets", type: :request do
     end
   end
 
+  describe "GET /task_presets/new" do
+    it "新規作成画面を表示" do
+      get new_task_preset_path
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
   describe "POST /task_presets" do
     it "プリセットを作成" do
       expect {
@@ -26,6 +33,22 @@ RSpec.describe "TaskPresets", type: :request do
           }
         }
       }.to change(TaskPreset, :count).by(1)
+    end
+
+    it "名前なしでは作成できない" do
+      post task_presets_path, params: {
+        task_preset: { name: "", task_type: "offboarding" }
+      }
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+  end
+
+  describe "GET /task_presets/:id/edit" do
+    it "編集画面を表示" do
+      preset = create(:task_preset, name: "既存プリセット")
+      get edit_task_preset_path(preset)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("既存プリセット")
     end
   end
 

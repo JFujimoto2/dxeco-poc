@@ -27,6 +27,7 @@ class EntraUserSyncJob < ApplicationJob
       user.save!
       stats[:processed_count] += 1
     rescue => e
+      Rails.logger.error("EntraUserSync: email=#{email} Error=#{e.message}")
       stats[:error_count] += 1
     end
 

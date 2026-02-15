@@ -1,14 +1,16 @@
 class SaasAccountsController < ApplicationController
+  include CsvExportable
+
   before_action :set_saas_account, only: [ :edit, :update, :destroy ]
   before_action :require_admin_or_manager, only: [ :import ]
 
   def index
     @saas_accounts = SaasAccount.includes(:saas, :user)
-    @saas_accounts = @saas_accounts.where(saas_id: params[:saas_id]) if params[:saas_id].present?
-    @saas_accounts = @saas_accounts.where(user_id: params[:user_id]) if params[:user_id].present?
-    @saas_accounts = @saas_accounts.where(status: params[:status]) if params[:status].present?
-    @saas_accounts = @saas_accounts.order("saases.name, users.display_name")
-                                   .page(params[:page]).per(25)
+                                .filter_by_saas(params[:saas_id])
+                                .filter_by_user(params[:user_id])
+                                .filter_by_status(params[:status])
+                                .order("saases.name, users.display_name")
+                                .page(params[:page]).per(25)
   end
 
   def new
@@ -56,20 +58,19 @@ class SaasAccountsController < ApplicationController
 
   def export
     accounts = SaasAccount.includes(:saas, :user)
-    accounts = accounts.where(saas_id: params[:saas_id]) if params[:saas_id].present?
-    accounts = accounts.where(user_id: params[:user_id]) if params[:user_id].present?
-    accounts = accounts.where(status: params[:status]) if params[:status].present?
-    accounts = accounts.order("saases.name, users.display_name")
-    csv_data = "\uFEFF" + CSV.generate { |csv|
-      csv << %w[SaaS名 メンバー名 部署 アカウントメール ロール ステータス 最終ログイン]
-      accounts.each do |a|
-        csv << [
-          a.saas.name, a.user.display_name, a.user.department,
-          a.account_email, a.role, a.status, a.last_login_at&.strftime("%Y/%m/%d %H:%M")
-        ]
-      end
-    }
-    send_data csv_data, filename: "saas_accounts_export_#{Date.current}.csv", type: "text/csv; charset=utf-8"
+                          .filter_by_saas(params[:saas_id])
+                          .filter_by_user(params[:user_id])
+                          .filter_by_status(params[:status])
+                          .order("saases.name, users.display_name")
+    rows = accounts.map do |a|
+      [ a.saas.name, a.user.display_name, a.user.department,
+       a.account_email, a.role, a.status, a.last_login_at&.strftime("%Y/%m/%d %H:%M") ]
+    end
+    send_csv(
+      filename: "saas_accounts_export",
+      headers: %w[SaaS名 メンバー名 部署 アカウントメール ロール ステータス 最終ログイン],
+      rows: rows
+    )
   end
 
   def download_template

@@ -5,6 +5,7 @@ class UsersController < ApplicationController
   def index
     @users = User.search_by_name(params[:q])
                  .filter_by_department(params[:department])
+                 .includes(:saas_accounts)
                  .order(:display_name)
                  .page(params[:page]).per(25)
     @departments = User.distinct.pluck(:department).compact.sort

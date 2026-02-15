@@ -4,15 +4,7 @@
 
 <%= form_with model: @survey, class: "card" do |f| %>
   <div class="card-body">
-    <% if @survey.errors.any? %>
-      <div class="alert alert-danger">
-        <ul class="mb-0">
-          <% @survey.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+    <%= render "shared/error_messages", model: @survey %>
 
     <div class="mb-3">
       <%= f.label :title, "タイトル", class: "form-label" %>

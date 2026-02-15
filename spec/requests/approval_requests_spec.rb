@@ -75,5 +75,42 @@ RSpec.describe "ApprovalRequests", type: :request do
       expect(request.reload).to be_rejected
       expect(request.rejection_reason).to eq("コスト超過")
     end
+
+    it "viewerは却下できない" do
+      login_as(viewer)
+      request = create(:approval_request, requester: create(:user))
+      post reject_approval_request_path(request)
+      expect(response).to redirect_to(approval_requests_path)
+      expect(request.reload).to be_pending
+    end
+  end
+
+  describe "GET /approval_requests/new" do
+    it "新規申請画面を表示" do
+      login_as(viewer)
+      get new_approval_request_path
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe "GET /approval_requests/:id" do
+    it "申請詳細を表示" do
+      login_as(admin)
+      request = create(:approval_request, requester: viewer, saas_name: "DetailApp")
+      get approval_request_path(request)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("DetailApp")
+    end
+  end
+
+  describe "POST /approval_requests (managerの承認)" do
+    it "managerが承認できる" do
+      manager = create(:user, :manager)
+      login_as(manager)
+      request = create(:approval_request, requester: viewer)
+      post approve_approval_request_path(request)
+      expect(request.reload).to be_approved
+      expect(request.approved_by).to eq(manager)
+    end
   end
 end

@@ -1,13 +1,5 @@
 <%= form_with(model: saas, class: "needs-validation") do |f| %>
-  <% if saas.errors.any? %>
-    <div class="alert alert-danger">
-      <ul class="mb-0">
-        <% saas.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "shared/error_messages", model: saas %>
 
   <div class="card mb-4">
     <div class="card-header">基本情報</div>
