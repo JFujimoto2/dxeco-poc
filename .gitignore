@@ -36,6 +36,7 @@
 
 # Infra secrets
 /infra/.env.azure
+/infra/DB接続情報.md
 
 # Node / Playwright
 /node_modules/
@@ -44,3 +45,7 @@
 
 # Coverage
 /coverage/
+
+# DBeaver
+/.dbeaver/
+*.dbp
