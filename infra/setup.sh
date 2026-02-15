@@ -36,6 +36,7 @@ az postgres flexible-server create \
   --name "$PG_SERVER_NAME" \
   --resource-group "$AZURE_RESOURCE_GROUP" \
   --location "$AZURE_LOCATION" \
+  --tier Burstable \
   --sku-name Standard_B1ms \
   --storage-size 32 \
   --version 16 \
@@ -87,7 +88,7 @@ az containerapp create \
   --ingress external \
   --cpu 0.25 \
   --memory 0.5Gi \
-  --min-replicas 1 \
+  --min-replicas 0 \
   --max-replicas 1 \
   --env-vars \
     "RAILS_ENV=production" \

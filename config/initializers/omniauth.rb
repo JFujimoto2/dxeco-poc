@@ -27,3 +27,14 @@ Rails.application.config.middleware.use OmniAuth::Builder do
 end
 
 OmniAuth.config.allowed_request_methods = [ :post ]
+OmniAuth.config.logger = Rails.logger
+
+OmniAuth.config.on_failure = Proc.new do |env|
+  error = env["omniauth.error"]
+  strategy = env["omniauth.error.strategy"]
+  type = env["omniauth.error.type"]
+  Rails.logger.error "[OmniAuth Failure] type=#{type}, error=#{error&.class}: #{error&.message}"
+  Rails.logger.error "[OmniAuth Failure] strategy=#{strategy&.name}" if strategy
+  Rails.logger.error "[OmniAuth Failure] backtrace: #{error&.backtrace&.first(5)&.join("\n")}" if error
+  OmniAuth::FailureEndpoint.new(env).redirect_to_failure
+end

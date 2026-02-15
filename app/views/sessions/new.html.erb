@@ -9,7 +9,7 @@
         </div>
 
         <% if entra_id_configured? %>
-          <%= form_tag("/auth/entra_id", method: :post) do %>
+          <%= form_tag("/auth/entra_id", method: :post, data: { turbo: false }) do %>
             <button type="submit" class="btn btn-primary w-100 py-2">
               <i class="bi bi-microsoft me-2"></i>Microsoft アカウントでログイン
             </button>
