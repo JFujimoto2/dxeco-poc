@@ -104,7 +104,7 @@ RSpec.describe "SaasAccounts", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to include("text/csv")
       expect(response.headers["Content-Disposition"]).to include("saas_account_template.csv")
-      expect(response.body).to include("saas_name,user_email")
+      expect(response.body).to include("SaaS名,ユーザーメール")
     end
   end
 

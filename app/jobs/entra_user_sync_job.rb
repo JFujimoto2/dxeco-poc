@@ -6,7 +6,12 @@ class EntraUserSyncJob < ApplicationJob
     stats = { processed_count: 0, created_count: 0, updated_count: 0, error_count: 0 }
 
     token = EntraClient.fetch_app_token
-    entra_users = EntraClient.fetch_all_users(token)
+    group_id = ENV["ENTRA_SYNC_GROUP_ID"]
+    entra_users = if group_id.present?
+      EntraClient.fetch_group_members(token, group_id)
+    else
+      EntraClient.fetch_all_users(token)
+    end
 
     entra_users.each do |eu|
       email = eu["mail"] || eu["userPrincipalName"]

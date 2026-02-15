@@ -9,7 +9,8 @@ class BaseCsvImportService
     result = { success_count: 0, error_count: 0, errors: [] }
 
     CSV.foreach(@file_path, headers: true, encoding: "BOM|UTF-8").with_index(2) do |row, line_num|
-      import_row(row, line_num, result)
+      mapped = normalize_headers(row)
+      import_row(mapped, line_num, result)
     end
 
     result
@@ -19,6 +20,23 @@ class BaseCsvImportService
 
   def import_row(row, line_num, result)
     raise NotImplementedError
+  end
+
+  # サブクラスでオーバーライドして日本語→英語のマッピングを定義
+  def header_mapping
+    {}
+  end
+
+  def normalize_headers(row)
+    mapping = header_mapping
+    return row if mapping.empty?
+
+    normalized = {}
+    row.each do |key, value|
+      mapped_key = mapping[key] || key
+      normalized[mapped_key] = value
+    end
+    CSV::Row.new(normalized.keys, normalized.values)
   end
 
   def record_success(result)

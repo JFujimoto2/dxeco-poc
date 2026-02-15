@@ -28,7 +28,7 @@ test.describe("CSVインポート", () => {
       expect(response.status()).toBe(200);
       expect(response.headers()["content-type"]).toContain("text/csv");
       const body = await response.text();
-      expect(body).toContain("name,category,url");
+      expect(body).toContain("SaaS名,カテゴリ,ステータス");
     });
 
     test("CSVファイルをアップロードしてインポートが成功する", async ({
@@ -39,7 +39,7 @@ test.describe("CSVインポート", () => {
       const csvPath = path.join(tmpDir, "saas_e2e_import.csv");
       fs.writeFileSync(
         csvPath,
-        "\uFEFFname,category,url,admin_url,description,status\nE2EテストSaaS_CSV,一般,https://e2e-test.example.com,,E2Eテスト用,active\n",
+        "\uFEFFSaaS名,カテゴリ,ステータス,URL,管理画面URL,説明\nE2EテストSaaS_CSV,一般,active,https://e2e-test.example.com,,E2Eテスト用\n",
         "utf-8"
       );
 
@@ -86,7 +86,7 @@ test.describe("CSVインポート", () => {
       expect(response.status()).toBe(200);
       expect(response.headers()["content-type"]).toContain("text/csv");
       const body = await response.text();
-      expect(body).toContain("saas_name,user_email");
+      expect(body).toContain("SaaS名,ユーザーメール");
     });
   });
 });

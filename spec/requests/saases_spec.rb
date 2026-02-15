@@ -115,7 +115,7 @@ RSpec.describe "Saases", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to include("text/csv")
       expect(response.headers["Content-Disposition"]).to include("saas_template.csv")
-      expect(response.body).to include("name,category,url")
+      expect(response.body).to include("SaaS名,カテゴリ,ステータス")
     end
   end
 

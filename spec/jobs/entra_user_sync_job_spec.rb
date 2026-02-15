@@ -37,6 +37,44 @@ RSpec.describe EntraUserSyncJob, type: :job do
     expect(user.display_name).to eq("テスト太郎")
   end
 
+  context "ENTRA_SYNC_GROUP_IDが設定されている場合" do
+    let(:group_id) { "group-abc-123" }
+
+    before do
+      stub_const("ENV", ENV.to_h.merge("ENTRA_SYNC_GROUP_ID" => group_id))
+      stub_request(:get, /groups\/group-abc-123\/members/)
+        .to_return(status: 200, body: { value: [
+          { "@odata.type" => "#microsoft.graph.user",
+            "id" => "oid-001", "displayName" => "グループメンバー", "mail" => "member@example.com",
+            "department" => "IT部", "jobTitle" => "担当", "employeeId" => "EMP010", "accountEnabled" => true }
+        ] }.to_json)
+    end
+
+    it "グループメンバーのみを同期する" do
+      expect { EntraUserSyncJob.perform_now }.to change(User, :count).by(1)
+      user = User.find_by(entra_id_sub: "oid-001")
+      expect(user.display_name).to eq("グループメンバー")
+    end
+
+    it "fetch_all_usersを呼ばない" do
+      allow(EntraClient).to receive(:fetch_all_users).and_call_original
+      EntraUserSyncJob.perform_now
+      expect(EntraClient).not_to have_received(:fetch_all_users)
+    end
+  end
+
+  context "ENTRA_SYNC_GROUP_IDが未設定の場合" do
+    before do
+      stub_const("ENV", ENV.to_h.merge("ENTRA_SYNC_GROUP_ID" => nil))
+    end
+
+    it "全ユーザーを同期する（従来動作）" do
+      expect { EntraUserSyncJob.perform_now }.to change(User, :count).by(1)
+      user = User.find_by(entra_id_sub: "oid-001")
+      expect(user.display_name).to eq("テスト太郎")
+    end
+  end
+
   it "lastPasswordChangeDateTimeを同期する" do
     entra_users_with_pwd = [
       { "id" => "oid-001", "displayName" => "テスト太郎", "mail" => "taro@example.com",

@@ -26,13 +26,18 @@ rails db:create db:migrate db:seed   # DB初期化
 
 ## 開発ルール
 
+### ブランチ運用
+- `main`: 開発統合ブランチ（PRマージのみ、直接push不可）
+- `prod`: 本番リリースブランチ（PRマージで Azure へ自動デプロイ）
+- 作業ブランチ → PR → `main` → PR → `prod` → 自動デプロイ
+
 ### 機能開発フロー（TDD必須）
 1. **計画書作成** → `docs/plans/` に `.md` を作成、ユーザーレビュー後に着手
 2. **テスト作成（RED）** → 先にRSpecテストを書き、失敗を確認
 3. **実装（GREEN）** → テストが通る最小限のコード（モデル→コントローラー→ビュー）
 4. **リファクタリング** → テスト維持しつつ改善
 5. **ドキュメント更新** → `docs/plans/` チェックリスト更新 + `docs/features/` 更新
-6. **コミット & push**
+6. **コミット & PR** → feature ブランチから `main` へ PR を作成
 
 ### コーディング規約
 - 日本語UIだがコード（変数名・メソッド名）は英語
@@ -40,9 +45,13 @@ rails db:create db:migrate db:seed   # DB初期化
 - N+1クエリ注意（`includes` / `preload` を使う）
 - Rubocop: `rubocop-rails-omakase` スタイル準拠
 
-## CI（GitHub Actions - 全パス必須）
+## CI/CD（GitHub Actions）
 
+### CI（`ci.yml` — main への push/PR 時）
 5ジョブ: `lint`(Rubocop) / `scan_ruby`(Brakeman+bundler-audit) / `scan_js`(importmap audit) / `test`(RSpec) / `e2e`(Playwright、testジョブ完了後)
+
+### CD（`deploy.yml` — prod への push 時）
+Docker ビルド → ACR プッシュ → Azure Container Apps 更新（自動デプロイ）
 
 ## アーキテクチャ
 
