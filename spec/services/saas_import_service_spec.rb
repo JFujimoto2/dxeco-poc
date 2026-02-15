@@ -34,5 +34,46 @@ RSpec.describe SaasImportService do
       expect(result[:success_count]).to eq(2)
       expect(result[:error_count]).to eq(1)
     end
+
+    it "日本語ヘッダー（エクスポート形式）のCSVをインポートできる" do
+      file = Tempfile.new([ "saas_jp", ".csv" ])
+      file.write("\uFEFFSaaS名,カテゴリ,ステータス,URL,担当者,プラン,月額,請求サイクル,契約期限\n")
+      file.write("TestSaaS,一般IT,active,https://test.com,,,,,\n")
+      file.rewind
+
+      result = SaasImportService.new(file.path).call
+      expect(result[:success_count]).to eq(1)
+      expect(result[:error_count]).to eq(0)
+      expect(Saas.find_by(name: "TestSaaS")).to be_present
+    ensure
+      file.close!
+    end
+
+    it "テンプレートCSVをそのままインポートできる" do
+      file = Tempfile.new([ "saas_tpl", ".csv" ])
+      file.write("\uFEFFSaaS名,カテゴリ,ステータス,URL,管理画面URL,説明\n")
+      file.write("サンプルSaaS,一般,active,https://example.com,,サービスの説明\n")
+      file.rewind
+
+      result = SaasImportService.new(file.path).call
+      expect(result[:success_count]).to eq(1)
+      expect(result[:error_count]).to eq(0)
+    ensure
+      file.close!
+    end
+
+    it "テンプレートCSVでもSaaS名の重複はエラーになる" do
+      create(:saas, name: "サンプルSaaS")
+      file = Tempfile.new([ "saas_dup", ".csv" ])
+      file.write("\uFEFFSaaS名,カテゴリ,ステータス,URL,管理画面URL,説明\n")
+      file.write("サンプルSaaS,一般,active,https://example.com,,サービスの説明\n")
+      file.rewind
+
+      result = SaasImportService.new(file.path).call
+      expect(result[:success_count]).to eq(0)
+      expect(result[:error_count]).to eq(1)
+    ensure
+      file.close!
+    end
   end
 end

@@ -75,7 +75,7 @@ class SaasAccountsController < ApplicationController
 
   def download_template
     csv_data = "\uFEFF" + CSV.generate { |csv|
-      csv << %w[saas_name user_email account_email role status]
+      csv << %w[SaaS名 ユーザーメール アカウントメール ロール ステータス]
       csv << [ "Slack", "user@example.com", "user@example.com", "member", "active" ]
     }
     send_data csv_data, filename: "saas_account_template.csv", type: "text/csv; charset=utf-8"

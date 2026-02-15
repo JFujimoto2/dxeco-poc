@@ -34,5 +34,33 @@ RSpec.describe SaasAccountImportService do
       expect(result[:success_count]).to eq(1)
       expect(result[:error_count]).to eq(1)
     end
+
+    it "日本語ヘッダー（エクスポート形式）のCSVをインポートできる" do
+      jp_file = Tempfile.new([ "account_jp", ".csv" ])
+      jp_file.write("\uFEFFSaaS名,メンバー名,部署,アカウントメール,ロール,ステータス,最終ログイン\n")
+      jp_file.write("Slack,テスト太郎,開発部,user1@example.com,member,active,\n")
+      jp_file.rewind
+
+      result = SaasAccountImportService.new(jp_file.path).call
+      expect(result[:success_count]).to eq(1)
+      expect(result[:error_count]).to eq(0)
+    ensure
+      jp_file.close!
+    end
+
+    it "テンプレートCSVをそのままインポートできる" do
+      create(:saas, name: "Slack")
+      create(:user, email: "user@example.com")
+      jp_file = Tempfile.new([ "account_tpl", ".csv" ])
+      jp_file.write("\uFEFFSaaS名,ユーザーメール,アカウントメール,ロール,ステータス\n")
+      jp_file.write("Slack,user@example.com,user@example.com,member,active\n")
+      jp_file.rewind
+
+      result = SaasAccountImportService.new(jp_file.path).call
+      expect(result[:success_count]).to eq(1)
+      expect(result[:error_count]).to eq(0)
+    ensure
+      jp_file.close!
+    end
   end
 end

@@ -84,8 +84,8 @@ class SaasesController < ApplicationController
 
   def download_template
     csv_data = "\uFEFF" + CSV.generate { |csv|
-      csv << %w[name category url admin_url description status]
-      csv << [ "サンプルSaaS", "一般", "https://example.com", "", "サービスの説明", "active" ]
+      csv << %w[SaaS名 カテゴリ ステータス URL 管理画面URL 説明]
+      csv << [ "サンプルSaaS", "一般", "active", "https://example.com", "", "サービスの説明" ]
     }
     send_data csv_data, filename: "saas_template.csv", type: "text/csv; charset=utf-8"
   end
