@@ -116,13 +116,16 @@ DXECOとの比較分析を踏まえ、POCの説得力を高めるために追加
 **詳細計画:** `docs/plans/saas_security_management.md`
 **GitHub Issue:** [#17](https://github.com/JFujimoto2/dxeco-poc/issues/17)
 
-### 1.8 メール通知機能（未着手）
+### 1.8 メール通知機能 ✅
 
-- [ ] Action Mailer + letter_opener(dev) + SMTP(prod)
-- [ ] TaskMailer / ApprovalRequestMailer / SurveyMailer
-- [ ] deliver_later（Solid Queue）
-- [ ] 計画書: `docs/plans/email_notification.md`
+- [x] Action Mailer + letter_opener(dev) + SMTP(prod)
+- [x] TaskMailer（アサイン通知 + CC: 部署manager, タスク作成者）
+- [x] ApprovalRequestMailer（申請・承認・却下通知 + CC: SaaSオーナー）
+- [x] SurveyMailer（配信・リマインド通知）
+- [x] deliver_later（Solid Queue）
+- [x] RSpecテスト作成（TaskMailer 7件 + ApprovalRequestMailer 11件 + SurveyMailer 6件 = 24件）
 
+**詳細計画:** `docs/plans/email_notification.md`
 **GitHub Issue:** [#9](https://github.com/JFujimoto2/dxeco-poc/issues/9)
 
 ### 1.9 OWASP ZAP 脆弱性診断（未着手）
@@ -264,11 +267,11 @@ DXECOとの比較分析を踏まえ、POCの説得力を高めるために追加
 6. ~~**2.4 リファクタリング**~~ ✅ 完了（14/17項目、Line 95.5% / Branch 77.9%）
 7. ~~**1.7 SaaSセキュリティ管理機能**~~ ✅ 完了（RSpec 335件 + E2E 79件）
 8. ~~**1.6 エラー監視・アラート通知**~~ ✅ アプリ層完了（インフラ層は本番移行時）
-9. **1.8 メール通知機能**
+9. ~~**1.8 メール通知機能**~~ ✅ 完了（RSpec 24件）
 10. **1.9 OWASP ZAP 脆弱性診断**
 11. **2.3 パイロット運用** → **2.4 全社展開**
 
 ---
 
 作成日: 2026年2月11日
-更新日: 2026年2月16日（セキュリティ管理機能✅完了、テスト数・カバレッジ更新）
+更新日: 2026年2月16日（セキュリティ管理機能✅完了、メール通知✅完了、テスト数・カバレッジ更新）
