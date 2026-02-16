@@ -72,7 +72,7 @@ class ApprovalRequestsController < ApplicationController
       status: :rejected,
       approved_by: current_user,
       approved_at: Time.current,
-      rejection_reason: params[:rejection_reason]
+      rejection_reason: params.permit(:rejection_reason)[:rejection_reason]
     )
     TeamsNotifier.notify(
       title: "申請が却下されました",

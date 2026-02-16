@@ -1,5 +1,6 @@
 class SaasesController < ApplicationController
   include CsvExportable
+  include FilterOptions
 
   before_action :set_saas, only: [ :show, :edit, :update, :destroy ]
   before_action :require_admin_or_manager, only: [ :import ]
@@ -14,8 +15,8 @@ class SaasesController < ApplicationController
                   .includes(:saas_accounts, :owner)
                   .order(:name)
                   .page(params[:page]).per(25)
-    @categories = Saas.distinct.pluck(:category).compact.sort
-    @departments = User.distinct.pluck(:department).compact.sort
+    @categories = saas_category_options
+    @departments = department_options
   end
 
   def show

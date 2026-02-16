@@ -83,3 +83,5 @@ group :development do
   gem "letter_opener"
   gem "letter_opener_web"
 end
+
+gem "rack-attack", "~> 6.8"
