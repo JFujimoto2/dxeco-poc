@@ -91,14 +91,17 @@ DXECOとの比較分析を踏まえ、POCの説得力を高めるために追加
 
 ---
 
-## 1.6 エラー監視・アラート通知（未着手）
+## 1.6 エラー監視・アラート通知 ✅（アプリ層完了）
 
-- [ ] Azure Monitor（Log Analytics）でコンテナログを収集
-- [ ] アラートルール作成（コンテナクラッシュ、HTTP 5xx、高レスポンスタイム等）
-- [ ] Teams Webhook（Action Group）でチャット通知
-- [ ] 計画書作成: `docs/plans/error_monitoring.md`
+- [x] `ErrorSubscriber` クラス作成（Rails ErrorReporter 連携）
+- [x] `TeamsNotifier.notify_error` メソッド追加
+- [x] スロットリング（同一エラー5分間デバウンス）
+- [x] RSpecテスト作成（6件）
+- [x] 計画書作成: `docs/plans/error_monitoring.md`
+- [ ] 本番環境変数に `TEAMS_WEBHOOK_ERROR_URL` 設定
+- [ ] Azure Monitor Action Group / コンテナ再起動アラート作成（インフラ層、本番移行時）
 
-**根拠:** 本番運用でエラーを即座に検知・対応できる体制は必須。Azure Monitor + Teams Webhook で低コストに実現可能。
+**詳細計画:** `docs/plans/error_monitoring.md`
 
 ### 1.7 SaaSセキュリティ管理機能 ✅
 
@@ -260,7 +263,7 @@ DXECOとの比較分析を踏まえ、POCの説得力を高めるために追加
 5. ~~**1.5 CSVエクスポート**~~ ✅ 完了
 6. ~~**2.4 リファクタリング**~~ ✅ 完了（14/17項目、Line 95.5% / Branch 77.9%）
 7. ~~**1.7 SaaSセキュリティ管理機能**~~ ✅ 完了（RSpec 335件 + E2E 79件）
-8. **1.6 エラー監視・アラート通知**
+8. ~~**1.6 エラー監視・アラート通知**~~ ✅ アプリ層完了（インフラ層は本番移行時）
 9. **1.8 メール通知機能**
 10. **1.9 OWASP ZAP 脆弱性診断**
 11. **2.3 パイロット運用** → **2.4 全社展開**
