@@ -3,7 +3,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h4>SaaS台帳</h4>
   <div>
-    <%= link_to export_saases_path(q: params[:q], category: params[:category], status: params[:status]), class: "btn btn-outline-success me-1" do %>
+    <%= link_to export_saases_path(q: params[:q], category: params[:category], status: params[:status], auth_method: params[:auth_method], data_location: params[:data_location], department: params[:department]), class: "btn btn-outline-success me-1" do %>
       <i class="bi bi-download me-1"></i>CSVエクスポート
     <% end %>
     <button class="btn btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#importModal">
@@ -18,11 +18,11 @@
 <div class="card mb-4">
   <div class="card-body">
     <%= form_tag(saases_path, method: :get, class: "row g-3 align-items-end") do %>
-      <div class="col-md-4">
+      <div class="col-md-3">
         <label class="form-label">キーワード</label>
         <input type="text" name="q" value="<%= params[:q] %>" class="form-control" placeholder="SaaS名で検索">
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
         <label class="form-label">カテゴリ</label>
         <select name="category" class="form-select">
           <option value="">すべて</option>
@@ -31,7 +31,7 @@
           <% end %>
         </select>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
         <label class="form-label">ステータス</label>
         <select name="status" class="form-select">
           <option value="">すべて</option>
@@ -41,8 +41,26 @@
         </select>
       </div>
       <div class="col-md-2">
+        <label class="form-label">認証方式</label>
+        <select name="auth_method" class="form-select">
+          <option value="">すべて</option>
+          <% Saas.auth_methods.each_key do |m| %>
+            <option value="<%= m %>" <%= "selected" if params[:auth_method] == m %>><%= m == "other_auth" ? "other" : m %></option>
+          <% end %>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">部署</label>
+        <select name="department" class="form-select">
+          <option value="">すべて</option>
+          <% @departments.each do |dept| %>
+            <option value="<%= dept %>" <%= "selected" if params[:department] == dept %>><%= dept %></option>
+          <% end %>
+        </select>
+      </div>
+      <div class="col-md-1">
         <button type="submit" class="btn btn-outline-secondary w-100">
-          <i class="bi bi-search me-1"></i>検索
+          <i class="bi bi-search"></i>
         </button>
       </div>
     <% end %>
@@ -57,6 +75,7 @@
           <th>SaaS名</th>
           <th>カテゴリ</th>
           <th>ステータス</th>
+          <th>セキュリティ</th>
           <th>担当者</th>
           <th>アカウント数</th>
           <th></th>
@@ -74,6 +93,18 @@
                                when "cancelled" then "bg-danger"
                                end %>
               <span class="badge <%= badge_class %>"><%= saas.status %></span>
+            </td>
+            <td>
+              <% if saas.handles_personal_data? %>
+                <span class="badge bg-danger" title="個人情報取扱い"><i class="bi bi-person-lock"></i> 個人情報</span>
+              <% end %>
+              <% if saas.auth_method.present? %>
+                <% auth_badge = saas.sso? ? "bg-success" : "bg-warning text-dark" %>
+                <span class="badge <%= auth_badge %>" title="認証方式"><%= saas.auth_method == "other_auth" ? "other" : saas.auth_method %></span>
+              <% end %>
+              <% if saas.overseas? %>
+                <span class="badge bg-info" title="海外データ保存"><i class="bi bi-globe"></i> 海外</span>
+              <% end %>
             </td>
             <td><%= saas.owner&.display_name || "-" %></td>
             <td><%= saas.saas_accounts.size %></td>

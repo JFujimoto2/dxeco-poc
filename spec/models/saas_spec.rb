@@ -44,6 +44,96 @@ RSpec.describe Saas, type: :model do
     end
   end
 
+  describe "セキュリティ属性 enum" do
+    it "auth_method: sso" do
+      saas = build(:saas, auth_method: "sso")
+      expect(saas).to be_sso
+    end
+
+    it "auth_method: password" do
+      saas = build(:saas, auth_method: "password")
+      expect(saas).to be_password
+    end
+
+    it "auth_method: mfa" do
+      saas = build(:saas, auth_method: "mfa")
+      expect(saas).to be_mfa
+    end
+
+    it "data_location: domestic" do
+      saas = build(:saas, data_location: "domestic")
+      expect(saas).to be_domestic
+    end
+
+    it "data_location: overseas" do
+      saas = build(:saas, data_location: "overseas")
+      expect(saas).to be_overseas
+    end
+
+    it "data_location: unknown" do
+      saas = build(:saas, data_location: "unknown")
+      expect(saas).to be_unknown
+    end
+  end
+
+  describe "セキュリティスコープ" do
+    before do
+      create(:saas, name: "SSO対応", auth_method: "sso", handles_personal_data: true, data_location: "domestic")
+      create(:saas, name: "パスワード個人情報", auth_method: "password", handles_personal_data: true, data_location: "overseas")
+      create(:saas, name: "MFA海外", auth_method: "mfa", handles_personal_data: false, data_location: "overseas")
+      create(:saas, name: "未設定", auth_method: nil, handles_personal_data: false, data_location: nil)
+    end
+
+    it "filter_by_auth_method で認証方式絞り込み" do
+      expect(Saas.filter_by_auth_method("sso").count).to eq(1)
+      expect(Saas.filter_by_auth_method("password").count).to eq(1)
+    end
+
+    it "filter_by_auth_method が空なら全件返す" do
+      expect(Saas.filter_by_auth_method(nil).count).to eq(4)
+      expect(Saas.filter_by_auth_method("").count).to eq(4)
+    end
+
+    it "filter_by_data_location でデータ保存先絞り込み" do
+      expect(Saas.filter_by_data_location("overseas").count).to eq(2)
+      expect(Saas.filter_by_data_location("domestic").count).to eq(1)
+    end
+
+    it "filter_by_data_location が空なら全件返す" do
+      expect(Saas.filter_by_data_location(nil).count).to eq(4)
+    end
+
+    it "personal_data_without_sso で個人情報+SSO未対応を返す" do
+      result = Saas.personal_data_without_sso
+      expect(result.map(&:name)).to contain_exactly("パスワード個人情報")
+    end
+
+    it "personal_data_overseas で個人情報+海外データ保存を返す" do
+      result = Saas.personal_data_overseas
+      expect(result.map(&:name)).to contain_exactly("パスワード個人情報")
+    end
+  end
+
+  describe "部署フィルタースコープ" do
+    it "filter_by_department で部署のユーザーが使うSaaSを返す" do
+      user_sales = create(:user, department: "営業部")
+      user_it = create(:user, department: "情報システム部")
+      saas_a = create(:saas, name: "SaaS A")
+      saas_b = create(:saas, name: "SaaS B")
+      create(:saas_account, saas: saas_a, user: user_sales)
+      create(:saas_account, saas: saas_b, user: user_it)
+
+      result = Saas.filter_by_department("営業部")
+      expect(result.map(&:name)).to contain_exactly("SaaS A")
+    end
+
+    it "filter_by_department が空なら全件返す" do
+      create(:saas, name: "SaaS X")
+      expect(Saas.filter_by_department(nil).count).to eq(1)
+      expect(Saas.filter_by_department("").count).to eq(1)
+    end
+  end
+
   describe "アソシエーション" do
     it "saas_contract を持てる" do
       saas = create(:saas, :with_contract)

@@ -8,10 +8,14 @@ class SaasesController < ApplicationController
     @saases = Saas.search_by_name(params[:q])
                   .filter_by_category(params[:category])
                   .filter_by_status(params[:status])
+                  .filter_by_auth_method(params[:auth_method])
+                  .filter_by_data_location(params[:data_location])
+                  .filter_by_department(params[:department])
                   .includes(:saas_accounts, :owner)
                   .order(:name)
                   .page(params[:page]).per(25)
     @categories = Saas.distinct.pluck(:category).compact.sort
+    @departments = User.distinct.pluck(:department).compact.sort
   end
 
   def show
@@ -68,24 +72,28 @@ class SaasesController < ApplicationController
     saases = Saas.search_by_name(params[:q])
                  .filter_by_category(params[:category])
                  .filter_by_status(params[:status])
+                 .filter_by_auth_method(params[:auth_method])
+                 .filter_by_data_location(params[:data_location])
+                 .filter_by_department(params[:department])
                  .includes(:saas_contract, :owner)
                  .order(:name)
     rows = saases.map do |saas|
       c = saas.saas_contract
       [ saas.name, saas.category, saas.status, saas.url, saas.owner&.display_name,
-       c&.plan_name, c&.price_cents, c&.billing_cycle, c&.expires_on ]
+       c&.plan_name, c&.price_cents, c&.billing_cycle, c&.expires_on,
+       saas.handles_personal_data ? "あり" : "なし", saas.auth_method || "", saas.data_location || "" ]
     end
     send_csv(
       filename: "saas_export",
-      headers: %w[SaaS名 カテゴリ ステータス URL 担当者 プラン 月額 請求サイクル 契約期限],
+      headers: %w[SaaS名 カテゴリ ステータス URL 担当者 プラン 月額 請求サイクル 契約期限 個人情報取扱い 認証方式 データ保存先],
       rows: rows
     )
   end
 
   def download_template
     csv_data = "\uFEFF" + CSV.generate { |csv|
-      csv << %w[SaaS名 カテゴリ ステータス URL 管理画面URL 説明]
-      csv << [ "サンプルSaaS", "一般", "active", "https://example.com", "", "サービスの説明" ]
+      csv << %w[SaaS名 カテゴリ ステータス URL 管理画面URL 説明 個人情報取扱い 認証方式 データ保存先]
+      csv << [ "サンプルSaaS", "一般", "active", "https://example.com", "", "サービスの説明", "なし", "SSO", "国内" ]
     }
     send_data csv_data, filename: "saas_template.csv", type: "text/csv; charset=utf-8"
   end
@@ -99,6 +107,7 @@ class SaasesController < ApplicationController
   def saas_params
     params.require(:saas).permit(
       :name, :category, :url, :admin_url, :description, :owner_id, :status, :entra_app_id,
+      :handles_personal_data, :auth_method, :data_location,
       saas_contract_attributes: [ :id, :plan_name, :price_cents, :billing_cycle, :started_on, :expires_on, :vendor, :notes ]
     )
   end

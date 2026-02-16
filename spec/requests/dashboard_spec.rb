@@ -71,6 +71,46 @@ RSpec.describe "Dashboard", type: :request do
     end
   end
 
+  describe "セキュリティリスク" do
+    let(:user) { create(:user, :admin) }
+
+    before { login_as(user) }
+
+    it "SSO未適用の個人情報SaaS件数を表示する" do
+      create(:saas, name: "リスクSaaS", handles_personal_data: true, auth_method: "password")
+      create(:saas, name: "安全SaaS", handles_personal_data: true, auth_method: "sso")
+
+      get root_path
+      expect(response.body).to include("セキュリティリスク")
+      expect(response.body).to include("SSO未適用")
+      expect(response.body).to include("リスクSaaS")
+    end
+
+    it "海外データ保存の個人情報SaaS件数を表示する" do
+      create(:saas, name: "海外個人情報SaaS", handles_personal_data: true, data_location: "overseas")
+
+      get root_path
+      expect(response.body).to include("海外データ保存")
+      expect(response.body).to include("海外個人情報SaaS")
+    end
+
+    it "部門別リスクSaaS利用数を表示する" do
+      dept_user = create(:user, department: "営業部")
+      risky_saas = create(:saas, name: "リスキーSaaS", handles_personal_data: true, auth_method: "password")
+      create(:saas_account, saas: risky_saas, user: dept_user)
+
+      get root_path
+      expect(response.body).to include("部門別リスクSaaS")
+      expect(response.body).to include("営業部")
+    end
+
+    it "リスクがなければセキュリティリスクセクションを表示しない" do
+      create(:saas, name: "安全SaaS", handles_personal_data: false)
+      get root_path
+      expect(response.body).not_to include("セキュリティリスク")
+    end
+  end
+
   describe "コスト可視化" do
     let(:user) { create(:user) }
 

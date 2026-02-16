@@ -45,6 +45,44 @@
       </div>
     </div>
 
+    <div class="card mb-4">
+      <div class="card-header">セキュリティ情報</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-3">個人情報取扱い</dt>
+          <dd class="col-sm-9">
+            <% if @saas.handles_personal_data? %>
+              <span class="badge bg-danger">あり</span>
+            <% else %>
+              <span class="badge bg-secondary">なし</span>
+            <% end %>
+          </dd>
+
+          <dt class="col-sm-3">認証方式</dt>
+          <dd class="col-sm-9">
+            <% if @saas.auth_method.present? %>
+              <% auth_label = { "sso" => "SSO", "password" => "パスワード", "mfa" => "MFA", "other_auth" => "その他" }[@saas.auth_method] || @saas.auth_method %>
+              <% auth_badge = @saas.sso? ? "bg-success" : "bg-warning text-dark" %>
+              <span class="badge <%= auth_badge %>"><%= auth_label %></span>
+            <% else %>
+              <span class="text-muted">未設定</span>
+            <% end %>
+          </dd>
+
+          <dt class="col-sm-3">データ保存先</dt>
+          <dd class="col-sm-9">
+            <% if @saas.data_location.present? %>
+              <% loc_label = { "domestic" => "国内", "overseas" => "海外", "unknown" => "不明" }[@saas.data_location] || @saas.data_location %>
+              <% loc_badge = @saas.overseas? ? "bg-info" : "bg-secondary" %>
+              <span class="badge <%= loc_badge %>"><%= loc_label %></span>
+            <% else %>
+              <span class="text-muted">未設定</span>
+            <% end %>
+          </dd>
+        </dl>
+      </div>
+    </div>
+
     <% if @saas.saas_contract %>
       <div class="card mb-4">
         <div class="card-header">契約情報</div>

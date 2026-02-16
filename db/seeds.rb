@@ -42,20 +42,20 @@ it_user    = users[1]  # 鈴木 花子
 
 # 一般IT (14件)
 general_saases_data = [
-  { name: "Slack", url: "https://slack.com", description: "ビジネスチャットツール" },
-  { name: "Google Workspace", url: "https://workspace.google.com", description: "メール・ドキュメント・カレンダー" },
-  { name: "Microsoft 365", url: "https://www.microsoft.com/microsoft-365", description: "Office生産性スイート" },
-  { name: "Zoom", url: "https://zoom.us", description: "ビデオ会議" },
-  { name: "Box", url: "https://www.box.com", description: "クラウドストレージ" },
-  { name: "Notion", url: "https://www.notion.so", description: "ナレッジベース・プロジェクト管理" },
-  { name: "Salesforce", url: "https://www.salesforce.com", description: "CRM・営業管理" },
-  { name: "GitHub", url: "https://github.com", description: "ソースコード管理" },
-  { name: "Jira", url: "https://www.atlassian.com/software/jira", description: "プロジェクト管理・課題追跡" },
-  { name: "Confluence", url: "https://www.atlassian.com/software/confluence", description: "社内Wiki・ドキュメント管理" },
-  { name: "1Password", url: "https://1password.com", description: "パスワード管理" },
-  { name: "DocuSign", url: "https://www.docusign.com", description: "電子署名" },
-  { name: "Canva", url: "https://www.canva.com", description: "デザインツール" },
-  { name: "ChatGPT Enterprise", url: "https://openai.com/chatgpt/enterprise", description: "AIアシスタント" }
+  { name: "Slack", url: "https://slack.com", description: "ビジネスチャットツール", handles_personal_data: false, auth_method: "sso", data_location: "overseas" },
+  { name: "Google Workspace", url: "https://workspace.google.com", description: "メール・ドキュメント・カレンダー", handles_personal_data: true, auth_method: "sso", data_location: "overseas" },
+  { name: "Microsoft 365", url: "https://www.microsoft.com/microsoft-365", description: "Office生産性スイート", handles_personal_data: true, auth_method: "sso", data_location: "domestic" },
+  { name: "Zoom", url: "https://zoom.us", description: "ビデオ会議", handles_personal_data: false, auth_method: "sso", data_location: "overseas" },
+  { name: "Box", url: "https://www.box.com", description: "クラウドストレージ", handles_personal_data: true, auth_method: "sso", data_location: "overseas" },
+  { name: "Notion", url: "https://www.notion.so", description: "ナレッジベース・プロジェクト管理", handles_personal_data: false, auth_method: "password", data_location: "overseas" },
+  { name: "Salesforce", url: "https://www.salesforce.com", description: "CRM・営業管理", handles_personal_data: true, auth_method: "mfa", data_location: "overseas" },
+  { name: "GitHub", url: "https://github.com", description: "ソースコード管理", handles_personal_data: false, auth_method: "sso", data_location: "overseas" },
+  { name: "Jira", url: "https://www.atlassian.com/software/jira", description: "プロジェクト管理・課題追跡", handles_personal_data: false, auth_method: "sso", data_location: "overseas" },
+  { name: "Confluence", url: "https://www.atlassian.com/software/confluence", description: "社内Wiki・ドキュメント管理", handles_personal_data: false, auth_method: "sso", data_location: "overseas" },
+  { name: "1Password", url: "https://1password.com", description: "パスワード管理", handles_personal_data: true, auth_method: "mfa", data_location: "overseas" },
+  { name: "DocuSign", url: "https://www.docusign.com", description: "電子署名", handles_personal_data: true, auth_method: "password", data_location: "overseas" },
+  { name: "Canva", url: "https://www.canva.com", description: "デザインツール", handles_personal_data: false, auth_method: "password", data_location: "overseas" },
+  { name: "ChatGPT Enterprise", url: "https://openai.com/chatgpt/enterprise", description: "AIアシスタント", handles_personal_data: false, auth_method: "sso", data_location: "overseas" }
 ]
 
 general_saases_data.each do |data|
@@ -65,6 +65,9 @@ general_saases_data.each do |data|
     s.description = data[:description]
     s.owner = admin_user
     s.status = "active"
+    s.handles_personal_data = data[:handles_personal_data]
+    s.auth_method = data[:auth_method]
+    s.data_location = data[:data_location]
   end
   unless saas.saas_contract
     saas.create_saas_contract!(
@@ -80,17 +83,17 @@ end
 
 # 不動産管理 (11件)
 realestate_saases_data = [
-  { name: "いえらぶCLOUD", url: "https://ielove-cloud.jp", description: "不動産業務支援クラウド" },
-  { name: "賃貸革命", url: "https://www.n-create.co.jp", description: "賃貸管理システム" },
-  { name: "ESいい物件One", url: "https://www.es-service.net", description: "不動産流通プラットフォーム" },
-  { name: "@プロパティ", url: "https://at-property.com", description: "不動産管理システム" },
-  { name: "ATBB", url: "https://atbb.athome.co.jp", description: "不動産業者間サイト" },
-  { name: "楽待", url: "https://www.rakumachi.jp", description: "投資用不動産ポータル" },
-  { name: "SUUMO Business", url: "https://business.suumo.jp", description: "SUUMO掲載管理" },
-  { name: "レインズ", url: "https://system.reins.jp", description: "不動産流通標準情報システム" },
-  { name: "イタンジ", url: "https://www.itandi.co.jp", description: "不動産テックプラットフォーム" },
-  { name: "きまRoom", url: "https://kimaroom.jp", description: "内見予約・顧客管理" },
-  { name: "不動産BB", url: "https://www.fudousan.ne.jp", description: "不動産業者間物件流通" }
+  { name: "いえらぶCLOUD", url: "https://ielove-cloud.jp", description: "不動産業務支援クラウド", handles_personal_data: true, auth_method: "password", data_location: "domestic" },
+  { name: "賃貸革命", url: "https://www.n-create.co.jp", description: "賃貸管理システム", handles_personal_data: true, auth_method: "password", data_location: "domestic" },
+  { name: "ESいい物件One", url: "https://www.es-service.net", description: "不動産流通プラットフォーム", handles_personal_data: true, auth_method: "password", data_location: "domestic" },
+  { name: "@プロパティ", url: "https://at-property.com", description: "不動産管理システム", handles_personal_data: true, auth_method: "password", data_location: "domestic" },
+  { name: "ATBB", url: "https://atbb.athome.co.jp", description: "不動産業者間サイト", handles_personal_data: false, auth_method: "password", data_location: "domestic" },
+  { name: "楽待", url: "https://www.rakumachi.jp", description: "投資用不動産ポータル", handles_personal_data: false, auth_method: "password", data_location: "domestic" },
+  { name: "SUUMO Business", url: "https://business.suumo.jp", description: "SUUMO掲載管理", handles_personal_data: true, auth_method: "password", data_location: "domestic" },
+  { name: "レインズ", url: "https://system.reins.jp", description: "不動産流通標準情報システム", handles_personal_data: true, auth_method: "password", data_location: "domestic" },
+  { name: "イタンジ", url: "https://www.itandi.co.jp", description: "不動産テックプラットフォーム", handles_personal_data: true, auth_method: "mfa", data_location: "domestic" },
+  { name: "きまRoom", url: "https://kimaroom.jp", description: "内見予約・顧客管理", handles_personal_data: true, auth_method: "password", data_location: "domestic" },
+  { name: "不動産BB", url: "https://www.fudousan.ne.jp", description: "不動産業者間物件流通", handles_personal_data: false, auth_method: "password", data_location: "domestic" }
 ]
 
 realestate_saases_data.each do |data|
@@ -100,6 +103,9 @@ realestate_saases_data.each do |data|
     s.description = data[:description]
     s.owner = it_user
     s.status = "active"
+    s.handles_personal_data = data[:handles_personal_data]
+    s.auth_method = data[:auth_method]
+    s.data_location = data[:data_location]
   end
   unless saas.saas_contract
     saas.create_saas_contract!(
@@ -115,11 +121,11 @@ end
 
 # バックオフィス (5件)
 backoffice_saases_data = [
-  { name: "freee会計", url: "https://www.freee.co.jp", description: "クラウド会計ソフト" },
-  { name: "SmartHR", url: "https://smarthr.jp", description: "労務管理・年末調整" },
-  { name: "KING OF TIME", url: "https://www.kingtime.jp", description: "勤怠管理" },
-  { name: "バクラク", url: "https://bakuraku.jp", description: "請求書・経費精算" },
-  { name: "マネーフォワード", url: "https://biz.moneyforward.com", description: "経理・人事クラウド" }
+  { name: "freee会計", url: "https://www.freee.co.jp", description: "クラウド会計ソフト", handles_personal_data: true, auth_method: "mfa", data_location: "domestic" },
+  { name: "SmartHR", url: "https://smarthr.jp", description: "労務管理・年末調整", handles_personal_data: true, auth_method: "password", data_location: "domestic" },
+  { name: "KING OF TIME", url: "https://www.kingtime.jp", description: "勤怠管理", handles_personal_data: true, auth_method: "password", data_location: "domestic" },
+  { name: "バクラク", url: "https://bakuraku.jp", description: "請求書・経費精算", handles_personal_data: true, auth_method: "mfa", data_location: "domestic" },
+  { name: "マネーフォワード", url: "https://biz.moneyforward.com", description: "経理・人事クラウド", handles_personal_data: true, auth_method: "password", data_location: "domestic" }
 ]
 
 backoffice_saases_data.each do |data|
@@ -129,6 +135,9 @@ backoffice_saases_data.each do |data|
     s.description = data[:description]
     s.owner = users[7] # 山田 (管理部)
     s.status = "active"
+    s.handles_personal_data = data[:handles_personal_data]
+    s.auth_method = data[:auth_method]
+    s.data_location = data[:data_location]
   end
   unless saas.saas_contract
     saas.create_saas_contract!(

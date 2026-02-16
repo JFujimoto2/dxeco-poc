@@ -9,8 +9,10 @@ class SaasAccountsController < ApplicationController
                                 .filter_by_saas(params[:saas_id])
                                 .filter_by_user(params[:user_id])
                                 .filter_by_status(params[:status])
+                                .filter_by_department(params[:department])
                                 .order("saases.name, users.display_name")
                                 .page(params[:page]).per(25)
+    @departments = User.distinct.pluck(:department).compact.sort
   end
 
   def new
@@ -61,6 +63,7 @@ class SaasAccountsController < ApplicationController
                           .filter_by_saas(params[:saas_id])
                           .filter_by_user(params[:user_id])
                           .filter_by_status(params[:status])
+                          .filter_by_department(params[:department])
                           .order("saases.name, users.display_name")
     rows = accounts.map do |a|
       [ a.saas.name, a.user.display_name, a.user.department,

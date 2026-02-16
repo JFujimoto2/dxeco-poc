@@ -18,5 +18,23 @@ class DashboardController < ApplicationController
     @total_monthly_cost = SaasContract.total_monthly_cost
     @total_annual_cost = SaasContract.total_annual_cost
     @cost_by_category = SaasContract.monthly_cost_by_category
+
+    @personal_data_without_sso = Saas.personal_data_without_sso
+    @personal_data_overseas = Saas.personal_data_overseas
+    @department_risk = department_risk_data
+  end
+
+  private
+
+  def department_risk_data
+    risky_saas_ids = Saas.where(handles_personal_data: true).where.not(auth_method: "sso").pluck(:id)
+    return [] if risky_saas_ids.empty?
+
+    SaasAccount.joins(:user)
+               .where(saas_id: risky_saas_ids)
+               .where.not(users: { department: nil })
+               .group("users.department")
+               .count
+               .sort_by { |_, v| -v }
   end
 end

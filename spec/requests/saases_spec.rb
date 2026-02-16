@@ -28,6 +28,35 @@ RSpec.describe "Saases", type: :request do
       expect(response.body).to include("Slack")
       expect(response.body).not_to include("いえらぶ")
     end
+
+    it "認証方式で絞り込み" do
+      create(:saas, name: "SSO対応", auth_method: "sso")
+      create(:saas, name: "パスワード", auth_method: "password")
+      get saases_path, params: { auth_method: "sso" }
+      expect(response.body).to include("SSO対応")
+      expect(response.body).not_to include("パスワード")
+    end
+
+    it "データ保存先で絞り込み" do
+      create(:saas, name: "国内SaaS", data_location: "domestic")
+      create(:saas, name: "海外SaaS", data_location: "overseas")
+      get saases_path, params: { data_location: "overseas" }
+      expect(response.body).to include("海外SaaS")
+      expect(response.body).not_to include("国内SaaS")
+    end
+
+    it "部署で絞り込み" do
+      sales_user = create(:user, department: "営業部")
+      it_user_dept = create(:user, department: "情報システム部")
+      saas_a = create(:saas, name: "営業用SaaS")
+      saas_b = create(:saas, name: "IT用SaaS")
+      create(:saas_account, saas: saas_a, user: sales_user)
+      create(:saas_account, saas: saas_b, user: it_user_dept)
+
+      get saases_path, params: { department: "営業部" }
+      expect(response.body).to include("営業用SaaS")
+      expect(response.body).not_to include("IT用SaaS")
+    end
   end
 
   describe "GET /saases/:id" do
@@ -37,9 +66,31 @@ RSpec.describe "Saases", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Slack")
     end
+
+    it "セキュリティ情報を表示" do
+      saas = create(:saas, name: "セキュリティSaaS", handles_personal_data: true, auth_method: "password", data_location: "overseas")
+      get saas_path(saas)
+      expect(response.body).to include("セキュリティ情報")
+      expect(response.body).to include("個人情報取扱い")
+      expect(response.body).to include("認証方式")
+      expect(response.body).to include("データ保存先")
+    end
   end
 
   describe "POST /saases" do
+    it "セキュリティ属性付きでSaaSを作成" do
+      expect {
+        post saases_path, params: { saas: {
+          name: "セキュリティSaaS", category: "一般",
+          handles_personal_data: true, auth_method: "sso", data_location: "domestic"
+        } }
+      }.to change(Saas, :count).by(1)
+      saas = Saas.last
+      expect(saas.handles_personal_data).to be true
+      expect(saas.auth_method).to eq("sso")
+      expect(saas.data_location).to eq("domestic")
+    end
+
     it "SaaSを作成" do
       expect {
         post saases_path, params: { saas: { name: "New SaaS", category: "一般" } }

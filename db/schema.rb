@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_15_124845) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_16_095701) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -99,17 +99,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_124845) do
 
   create_table "saases", force: :cascade do |t|
     t.string "admin_url"
+    t.string "auth_method"
     t.string "category"
     t.datetime "created_at", null: false
     t.jsonb "custom_fields", default: {}
+    t.string "data_location"
     t.text "description"
     t.string "entra_app_id"
+    t.boolean "handles_personal_data", default: false, null: false
     t.string "name", null: false
     t.bigint "owner_id"
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
     t.string "url"
+    t.index ["auth_method"], name: "index_saases_on_auth_method"
     t.index ["category"], name: "index_saases_on_category"
+    t.index ["data_location"], name: "index_saases_on_data_location"
     t.index ["entra_app_id"], name: "index_saases_on_entra_app_id", unique: true
     t.index ["name"], name: "index_saases_on_name"
     t.index ["owner_id"], name: "index_saases_on_owner_id"

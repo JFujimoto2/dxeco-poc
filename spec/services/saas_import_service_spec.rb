@@ -62,6 +62,36 @@ RSpec.describe SaasImportService do
       file.close!
     end
 
+    it "セキュリティ属性付きCSVをインポートできる" do
+      file = Tempfile.new([ "saas_sec", ".csv" ])
+      file.write("\uFEFFSaaS名,カテゴリ,ステータス,URL,個人情報取扱い,認証方式,データ保存先\n")
+      file.write("セキュアSaaS,一般IT,active,https://secure.com,あり,SSO,国内\n")
+      file.write("リスクSaaS,一般IT,active,https://risk.com,あり,パスワード,海外\n")
+      file.write("普通SaaS,一般IT,active,https://normal.com,なし,,\n")
+      file.rewind
+
+      result = SaasImportService.new(file.path).call
+      expect(result[:success_count]).to eq(3)
+      expect(result[:error_count]).to eq(0)
+
+      secure = Saas.find_by(name: "セキュアSaaS")
+      expect(secure.handles_personal_data).to be true
+      expect(secure.auth_method).to eq("sso")
+      expect(secure.data_location).to eq("domestic")
+
+      risky = Saas.find_by(name: "リスクSaaS")
+      expect(risky.handles_personal_data).to be true
+      expect(risky.auth_method).to eq("password")
+      expect(risky.data_location).to eq("overseas")
+
+      normal = Saas.find_by(name: "普通SaaS")
+      expect(normal.handles_personal_data).to be false
+      expect(normal.auth_method).to be_nil
+      expect(normal.data_location).to be_nil
+    ensure
+      file.close!
+    end
+
     it "テンプレートCSVでもSaaS名の重複はエラーになる" do
       create(:saas, name: "サンプルSaaS")
       file = Tempfile.new([ "saas_dup", ".csv" ])

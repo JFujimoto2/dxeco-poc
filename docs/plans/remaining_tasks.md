@@ -100,6 +100,37 @@ DXECOとの比較分析を踏まえ、POCの説得力を高めるために追加
 
 **根拠:** 本番運用でエラーを即座に検知・対応できる体制は必須。Azure Monitor + Teams Webhook で低コストに実現可能。
 
+### 1.7 SaaSセキュリティ管理機能 ✅
+
+- [x] SaaS台帳にセキュリティ属性追加（個人情報取扱い、認証方式、データ保存先）
+- [x] ダッシュボードにセキュリティリスクカード追加（SSO未適用・海外データ保存・部門別リスク）
+- [x] SaaS一覧に認証方式・データ保存先・部署フィルター追加
+- [x] アカウント管理に部署フィルター追加
+- [x] CSVインポート/エクスポートにセキュリティ属性対応
+- [x] RSpecテスト作成（335件全パス、Line 95.7% / Branch 79.0%）
+- [x] Playwright E2Eテスト追加（79件全パス）
+
+**詳細計画:** `docs/plans/saas_security_management.md`
+**GitHub Issue:** [#17](https://github.com/JFujimoto2/dxeco-poc/issues/17)
+
+### 1.8 メール通知機能（未着手）
+
+- [ ] Action Mailer + letter_opener(dev) + SMTP(prod)
+- [ ] TaskMailer / ApprovalRequestMailer / SurveyMailer
+- [ ] deliver_later（Solid Queue）
+- [ ] 計画書: `docs/plans/email_notification.md`
+
+**GitHub Issue:** [#9](https://github.com/JFujimoto2/dxeco-poc/issues/9)
+
+### 1.9 OWASP ZAP 脆弱性診断（未着手）
+
+- [ ] Docker で Baseline Scan 実行（ローカル）
+- [ ] 認証付きスキャン（dev_login 利用）
+- [ ] CI/CD に scan_dast ジョブ追加
+- [ ] 計画書: `docs/plans/owasp_zap_scan.md`
+
+**GitHub Issue:** [#16](https://github.com/JFujimoto2/dxeco-poc/issues/16)
+
 ---
 
 ## 2. 運用本番化に向けた課題
@@ -172,7 +203,27 @@ DXECOとの比較分析を踏まえ、POCの説得力を高めるために追加
 
 ※ 実際の運用フローを確認してから設計する
 
-### 2.3 未実装のDXECO機能（本番移行時に要検討）
+### 2.3 パイロット運用（WEBチーム）
+
+- [ ] WEBチームで2〜4週間の実運用テスト
+- [ ] 棚卸しサーベイを実際に回す
+- [ ] 退職者アカウントの自動検出を実運用
+- [ ] 成果を数字で記録（退職者アカウント件数、棚卸し工数削減率、未利用アカウント件数）
+
+**GitHub Issue:** [#18](https://github.com/JFujimoto2/dxeco-poc/issues/18)
+**前提:** SaaSセキュリティ管理機能の実装完了 + 現場課長へのデモ完了・合意
+
+### 2.4 全社展開・開発チーム構築
+
+- [ ] 全社のSaaSデータを投入
+- [ ] 他部署への横展開（定例会議でデモ）
+- [ ] デジタル推進部を味方に（セキュリティ管理機能を強調）
+- [ ] 業務委託 or 副担当を入れて属人化リスクを解消
+
+**GitHub Issue:** [#19](https://github.com/JFujimoto2/dxeco-poc/issues/19)
+**前提:** パイロット運用で具体的な成果が出ていること
+
+### 2.5 未実装のDXECO機能（本番移行時に要検討）
 
 | 機能 | 必要性 | 備考 |
 |------|--------|------|
@@ -208,9 +259,13 @@ DXECOとの比較分析を踏まえ、POCの説得力を高めるために追加
 4. ~~**1.4 コスト可視化**~~ ✅ 完了
 5. ~~**1.5 CSVエクスポート**~~ ✅ 完了
 6. ~~**2.4 リファクタリング**~~ ✅ 完了（14/17項目、Line 95.5% / Branch 77.9%）
-7. **1.6 エラー監視・アラート通知** ← 次のタスク（最優先）
+7. ~~**1.7 SaaSセキュリティ管理機能**~~ ✅ 完了（RSpec 335件 + E2E 79件）
+8. **1.6 エラー監視・アラート通知**
+9. **1.8 メール通知機能**
+10. **1.9 OWASP ZAP 脆弱性診断**
+11. **2.3 パイロット運用** → **2.4 全社展開**
 
 ---
 
 作成日: 2026年2月11日
-更新日: 2026年2月15日（エラー監視・アラート通知を最優先タスクとして追加）
+更新日: 2026年2月16日（セキュリティ管理・メール通知・OWASP ZAP・パイロット運用・全社展開を追加）
