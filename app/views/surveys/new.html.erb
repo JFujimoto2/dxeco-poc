@@ -20,8 +20,7 @@
         <%= f.label :deadline, "回答期限", class: "form-label" %>
         <% default_deadline = 2.weeks.from_now.to_date %>
         <div class="date-weekday-wrap">
-          <%= f.date_field :deadline, class: "form-control", id: "deadline-input", value: default_deadline,
-              onchange: "updateDateDisplay(this, 'deadline-display')" %>
+          <%= f.date_field :deadline, class: "form-control", id: "deadline-input", value: default_deadline %>
           <span id="deadline-display" class="date-weekday-display"><%= format_date_with_weekday(default_deadline) %></span>
         </div>
       </div>
@@ -59,16 +58,21 @@
   </div>
 <% end %>
 
-<script>
-  function updateDateDisplay(input, displayId) {
-    var weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-    var span = document.getElementById(displayId);
-    if (input.value) {
-      var parts = input.value.split("-");
-      var d = new Date(input.value + "T00:00:00");
-      span.textContent = parts[0] + "/" + parts[1] + "/" + parts[2] + " (" + weekdays[d.getDay()] + ")";
-    } else {
-      span.textContent = "";
+<script nonce="<%= content_security_policy_nonce %>">
+  document.addEventListener("DOMContentLoaded", function() {
+    var input = document.getElementById("deadline-input");
+    if (input) {
+      input.addEventListener("change", function() {
+        var weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+        var span = document.getElementById("deadline-display");
+        if (this.value) {
+          var parts = this.value.split("-");
+          var d = new Date(this.value + "T00:00:00");
+          span.textContent = parts[0] + "/" + parts[1] + "/" + parts[2] + " (" + weekdays[d.getDay()] + ")";
+        } else {
+          span.textContent = "";
+        }
+      });
     }
-  }
+  });
 </script>
