@@ -51,6 +51,30 @@
     </div>
   </div>
 
+  <div class="card mb-4">
+    <div class="card-header">セキュリティ情報</div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <div class="form-check">
+            <%= f.check_box :handles_personal_data, class: "form-check-input" %>
+            <%= f.label :handles_personal_data, "個人情報を取り扱う", class: "form-check-label" %>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <%= f.label :auth_method, "認証方式", class: "form-label" %>
+          <%= f.select :auth_method, [["SSO", "sso"], ["パスワード", "password"], ["MFA", "mfa"], ["その他", "other_auth"]],
+              { include_blank: "未設定" }, class: "form-select" %>
+        </div>
+        <div class="col-md-4 mb-3">
+          <%= f.label :data_location, "データ保存先", class: "form-label" %>
+          <%= f.select :data_location, [["国内", "domestic"], ["海外", "overseas"], ["不明", "unknown"]],
+              { include_blank: "未設定" }, class: "form-select" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <%= f.fields_for :saas_contract do |cf| %>
     <div class="card mb-4">
       <div class="card-header">契約情報</div>

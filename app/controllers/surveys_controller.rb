@@ -1,4 +1,5 @@
 class SurveysController < ApplicationController
+  include FilterOptions
   before_action :require_admin, only: [ :new, :create, :activate, :close, :remind, :create_cleanup_task ]
 
   def index
@@ -12,7 +13,7 @@ class SurveysController < ApplicationController
   def new
     @survey = Survey.new
     @saases = Saas.where(status: "active").order(:name)
-    @departments = User.where.not(department: [ nil, "" ]).distinct.pluck(:department).sort
+    @departments = department_options
   end
 
   def create
@@ -23,7 +24,7 @@ class SurveysController < ApplicationController
       redirect_to survey_path(@survey), notice: "サーベイを作成しました"
     else
       @saases = Saas.where(status: "active").order(:name)
-      @departments = User.where.not(department: [ nil, "" ]).distinct.pluck(:department).sort
+      @departments = department_options
       render :new, status: :unprocessable_entity
     end
   end

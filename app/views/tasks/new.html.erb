@@ -41,8 +41,7 @@
         <div class="col-md-3">
           <%= f.label :due_date, "期限", class: "form-label" %>
           <div class="date-weekday-wrap">
-            <%= f.date_field :due_date, class: "form-control", id: "due-date-input",
-                onchange: "updateDateDisplay(this, 'due-date-display')" %>
+            <%= f.date_field :due_date, class: "form-control", id: "due-date-input" %>
             <span id="due-date-display" class="date-weekday-display"><%= format_date_with_weekday(@task.due_date) %></span>
           </div>
         </div>
@@ -91,15 +90,21 @@
   <% end %>
 <% end %>
 
-<script>
-  function updateDateDisplay(input, displayId) {
-    var weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-    var span = document.getElementById(displayId);
-    if (input.value) {
-      var parts = input.value.split("-");
-      var d = new Date(input.value + "T00:00:00");
-      span.textContent = parts[0] + "/" + parts[1] + "/" + parts[2] + " (" + weekdays[d.getDay()] + ")";
-    } else {
-      span.textContent = "";
-  }
+<script nonce="<%= content_security_policy_nonce %>">
+  document.addEventListener("DOMContentLoaded", function() {
+    var input = document.getElementById("due-date-input");
+    if (input) {
+      input.addEventListener("change", function() {
+        var weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+        var span = document.getElementById("due-date-display");
+        if (this.value) {
+          var parts = this.value.split("-");
+          var d = new Date(this.value + "T00:00:00");
+          span.textContent = parts[0] + "/" + parts[1] + "/" + parts[2] + " (" + weekdays[d.getDay()] + ")";
+        } else {
+          span.textContent = "";
+        }
+      });
+    }
+  });
 </script>

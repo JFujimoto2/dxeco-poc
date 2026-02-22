@@ -1,5 +1,6 @@
 class SaasAccountsController < ApplicationController
   include CsvExportable
+  include FilterOptions
 
   before_action :set_saas_account, only: [ :edit, :update, :destroy ]
   before_action :require_admin_or_manager, only: [ :import ]
@@ -9,8 +10,10 @@ class SaasAccountsController < ApplicationController
                                 .filter_by_saas(params[:saas_id])
                                 .filter_by_user(params[:user_id])
                                 .filter_by_status(params[:status])
+                                .filter_by_department(params[:department])
                                 .order("saases.name, users.display_name")
                                 .page(params[:page]).per(25)
+    @departments = department_options
   end
 
   def new
@@ -61,6 +64,7 @@ class SaasAccountsController < ApplicationController
                           .filter_by_saas(params[:saas_id])
                           .filter_by_user(params[:user_id])
                           .filter_by_status(params[:status])
+                          .filter_by_department(params[:department])
                           .order("saases.name, users.display_name")
     rows = accounts.map do |a|
       [ a.saas.name, a.user.display_name, a.user.department,

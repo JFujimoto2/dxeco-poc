@@ -17,12 +17,13 @@ test.describe("日付フィールドの曜日表示", () => {
   test("サーベイ作成画面で日付変更時にオーバーレイが更新される", async ({ page }) => {
     await page.goto("/surveys/new");
 
-    // 日付を 2026-03-01 (日曜日) に変更
+    // 日付を変更して曜日が更新されることを確認
     const dateInput = page.locator("#deadline-input");
-    await dateInput.fill("2026-03-01");
+    await dateInput.fill("2026-06-01");
     await dateInput.dispatchEvent("change");
 
     const display = page.locator("#deadline-display");
-    await expect(display).toHaveText("2026/03/01 (日)");
+    // 2026-06-01 is Monday (月)
+    await expect(display).toHaveText("2026/06/01 (月)");
   });
 });

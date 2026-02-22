@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  include FilterOptions
   before_action :set_user, only: [ :show, :edit, :update ]
   before_action :require_admin, only: [ :edit, :update ]
 
@@ -8,7 +9,7 @@ class UsersController < ApplicationController
                  .includes(:saas_accounts)
                  .order(:display_name)
                  .page(params[:page]).per(25)
-    @departments = User.distinct.pluck(:department).compact.sort
+    @departments = department_options
   end
 
   def show

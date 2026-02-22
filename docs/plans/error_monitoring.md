@@ -93,11 +93,11 @@ az monitor metrics alert create \
 ## 成果物チェックリスト
 
 ### アプリケーション層
-- [ ] `ErrorSubscriber` クラス作成
-- [ ] `TeamsNotifier.notify_error` メソッド追加
-- [ ] ErrorReporter への登録（initializer）
-- [ ] スロットリング（5分デバウンス）
-- [ ] RSpec テスト作成
+- [x] `ErrorSubscriber` クラス作成
+- [x] `TeamsNotifier.notify_error` メソッド追加
+- [x] ErrorReporter への登録（initializer）
+- [x] スロットリング（5分デバウンス）
+- [x] RSpec テスト作成（6件）
 - [ ] 本番環境変数に `TEAMS_WEBHOOK_ERROR_URL` 設定
 
 ### インフラ層

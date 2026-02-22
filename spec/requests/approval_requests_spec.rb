@@ -62,7 +62,7 @@ RSpec.describe "ApprovalRequests", type: :request do
       login_as(viewer)
       request = create(:approval_request, requester: create(:user))
       post approve_approval_request_path(request)
-      expect(response).to redirect_to(approval_requests_path)
+      expect(response).to redirect_to(root_path)
       expect(request.reload).to be_pending
     end
   end
@@ -80,7 +80,7 @@ RSpec.describe "ApprovalRequests", type: :request do
       login_as(viewer)
       request = create(:approval_request, requester: create(:user))
       post reject_approval_request_path(request)
-      expect(response).to redirect_to(approval_requests_path)
+      expect(response).to redirect_to(root_path)
       expect(request.reload).to be_pending
     end
   end

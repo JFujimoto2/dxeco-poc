@@ -14,6 +14,21 @@ RSpec.describe "SaasAccounts", type: :request do
       expect(response.body).to include("Slack")
     end
 
+    it "部署で絞り込み" do
+      sales_user = create(:user, display_name: "営業太郎", department: "営業部")
+      it_dept_user = create(:user, display_name: "情シス花子", department: "情報システム部")
+      saas_a = create(:saas, name: "SaaSセールス")
+      saas_b = create(:saas, name: "SaaSアイティー")
+      create(:saas_account, saas: saas_a, user: sales_user)
+      create(:saas_account, saas: saas_b, user: it_dept_user)
+
+      get saas_accounts_path, params: { department: "営業部" }
+      # テーブル内のtbody部分のみ確認（フィルタードロップダウンにはSaaS名が表示されるため）
+      tbody = response.body.match(/<tbody>(.*?)<\/tbody>/m)&.send(:[], 1) || ""
+      expect(tbody).to include("営業太郎")
+      expect(tbody).not_to include("情シス花子")
+    end
+
     it "SaaSで絞り込み" do
       saas1 = create(:saas, name: "SlackApp")
       saas2 = create(:saas, name: "ZoomApp")

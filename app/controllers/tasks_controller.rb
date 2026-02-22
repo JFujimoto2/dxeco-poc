@@ -40,7 +40,7 @@ class TasksController < ApplicationController
       end
 
       if preset.onboarding?
-        Saas.active.each do |saas|
+        Saas.active.find_each do |saas|
           @task.task_items.build(
             action_type: "account_create",
             description: "#{saas.name} アカウント作成",
