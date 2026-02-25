@@ -164,7 +164,7 @@ RAILS_ENV=test bin/rails assets:precompile
 
 ### 紹介資料
 
-- **[画面説明書（スクリーンショット付き）](docs/presentation_screenshots.md)** - 全画面のスクリーンショット付き説明文書（上長提出用）
+- **[画面説明書（スクリーンショット付き）](docs/presentation_screenshots.md)** - 全画面のスクリーンショット付き説明文書
 
 ### 運用・開発
 
