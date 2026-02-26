@@ -13,7 +13,7 @@ Rails.application.configure do
     policy.script_src  :self, "https://cdn.jsdelivr.net"
     policy.style_src   :self, "https://cdn.jsdelivr.net", :unsafe_inline
     policy.connect_src :self
-    policy.frame_src   :none
+    policy.frame_src   :self
     policy.base_uri    :self
     policy.form_action :self
   end
