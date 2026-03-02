@@ -1,31 +1,22 @@
 # ドキュメント一覧
 
-## 概要・企画
+## プロジェクト概要 (`project/`)
 
 | ファイル | 内容 |
 | --- | --- |
-| [機能概要.md](機能概要.md) | システム全体の機能マップと各機能の説明 |
-| [セキュリティ対策.md](セキュリティ対策.md) | 認証・暗号化・インフラ・アプリ・CI/CDのセキュリティ対策 |
-| [自社開発_タスク_機能一覧.md](自社開発_タスク_機能一覧.md) | POC開発計画と実装状況（全16機能） |
-| [社内開発ガイドライン.md](社内開発ガイドライン.md) | 社内開発の方針・ルール |
-| [社内開発セキュリティガイドライン.md](社内開発セキュリティガイドライン.md) | 社内開発におけるセキュリティガイドライン |
+| [機能概要.md](project/機能概要.md) | システム全体の機能マップと各機能の説明 |
+| [セキュリティ対策.md](project/セキュリティ対策.md) | 認証・暗号化・インフラ・アプリ・CI/CDのセキュリティ対策 |
+| [自社開発_タスク_機能一覧.md](project/自社開発_タスク_機能一覧.md) | POC開発計画と実装状況（全16機能） |
 
-## 運用ガイド
+## ガイド・手順書 (`guides/`)
 
 | ファイル | 対象者 | 内容 |
 | --- | --- | --- |
-| [user-guide.md](user-guide.md) | 全ユーザー | 画面操作・ロール別ガイド・POCトライアル手順 |
-| [operations.md](operations.md) | 開発者 | 開発フロー・TDD・CI/CD・テスト戦略・DB操作 |
-| [environment-setup.md](environment-setup.md) | 開発者 | 環境変数・Entra ID SSO・Graph API・Teams Webhook・SMTP設定 |
-
-## プレゼン資料 (`presentation/`)
-
-| ファイル | 内容 |
-| --- | --- |
-| [slides.md](presentation/slides.md) | Marpスライド |
-| [slides.pptx](presentation/slides.pptx) | PowerPointスライド |
-| [screenshots_guide.md](presentation/screenshots_guide.md) | 画面説明書（上長提出用） |
-| `screenshots/` | 画面キャプチャ画像 |
+| [user-guide.md](guides/user-guide.md) | 全ユーザー | 画面操作・ロール別ガイド・POCトライアル手順 |
+| [operations.md](guides/operations.md) | 開発者 | 開発フロー・TDD・CI/CD・テスト戦略・DB操作 |
+| [environment-setup.md](guides/environment-setup.md) | 開発者 | 環境変数・Entra ID SSO・Graph API・Teams Webhook・SMTP設定 |
+| [社内開発ガイドライン.md](guides/社内開発ガイドライン.md) | 開発者 | 社内開発の方針・ルール |
+| [社内開発セキュリティガイドライン.md](guides/社内開発セキュリティガイドライン.md) | 開発者 | 社内開発におけるセキュリティガイドライン |
 
 ## 機能仕様 (`features/`)
 
@@ -57,6 +48,15 @@
 | [remaining_tasks.md](plans/remaining_tasks.md) | 残タスク一覧（実装状況） |
 | phase1〜4 | フェーズ別実装計画 |
 | 各機能計画書 | 個別機能のTDD実装計画 |
+
+## プレゼン資料 (`presentation/`)
+
+| ファイル | 内容 |
+| --- | --- |
+| [slides.md](presentation/slides.md) | Marpスライド |
+| [slides.pptx](presentation/slides.pptx) | PowerPointスライド |
+| [screenshots_guide.md](presentation/screenshots_guide.md) | 画面説明書（上長提出用） |
+| `screenshots/` | 画面キャプチャ画像 |
 
 ## インフラ (`infra/`)
 
