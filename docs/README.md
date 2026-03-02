@@ -7,8 +7,8 @@
 | [機能概要.md](機能概要.md) | システム全体の機能マップと各機能の説明 |
 | [セキュリティ対策.md](セキュリティ対策.md) | 認証・暗号化・インフラ・アプリ・CI/CDのセキュリティ対策 |
 | [自社開発_タスク_機能一覧.md](自社開発_タスク_機能一覧.md) | POC開発計画と実装状況（全16機能） |
-| [コスト比較_DXECO_vs_自社開発.md](コスト比較_DXECO_vs_自社開発.md) | DXECO vs 自社開発のコスト比較 |
-| [デクセコ_調査レポート_.md](デクセコ_調査レポート_.md) | DXECO製品の調査レポート |
+| [社内開発ガイドライン.md](社内開発ガイドライン.md) | 社内開発の方針・ルール |
+| [社内開発セキュリティガイドライン.md](社内開発セキュリティガイドライン.md) | 社内開発におけるセキュリティガイドライン |
 
 ## 運用ガイド
 
@@ -17,6 +17,15 @@
 | [user-guide.md](user-guide.md) | 全ユーザー | 画面操作・ロール別ガイド・POCトライアル手順 |
 | [operations.md](operations.md) | 開発者 | 開発フロー・TDD・CI/CD・テスト戦略・DB操作 |
 | [environment-setup.md](environment-setup.md) | 開発者 | 環境変数・Entra ID SSO・Graph API・Teams Webhook・SMTP設定 |
+
+## プレゼン資料 (`presentation/`)
+
+| ファイル | 内容 |
+| --- | --- |
+| [slides.md](presentation/slides.md) | Marpスライド |
+| [slides.pptx](presentation/slides.pptx) | PowerPointスライド |
+| [screenshots_guide.md](presentation/screenshots_guide.md) | 画面説明書（上長提出用） |
+| `screenshots/` | 画面キャプチャ画像 |
 
 ## 機能仕様 (`features/`)
 
