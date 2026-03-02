@@ -19,7 +19,7 @@
 
 ### 技術スタック
 
-Ruby on Rails 8 / PostgreSQL / Bootstrap 5 / Microsoft Entra ID SSO / Azure Container Apps
+Ruby 4.0.1 / Rails 8.1.2 / PostgreSQL / Bootstrap 5 / Microsoft Entra ID SSO / Azure Container Apps
 
 ---
 
