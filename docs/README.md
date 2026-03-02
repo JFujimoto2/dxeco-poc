@@ -37,17 +37,20 @@
 | 13 | [contract_renewal_alert](features/13_contract_renewal_alert.md) | 契約更新アラート |
 | 14 | [cost_visualization](features/14_cost_visualization.md) | コスト可視化 |
 | 15 | [csv_export](features/15_csv_export.md) | CSVエクスポート |
-| 16 | [entra_account_sync](features/16_entra_account_sync.md) | SaaSアカウント同期 |
+| 16 | [entra_account_sync](features/16_entra_account_sync.md) | SaaSアカウント同期（グループ限定同期含む） |
+| 17 | [saas_security_management](features/17_saas_security_management.md) | SaaSセキュリティ管理 |
 
 ## 実装計画 (`plans/`)
 
-機能実装時のTDD計画書。チェックリスト付き。
+未着手・進行中のTDD計画書。完了済みの計画書は features/ に集約済み。
 
-| ファイル | 内容 |
-| --- | --- |
-| [remaining_tasks.md](plans/remaining_tasks.md) | 残タスク一覧（実装状況） |
-| phase1〜4 | フェーズ別実装計画 |
-| 各機能計画書 | 個別機能のTDD実装計画 |
+| ファイル | 内容 | 状態 |
+| --- | --- | --- |
+| [remaining_tasks.md](plans/remaining_tasks.md) | 残タスク一覧（実装状況） | — |
+| [owasp_zap_scan.md](plans/owasp_zap_scan.md) | OWASP ZAP 脆弱性診断導入 | 未着手 |
+| [password_management_improvement.md](plans/password_management_improvement.md) | パスワード管理改善 | 未着手 |
+| [error_monitoring.md](plans/error_monitoring.md) | エラー監視（アプリ層完了、インフラ層未完） | 進行中 |
+| [refactoring.md](plans/refactoring.md) | リファクタリング（14/17完了） | 進行中 |
 
 ## プレゼン資料 (`presentation/`)
 
