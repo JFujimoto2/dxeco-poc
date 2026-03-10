@@ -399,6 +399,9 @@ bin/dev
 # http://localhost:3000
 
 # 4. dev_login フォームで admin@example.com でログイン
+
+# 5. メール確認（letter_opener）
+# http://localhost:3000/letter_opener
 ```
 
 ### デモシナリオ例

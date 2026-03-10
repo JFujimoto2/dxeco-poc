@@ -76,6 +76,18 @@ SSO連携するSaaSは、Azure Portal でエンタープライズアプリケー
 - 期限切れ・期限間近のユーザーをカード形式で表示
 - ユーザー名、部署、最終パスワード変更日、残日数を表示
 
+## グループ限定同期
+
+### 仕組み
+- 環境変数 `ENTRA_SYNC_GROUP_ID` にEntra IDセキュリティグループのIDを設定すると、そのグループメンバーのみを同期対象にする
+- 未設定の場合はテナント全ユーザーを同期（従来動作）
+- Graph API `/groups/{id}/members` エンドポイントを使用
+- デバイス等のユーザー以外のオブジェクトは自動フィルタ
+
+### 運用上の表示
+- バッチ管理画面の説明文が同期モード（グループ限定 / 全ユーザー）に応じて変わる
+- `BatchExecutionLog` に実行モードを記録
+
 ## バッチ実行
 - **URL**: `POST /admin/batches/sync_entra_accounts`
 - `EntraAccountSyncJob` を実行

@@ -49,3 +49,6 @@
 # DBeaver
 /.dbeaver/
 *.dbp
+
+# Internal documents (not for git)
+/docs/internal/

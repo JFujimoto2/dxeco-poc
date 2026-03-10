@@ -62,7 +62,7 @@ draft → active → closed
 |------|:--------:|------|
 | Teams Webhook | ○ | `TEAMS_WEBHOOK_SURVEY_URL` 設定時はサーベイ専用チャネルへ、未設定時は `TEAMS_WEBHOOK_URL` にフォールバック |
 | アプリ内（画面） | ○ | ユーザーがログイン後、サーベイ一覧から active なサーベイを確認・回答 |
-| メール通知 | ○ | SMTP設定時、配信・リマインド時に対象ユーザーへ個別メール送信（`deliver_later`） |
+| メール通知 | ○ | Microsoft Graph API経由で配信・リマインド時に対象ユーザーへメール送信（`deliver_later`） |
 
 ### 配信フロー
 ```

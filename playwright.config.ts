@@ -17,6 +17,12 @@ export default defineConfig({
     {
       name: "chromium",
       use: { browserName: "chromium" },
+      testIgnore: /screenshots\.spec\.ts/,
+    },
+    {
+      name: "screenshots",
+      use: { browserName: "chromium", viewport: { width: 1440, height: 900 } },
+      testMatch: /screenshots\.spec\.ts/,
     },
   ],
   webServer: {

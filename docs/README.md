@@ -1,22 +1,22 @@
 # ドキュメント一覧
 
-## 概要・企画
+## プロジェクト概要 (`project/`)
 
 | ファイル | 内容 |
 | --- | --- |
-| [機能概要.md](機能概要.md) | システム全体の機能マップと各機能の説明 |
-| [セキュリティ対策.md](セキュリティ対策.md) | 認証・暗号化・インフラ・アプリ・CI/CDのセキュリティ対策 |
-| [自社開発_タスク_機能一覧.md](自社開発_タスク_機能一覧.md) | POC開発計画と実装状況（全16機能） |
-| [コスト比較_DXECO_vs_自社開発.md](コスト比較_DXECO_vs_自社開発.md) | DXECO vs 自社開発のコスト比較 |
-| [デクセコ_調査レポート_.md](デクセコ_調査レポート_.md) | DXECO製品の調査レポート |
+| [機能概要.md](project/機能概要.md) | システム全体の機能マップと各機能の説明 |
+| [セキュリティ対策.md](project/セキュリティ対策.md) | 認証・暗号化・インフラ・アプリ・CI/CDのセキュリティ対策 |
+| [自社開発_タスク_機能一覧.md](project/自社開発_タスク_機能一覧.md) | POC開発計画と実装状況（全16機能） |
 
-## 運用ガイド
+## ガイド・手順書 (`guides/`)
 
 | ファイル | 対象者 | 内容 |
 | --- | --- | --- |
-| [user-guide.md](user-guide.md) | 全ユーザー | 画面操作・ロール別ガイド・POCトライアル手順 |
-| [operations.md](operations.md) | 開発者 | 開発フロー・TDD・CI/CD・テスト戦略・DB操作 |
-| [environment-setup.md](environment-setup.md) | 開発者 | 環境変数・Entra ID SSO・Graph API・Teams Webhook・SMTP設定 |
+| [user-guide.md](guides/user-guide.md) | 全ユーザー | 画面操作・ロール別ガイド・POCトライアル手順 |
+| [operations.md](guides/operations.md) | 開発者 | 開発フロー・TDD・CI/CD・テスト戦略・DB操作 |
+| [environment-setup.md](guides/environment-setup.md) | 開発者 | 環境変数・Entra ID SSO・Graph API・Teams Webhook・SMTP設定 |
+| [社内開発ガイドライン.md](guides/社内開発ガイドライン.md) | 開発者 | 社内開発の方針・ルール |
+| [社内開発セキュリティガイドライン.md](guides/社内開発セキュリティガイドライン.md) | 開発者 | 社内開発におけるセキュリティガイドライン |
 
 ## 機能仕様 (`features/`)
 
@@ -37,17 +37,29 @@
 | 13 | [contract_renewal_alert](features/13_contract_renewal_alert.md) | 契約更新アラート |
 | 14 | [cost_visualization](features/14_cost_visualization.md) | コスト可視化 |
 | 15 | [csv_export](features/15_csv_export.md) | CSVエクスポート |
-| 16 | [entra_account_sync](features/16_entra_account_sync.md) | SaaSアカウント同期 |
+| 16 | [entra_account_sync](features/16_entra_account_sync.md) | SaaSアカウント同期（グループ限定同期含む） |
+| 17 | [saas_security_management](features/17_saas_security_management.md) | SaaSセキュリティ管理 |
 
 ## 実装計画 (`plans/`)
 
-機能実装時のTDD計画書。チェックリスト付き。
+未着手・進行中のTDD計画書。完了済みの計画書は features/ に集約済み。
+
+| ファイル | 内容 | 状態 |
+| --- | --- | --- |
+| [remaining_tasks.md](plans/remaining_tasks.md) | 残タスク一覧（実装状況） | — |
+| [owasp_zap_scan.md](plans/owasp_zap_scan.md) | OWASP ZAP 脆弱性診断導入 | 未着手 |
+| [password_management_improvement.md](plans/password_management_improvement.md) | パスワード管理改善 | 未着手 |
+| [error_monitoring.md](plans/error_monitoring.md) | エラー監視（アプリ層完了、インフラ層未完） | 進行中 |
+| [refactoring.md](plans/refactoring.md) | リファクタリング（14/17完了） | 進行中 |
+
+## プレゼン資料 (`presentation/`)
 
 | ファイル | 内容 |
 | --- | --- |
-| [remaining_tasks.md](plans/remaining_tasks.md) | 残タスク一覧（実装状況） |
-| phase1〜4 | フェーズ別実装計画 |
-| 各機能計画書 | 個別機能のTDD実装計画 |
+| [slides.md](presentation/slides.md) | Marpスライド |
+| [slides.pptx](presentation/slides.pptx) | PowerPointスライド |
+| [screenshots_guide.md](presentation/screenshots_guide.md) | 画面説明書（上長提出用） |
+| `screenshots/` | 画面キャプチャ画像 |
 
 ## インフラ (`infra/`)
 
