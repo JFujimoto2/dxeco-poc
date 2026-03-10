@@ -40,8 +40,13 @@ Rails.application.configure do
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
-  # Preview emails in browser via letter_opener_web
-  config.action_mailer.delivery_method = :letter_opener_web
+  # Entra ID設定がある場合はGraph APIで実際に送信、なければletter_opener_webでプレビュー
+  if ENV["ENTRA_CLIENT_ID"].present?
+    config.action_mailer.delivery_method = :graph_api
+    config.action_mailer.raise_delivery_errors = true
+  else
+    config.action_mailer.delivery_method = :letter_opener_web
+  end
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

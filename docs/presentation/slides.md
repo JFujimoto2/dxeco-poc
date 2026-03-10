@@ -260,7 +260,7 @@ style: |
 | Container Apps（月1回起動） | ~¥100 |
 | Key Vault / VNet / Monitor | ほぼ¥0 |
 | SSL証明書 | ¥0 |
-| メール送信（Exchange Online SMTP） | ¥0（E5に含まれる） |
+| メール送信（Microsoft Graph API） | ¥0（E5に含まれる） |
 | **合計** | **約¥4,650〜6,000** |
 
 > コストの95%以上はPostgreSQL（¥3,750）とACR（¥750）の固定費。
@@ -314,7 +314,7 @@ style: |
 | セキュリティ | 最低限 | **VNet + Key Vault + 監視** |
 | コンテナ | min 0（手動） | **min 0 + CRONで月次バッチ自動実行** |
 | DB | 個人サブスクリプション | **会社サブスクリプション（常時起動）** |
-| メール | 未設定 | **Exchange Online SMTP（E5に含まれる）** |
+| メール | 未設定 | **Microsoft Graph API（E5に含まれる）** |
 | 開発環境 | Azure上 | **ローカル Docker Compose** |
 
 ---
