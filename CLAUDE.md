@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## プロジェクト概要
 
 SaaS（約260件）のアカウントを一元管理するWebアプリケーション（POC）。
-DXECO（年204万円）の代替として自社開発の実証。
+外部SaaS（年204万円）の代替として自社開発の実証。
 
 **技術スタック:** Ruby 4.0.1 / Rails 8.1.2 / PostgreSQL / Bootstrap 5 / Entra ID SSO (OIDC) / Hotwire / Solid Queue
 
