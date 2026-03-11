@@ -70,7 +70,7 @@ RSpec.describe GraphApiDelivery do
         to      "user@example.com"
         subject "テスト"
         content_type "text/html"
-        body    "<p>テスト</p>"
+        body "<p>テスト</p>"
       end
       stub_request(:post, /sendMail/).to_return(status: 202, body: "")
 
