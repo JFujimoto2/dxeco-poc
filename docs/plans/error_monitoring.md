@@ -100,13 +100,17 @@ az monitor metrics alert create \
 - [x] RSpec テスト作成（6件）
 - [ ] 本番環境変数に `TEAMS_WEBHOOK_ERROR_URL` 設定
 
-### インフラ層
+### インフラ層（→ 詳細は `docs/plans/azure_monitoring.md` に統合）
+- [ ] Log Analytics ワークスペース作成
+- [ ] 診断設定の作成（コンテナログ + メトリクス → Log Analytics）
 - [ ] Azure Monitor Action Group 作成
 - [ ] コンテナ再起動アラートルール作成
+- [ ] CPU/メモリ アラートルール作成
 
 ### ドキュメント
+- [x] 監視設計計画書: `docs/plans/azure_monitoring.md`
+- [x] `インフラ構成.md` 更新（監視セクション・コスト・運用手順追記）
 - [ ] `docs/features/` にドキュメント追加
-- [ ] `インフラ構成.md` 更新
 
 ---
 
