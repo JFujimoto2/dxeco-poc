@@ -64,18 +64,20 @@
 
 ## 技術設計
 
-### SMTP設定（環境変数）
+### メール送信方式（Microsoft Graph API）
+
+Security Defaults が有効なテナントでは SMTP AUTH が使えないため、Microsoft Graph API (`/v1.0/users/{sender}/sendMail`) でメール送信する。
 
 | 変数名 | 用途 | 例 |
 |--------|------|-----|
-| `SMTP_ADDRESS` | SMTPサーバー | `smtp.office365.com` |
-| `SMTP_PORT` | ポート | `587` |
-| `SMTP_USERNAME` | ユーザー名 | `noreply@example.com` |
-| `SMTP_PASSWORD` | パスワード | `xxxxxxxxxx` |
-| `SMTP_DOMAIN` | HELOドメイン | `example.com` |
-| `MAILER_FROM` | 送信元アドレス | `noreply@example.com` |
+| `ENTRA_CLIENT_ID` | Entra ID クライアントID | （Entra ID連携と共通） |
+| `ENTRA_CLIENT_SECRET` | Entra ID シークレット | （Entra ID連携と共通） |
+| `ENTRA_TENANT_ID` | テナントID | （Entra ID連携と共通） |
+| `MAILER_FROM` | 送信元アドレス | `saas-mgmt@example.com` |
 
-未設定の場合はメール通知をスキップ（Teams通知と同じパターン）。
+- Entra ID アプリに `Mail.Send` アプリケーション権限 + Admin Consent が必要
+- `MAILER_FROM` のアドレスはテナント内に存在するメールボックス（共有メールボックス可）であること
+- 開発環境: `ENTRA_CLIENT_ID` 未設定時は `letter_opener_web` でプレビュー
 
 ### ファイル構成
 
@@ -98,8 +100,8 @@ app/views/
     └── reminder.html.erb
 
 config/environments/
-├── development.rb              # letter_opener で開発確認
-└── production.rb               # SMTP設定
+├── development.rb              # Entra ID設定時はGraph API、未設定時はletter_opener
+└── production.rb               # Graph API で送信
 
 spec/mailers/
 ├── task_mailer_spec.rb
@@ -129,9 +131,9 @@ SurveyMailer.distribution(survey).deliver_later
 
 ### 環境構築
 - [x] `letter_opener` gem 追加（development用）
-- [x] SMTP 環境変数の設定（config/environments/production.rb）
+- [x] Graph API delivery method 実装（lib/graph_api_delivery.rb）
 - [x] ApplicationMailer の from アドレスを環境変数化
-- [x] `.env.example` に SMTP 関連変数を追加
+- [x] Entra ID アプリに Mail.Send 権限追加
 
 ### Mailer 実装
 - [x] TaskMailer（アサイン通知 + CC: 部署manager, タスク作成者）
@@ -157,6 +159,6 @@ SurveyMailer.distribution(survey).deliver_later
 - [x] 全177テスト パス確認
 
 ### ドキュメント
-- [x] docs/environment-setup.md に SMTP 設定手順を追記
+- [x] docs 更新（SMTP → Graph API）
 - [x] docs/features/05_survey.md 更新
 - [x] .env.example 更新
