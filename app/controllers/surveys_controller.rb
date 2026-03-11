@@ -38,9 +38,8 @@ class SurveysController < ApplicationController
         responded: @survey.survey_responses.responded.count,
         not_using: @survey.survey_responses.not_using.count
       }
-    else
-      @my_responses = @survey.survey_responses.where(user: current_user).includes(saas_account: :saas)
     end
+    @my_responses = @survey.survey_responses.where(user: current_user).includes(saas_account: :saas)
   end
 
   def activate
