@@ -1,7 +1,7 @@
 # SaaS管理ツール POC (dxeco-poc)
 
 組織内で利用しているSaaS（約260件）のアカウントを一元管理するWebアプリケーション。
-DXECO（年204万円）の代替として自社開発で現場課題を解決できることを実証するPOC。
+外部SaaS（年204万円）の代替として自社開発で現場課題を解決できることを実証するPOC。
 
 ## 技術スタック
 
@@ -175,7 +175,7 @@ RAILS_ENV=test bin/rails assets:precompile
 ### インフラ・デプロイ
 
 - **[インフラ構成](infra/インフラ構成.md)** - Azure Container Apps 構成・セットアップ手順・運用
-- **[コスト比較](docs/コスト比較_DXECO_vs_自社開発.md)** - DXECO vs 自社開発のコスト比較
+- **[コスト比較](docs/コスト比較_外部SaaS_vs_自社開発.md)** - 外部SaaS vs 自社開発のコスト比較
 
 ### 機能ドキュメント
 
@@ -195,7 +195,7 @@ RAILS_ENV=test bin/rails assets:precompile
 
 - **[バッチ処理設計](docs/バッチ処理設計.md)**
 - **[認証方式の実装方針](docs/認証方式の実装方針.md)**
-- **[DXECO 調査レポート](docs/デクセコ_調査レポート_.md)**
+- **[外部SaaS 調査レポート](docs/デクセコ_調査レポート_.md)**
 - **[機能一覧](docs/自社開発_タスク_機能一覧.md)**
 - **[運用ルール](docs/運用ルール.md)**
 

@@ -142,9 +142,11 @@
     </div>
   <% end %>
 
-<% else %>
-  <%# 一般ユーザー: 回答フォーム %>
-  <div class="card">
+<% end %>
+
+<% if @my_responses.present? %>
+  <%# 回答フォーム（全ロール共通） %>
+  <div class="card<%= ' mt-4' if current_user.admin? %>">
     <div class="card-header"><h6 class="mb-0">あなたのSaaSアカウント</h6></div>
     <div class="card-body p-0">
       <table class="table mb-0">
